@@ -1,0 +1,28 @@
+.char-toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+
+    .pill {
+        padding: 7px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid var(--paper-dim);
+        background: var(--paper-card);
+        color: var(--ink-soft);
+    }
+
+    .active {
+        background: var(--ink);
+        color: var(--paper-card);
+        border-color: var(--ink);
+    }
+}
+
+.char-grid {
+    display: grid;
+    grid-template-columns: repeat(6,1fr);
+    gap: 12px;
+}
