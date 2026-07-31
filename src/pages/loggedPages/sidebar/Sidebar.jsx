@@ -10,7 +10,7 @@ const Sidebar = () => {
     const location = useLocation();
 
     const dataPages = [
-        {id: 1, name: "Trang chủ", navi: "/", icon: "RiHome2Line"},
+        {id: 1, name: "Trang chủ", navi: "/home", icon: "RiHome2Line"},
         {id: 2, name: "Bài học", navi: "/lessons", icon: "RiBook2Line"},
         {id: 3, name: "Luyện viết AI", navi: "/practice", icon: "RiPencilAi2Line"},
         {id: 4, name: "Tiến độ", navi: "/progress", icon: "RiBarChart2Line"},
@@ -49,7 +49,7 @@ const Sidebar = () => {
                 })}
             </div>
 
-            <div className="sidebar-foot">
+            <div className="sidebar-foot" style={{cursor: "pointer"}} onClick={() => navigate("/auth")}>
                 <div className="avatar">TM</div>
 
                 <div>

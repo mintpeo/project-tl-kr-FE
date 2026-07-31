@@ -1,0 +1,47 @@
+.cta-section {
+    padding: 70px 40px;
+    max-width: 1180px;
+    margin: 0 auto;
+
+    .cta-card {
+        background: linear-gradient(135deg, var(--celadon-dark), var(--celadon));
+        border-radius: 24px;
+        padding: 56px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        color: #fff;
+
+        h2 {
+            color: #fff;
+            font-size: 28px;
+            margin: 0 0 12px;
+            position: relative;
+        }
+
+        p {
+            color: rgba(255,255,255,0.82);
+            font-size: 14px;
+            margin: 0 0 26px;
+            position: relative;
+        }
+
+        .ghost-char {
+            position: absolute;
+            font-family: 'Noto Serif KR',serif;
+            font-size: 280px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.06);
+            right: -30px;
+            top: -60px;
+            line-height: 1;
+        }
+
+        .cta-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            position: relative;
+        }
+    }
+}

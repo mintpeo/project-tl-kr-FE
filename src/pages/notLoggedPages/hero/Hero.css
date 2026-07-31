@@ -1,0 +1,236 @@
+.hero {
+    padding: 70px 40px 40px;
+    max-width: 1180px;
+    margin: 0 auto;
+
+    h1 {
+        font-size: 42px;
+        line-height: 1.22;
+        margin: 0 0 18px;
+
+        .accent {
+            color: var(--celadon-dark);
+        }
+    }
+
+    p {
+        .lead {
+            font-size: 16px;
+            color: var(--ink-soft);
+            line-height: 1.7;
+            max-width: 460px;
+            margin: 0 0 28px;
+        }
+    }
+
+    .hero-grid {
+        display: grid;
+        grid-template-columns: 1fr 0.9fr;
+        gap: 50px;
+        align-items: center;
+
+        .eyebrow-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--celadon-dark);
+            background: var(--celadon-light);
+            padding: 6px 13px;
+            border-radius: 20px;
+            margin-bottom: 18px;
+
+            svg {
+                width: 13px;
+                height: 13px;
+                stroke: currentColor;
+                fill: none;
+                stroke-width: 2;
+            }
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .trust-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 13px;
+            color: var(--ink-soft);
+
+            .avatar-stack {
+                display: flex;
+
+                span {
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 50%;
+                    border: 2px solid var(--paper);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 10px;
+                    font-weight: 700;
+                    color: #fff;
+                    margin-left: -8px;
+                    font-family: 'Noto Serif KR',serif;
+
+                    &:first-child {
+                        margin-left: 0;
+                    }
+                }
+            }
+        }
+
+        .hero-visual {
+            position: relative;
+
+            .floating-streak {
+                position: absolute;
+                top: -16px;
+                left: -16px;
+                background: #fff;
+                border-radius: 14px;
+                padding: 10px 14px;
+                box-shadow: 0 14px 32px rgba(0,0,0,0.14);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+
+                .dot {
+                    width: 9px;
+                    height: 9px;
+                    border-radius: 50%;
+                    background: var(--gold);
+                }
+
+                span {
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: var(--ink);
+                }
+            }
+
+            .hero-card {
+                background: var(--paper-card);
+                border: 1px solid var(--paper-dim);
+                border-radius: 20px;
+                padding: 22px;
+                box-shadow: 0 20px 50px rgba(63,94,69,0.12);
+
+                .hero-card-top {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 16px;
+
+                    p {
+                        margin: 0;
+                        font-size: 12px;
+                        color: var(--ink-soft);
+                    }
+
+                    .char-badge {
+                        font-family: 'Noto Serif KR',serif;
+                        font-weight: 700;
+                        font-size: 13px;
+                        color: var(--celadon-dark);
+                        background: var(--celadon-light);
+                        padding: 4px 10px;
+                        border-radius: 20px;
+                    }
+                }
+
+                .hero-canvas {
+                    position: relative;
+                    aspect-ratio: 1/1;
+                    border-radius: 14px;
+                    background: var(--paper);
+                    border: 1px dashed var(--paper-dim);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    overflow: hidden;
+
+                    .ghost {
+                        font-family: 'Noto Serif KR',serif;
+                        font-size: 150px;
+                        font-weight: 700;
+                        color: var(--paper-dim);
+                    }
+
+                    svg {
+                        .stroke-demo {
+                            position: absolute;
+                            inset: 0;
+                            width: 100%;
+                            height: 100%;
+                        }
+                    }
+                }
+            }
+
+            .floating-score {
+                position: absolute;
+                bottom: -18px;
+                right: -18px;
+                background: #fff;
+                border-radius: 14px;
+                padding: 14px 18px;
+                box-shadow: 0 14px 32px rgba(0,0,0,0.14);
+                text-align: center;
+                min-width: 110px;
+
+                .num {
+                    font-family: 'Noto Serif KR',serif;
+                    font-size: 24px;
+                    font-weight: 700;
+                    color: var(--celadon-dark);
+                }
+
+                .lbl {
+                    font-size: 10px;
+                    color: var(--ink-soft);
+                    margin-top: 2px;
+                }
+            }
+        }
+    }
+}
+
+.stats-strip {
+    border-top: 1px solid var(--paper-dim);
+    border-bottom: 1px solid var(--paper-dim);
+    margin-top: 50px;
+
+    .stats-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 26px 40px;
+        max-width: 1180px;
+        margin: 0 auto;
+
+        .stat-block {
+            text-align: center;
+            flex: 1;
+
+            .num {
+                font-family: 'Noto Serif KR',serif;
+                font-size: 26px;
+                font-weight: 700;
+                color: var(--ink);
+            }
+
+            .lbl {
+                font-size: 12px;
+                color: var(--ink-soft);
+                margin-top: 3px;
+            }
+        }
+    }
+}

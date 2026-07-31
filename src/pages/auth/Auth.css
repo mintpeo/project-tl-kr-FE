@@ -1,0 +1,151 @@
+.auth-shell {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+
+    /* ---------- LEFT BRAND PANEL ---------- */
+    .brand-panel {
+        background: var(--celadon-dark);
+        background: linear-gradient(160deg, var(--celadon-dark) 0%, var(--celadon) 100%);
+        color: #fff;
+        padding: 48px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+
+        .ghost-char {
+            position: absolute;
+            right: -60px; bottom: -70px;
+            font-family: 'Noto Serif KR',serif;
+            font-size: 460px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.07);
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        .brand-mark-row {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            position: relative;
+            z-index: 1;
+            width: fit-content;
+
+            .brand-mark {
+                width: 40px;
+                height: 40px;
+                border-radius: 11px;
+                background: rgba(255,255,255,0.16);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: 'Noto Serif KR',serif;
+                font-size: 20px;
+                font-weight: 700;
+            }
+
+            .brand-name {
+                font-family: 'Noto Serif KR',serif;
+                font-size: 20px;
+                font-weight: 700;
+            }
+
+            .brand-sub {
+                font-size: 12px;
+                color: rgba(255,255,255,0.75);
+                margin-top: 1px;
+            }
+        }
+
+        .brand-copy {
+            position: relative;
+            z-index: 1;
+            max-width: 380px;
+
+            h1 {
+                font-size: 32px;
+                color: #fff;
+                line-height: 1.25;
+                margin: 0 0 14px;
+            }
+
+            p {
+                font-size: 15px;
+                color: rgba(255,255,255,0.82);
+                line-height: 1.65;
+                margin: 0;
+            }
+        }
+
+        .feature-list {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+
+            .feature-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-size: 14px;
+                color: rgba(255,255,255,0.92);
+
+                .feature-icon {
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 8px;
+                    background: rgba(255,255,255,0.14);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-shrink: 0;
+                }
+            }
+        }
+    }
+
+    /* ---------- RIGHT FORM PANEL ---------- */
+    .form-panel {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+
+        .form-card {
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .auth-toggle {
+            display: flex;
+            background: var(--paper-card);
+            border: 1px solid var(--paper-dim);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 30px;
+
+            button {
+                flex: 1;
+                border: none;
+                background: transparent;
+                padding: 9px 0;
+                border-radius: 9px;
+                font-size: 14px;
+                font-weight: 600;
+                color: var(--ink-soft);
+                cursor: pointer;
+                font-family: 'Be Vietnam Pro',sans-serif;
+                transition: background .15s ease, color .15s ease;
+            }
+
+            .active {
+                background: var(--ink);
+                color: var(--paper-card);
+            }
+        }
+    }
+}

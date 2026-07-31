@@ -1,0 +1,7 @@
+@media (max-width:900px){
+    .hero-grid{grid-template-columns:1fr;}
+    .feature-grid,.steps-grid{grid-template-columns:1fr;gap:28px;}
+    .step-connector{display:none;}
+    .nav-links{display:none;}
+    .stats-row{flex-wrap:wrap;gap:20px;}
+}
