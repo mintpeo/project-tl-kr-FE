@@ -1,0 +1,25 @@
+.footer {
+    border-top: 1px solid var(--paper-dim);
+    padding: 36px 40px;
+
+    .footer-row {
+        max-width: 1180px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        color: var(--ink-soft);
+
+        .footer-links {
+            display: flex;
+            gap: 22px;
+
+            a {
+                &:hover {
+                    color: var(--ink);
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,28 @@
+.gs-btn-spinner {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    animation: gs-spin .7s linear infinite;
+    display: none;
+}
+
+.btn-ghost {
+    .gs-btn-spinner {
+        border: 2px solid var(--paper-dim);
+        border-top-color: var(--celadon-dark);
+    }
+}
+
+.gs-btn-loading {
+    pointer-events: none;
+
+    .gs-btn-spinner {
+        display: inline-block;
+    }
+
+    .gs-btn-label {
+        opacity: .55;
+    }
+}

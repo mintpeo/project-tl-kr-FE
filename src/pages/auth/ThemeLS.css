@@ -1,0 +1,180 @@
+.panel-form {
+    display: none;
+
+    .form-head {
+        margin-bottom: 26px;
+
+        h2 {
+            font-size: 23px;
+            margin: 0 0 6px;
+        }
+
+        p {
+            font-size: 14px;
+            color: var(--ink-soft);
+            margin: 0;
+        }
+    }
+
+    .field {
+        margin-bottom: 16px;
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 6px;
+        }
+
+        .input-wrap {
+            position: relative;
+
+            svg{
+                position: absolute;left: 13px;top: 50%;transform: translateY(-50%);
+                width: 16px;height: 16px;stroke: var(--ink-soft);fill: none;stroke-width: 1.8;pointer-events: none;
+            }
+
+            input {
+                width: 100%;
+                padding: 11px 14px 11px 38px;
+                border-radius: 10px;
+                border: 1px solid var(--paper-dim);
+                background: var(--paper-card);
+                font-size: 14px;
+                color: var(--ink);
+                font-family: 'Be Vietnam Pro',sans-serif;
+                outline: none;
+                transition: border-color .15s ease;
+
+                &:focus {
+                    border-color: var(--celadon);
+                }
+            }
+
+            .toggle-eye {
+                left: auto;
+                right: 13px;
+                cursor: pointer;
+                pointer-events: all;
+            }
+        }
+    }
+
+    .field-row {
+        display: flex;
+        gap: 12px;
+
+        .field {
+            flex: 1;
+        }
+    }
+
+    .row-between {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+        font-size: 13px;
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--ink-soft);
+
+            input {
+                width: 15px;
+                height: 15px;
+                accent-color: var(--celadon-dark);
+            }
+
+            .terms-line {
+                font-size: 12px;
+                color: var(--ink-soft);
+                line-height: 1.5;
+            }
+        }
+
+        .link {
+            color: var(--celadon-dark);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    }
+
+    .btn {
+        width: 100%;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 14px;
+        font-weight: 700;
+        font-family: 'Be Vietnam Pro',sans-serif;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: var(--celadon-dark);
+        color: #fff;
+
+        &:hover {
+            background: #324c37;
+        }
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 22px 0;
+        color: var(--ink-soft);
+        font-size: 12px;
+    }
+
+    .btn-google {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        border: 1px solid var(--paper-dim);
+        background: var(--paper-card);
+        border-radius: 10px;
+        padding: 11px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ink);
+        cursor: pointer;
+        font-family: 'Be Vietnam Pro',sans-serif;
+
+        &:before, &:after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--paper-dim);
+        }
+
+        &:hover {
+            border-color: var(--celadon);
+        }
+
+        svg {
+            width: 17px;
+            height: 17px;
+            flex-shrink: 0;
+        }
+    }
+
+    .switch-line {
+        text-align: center;
+        margin-top: 24px;
+        font-size: 13px;
+        color: var(--ink-soft);
+    }
+}
+
+.active {
+    display: block;
+}

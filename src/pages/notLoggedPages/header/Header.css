@@ -1,0 +1,63 @@
+.header {
+    position: sticky;
+    top: 0;
+    background: rgba(238,241,234,0.9);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--paper-dim);
+    z-index: 50;
+
+    .nav-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 40px;
+        max-width: 1180px;
+        margin: 0 auto;
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            .brand-mark {
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+                background: var(--celadon);
+                color: var(--paper-card);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: 'Noto Serif KR',serif;
+                font-size: 18px;
+                font-weight: 700;
+            }
+
+            .brand-name {
+                font-family: 'Noto Serif KR',serif;
+                font-size: 18px;
+                font-weight: 700;
+            }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink-soft);
+
+            a {
+                &:hover {
+                    color: var(--ink);
+                }
+            }
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+    }
+}

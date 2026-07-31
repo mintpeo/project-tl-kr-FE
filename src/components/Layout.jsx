@@ -2,7 +2,7 @@ import React from 'react';
 import {Outlet} from'react-router-dom';
 
 // import Pages
-import Sidebar from "../pages/sidebar/Sidebar.jsx";
+import Sidebar from "../pages/loggedPages/sidebar/Sidebar.jsx";
 
 const Layout = () => {
     return (
