@@ -1,13 +1,23 @@
-import React from 'react';
+import React, {useRef, useState} from 'react';
 import './Sidebar.css';
 import {useLocation, useNavigate} from "react-router-dom";
 
 // import Icons
-import { RiHome2Line, RiBook2Line, RiPencilAi2Line, RiBarChart2Line } from "react-icons/ri";
+import {
+    RiHome2Line,
+    RiBook2Line,
+    RiPencilAi2Line,
+    RiBarChart2Line,
+    RiUser3Line,
+    RiSettings3Line,
+    RiLogoutCircleRLine
+} from "react-icons/ri";
 
 const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
+
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const dataPages = [
         {id: 1, name: "Trang chủ", navi: "/home", icon: "RiHome2Line"},
@@ -22,6 +32,11 @@ const Sidebar = () => {
         RiPencilAi2Line: RiPencilAi2Line,
         RiBarChart2Line: RiBarChart2Line,
     };
+
+    const handleLogout = () => {
+        localStorage.clear();
+        window.location.reload();
+    }
 
     return (
         <div className="sidebar">
@@ -49,12 +64,44 @@ const Sidebar = () => {
                 })}
             </div>
 
-            <div className="sidebar-foot" style={{cursor: "pointer"}} onClick={() => navigate("/auth")}>
-                <div className="avatar">TM</div>
+            <div className="sidebar-foot-wrapper" onMouseLeave={() => setIsMenuOpen(false)}>
+                {isMenuOpen && (
+                    <div className="user-dropdown-menu">
+                        <button
+                            className="menu-item"
+                            // onClick={() => handleNavigate("/profile")}
+                        >
+                            <RiUser3Line size={18} />
+                            <span>Thông tin cá nhân</span>
+                        </button>
 
-                <div>
-                    <div className="name">Trần Quốc Minh</div>
-                    <div className="role">Người học</div>
+                        <button
+                            className="menu-item"
+                            // onClick={() => handleNavigate("/settings")}
+                        >
+                            <RiSettings3Line size={18} />
+                            <span>Cài đặt</span>
+                        </button>
+
+                        <div className="menu-divider"></div>
+
+                        <button
+                            className="menu-item logout"
+                            onClick={handleLogout}
+                        >
+                            <RiLogoutCircleRLine size={18} />
+                            <span>Đăng xuất</span>
+                        </button>
+                    </div>
+                )}
+
+                <div className="sidebar-foot" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                    <div className="avatar">TM</div>
+
+                    <div>
+                        <div className="name">Trần Quốc Minh</div>
+                        <div className="role">Người học</div>
+                    </div>
                 </div>
             </div>
         </div>
