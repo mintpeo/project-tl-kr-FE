@@ -1,9 +1,12 @@
 import React, {useState} from 'react';
-import {API_URL} from "../../components/API_URL.jsx";
+import {API_URL} from "../../../components/API_URL.jsx";
 import './ThemeLS.css'
-import '../../components/loading/BtnSpinner.css';
+import '../../../components/loading/BtnSpinner.css';
+import {useNavigate} from "react-router-dom";
 
 const SignUp = ({isTabLogin}) => {
+    const navigate = useNavigate();
+
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [pass, setPass] = useState("");
@@ -40,7 +43,9 @@ const SignUp = ({isTabLogin}) => {
             const data = await res.json();
             if (data) {
                 setIsLoading(false);
-                alert("Đăng nhập thành công.");
+                navigate("/verify", {
+                    state: { email: email }
+                });
             }
         } catch (e) {
             console.log("Error SignUp Auth", e);
@@ -48,7 +53,9 @@ const SignUp = ({isTabLogin}) => {
     }
 
     return (
-        <form className={`panel-form ${!isTabLogin ? `active` : ``}`} onSubmit={handleSignUp}>
+        <form className={`panel-form ${!isTabLogin ? `active` : ``}`}
+              onSubmit={handleSignUp}
+        >
             <div className="form-head">
                 <h2>Tạo tài khoản mới</h2>
                 <p>Bắt đầu học Hangul cùng trợ lý AI ngay hôm nay.</p>
@@ -117,7 +124,9 @@ const SignUp = ({isTabLogin}) => {
                 </label>
             </div>
 
-            <button className={`btn btn-primary ${isLoading ? `gs-btn-loading` : ``}`} type="submit" style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+            <button className={`btn btn-primary ${isLoading ? `gs-btn-loading` : ``}`}
+                    type="submit" style={{display: "flex", alignItems: "center", justifyContent: "center"}}
+            >
                 <span className="gs-btn-spinner"></span>
                 <span className="gs-btn-label" style={{marginLeft: '5px'}}>Tạo tài khoản</span>
             </button>

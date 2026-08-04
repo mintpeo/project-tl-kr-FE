@@ -3,8 +3,8 @@ import {useNavigate} from "react-router-dom";
 import './Auth.css';
 
 // import Pages
-import Login from "./Login.jsx";
-import SignUp from "./SignUp.jsx";
+import Login from "./loginSign/Login.jsx";
+import SignUp from "./loginSign/SignUp.jsx";
 
 // import Icons
 import { RiBook2Line, RiPencilAi2Line, RiBarChart2Line } from "react-icons/ri";

@@ -1,9 +1,10 @@
 .sidebar {
     width: 236px;
-    display: flex;
+    flex-shrink: 0;
     padding: 28px 18px;
+    display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 26px;
     border-right: 1px solid var(--paper-dim);
 
     .brand {
@@ -39,6 +40,16 @@
         }
     }
 
+    .nav-group-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: var(--ink-soft);
+        font-weight: 700;
+        padding: 0 12px;
+        margin: 4px 0 2px;
+    }
+
     .nav {
         display: flex;
         flex-direction: column;
@@ -50,7 +61,7 @@
             gap: 11px;
             padding: 10px 12px;
             border-radius: 10px;
-            font-size: 15px;
+            font-size: 14px;
             color: var(--ink-soft);
             cursor: pointer;
             border: none;
@@ -61,9 +72,10 @@
             transition: background .15s ease, color .15s ease;
 
             svg {
-                width: 18px;
-                height: 18px;
+                width: 17px;
+                height: 17px;
                 flex-shrink: 0;
+                stroke: currentColor;
             }
 
             &:hover {
@@ -79,12 +91,8 @@
         }
     }
 
-    .sidebar-foot-wrapper {
-        margin-top: auto;
-        position: relative;
-    }
-
     .sidebar-foot {
+        margin-top: auto;
         display: flex;
         align-items: center;
         gap: 10px;
@@ -92,12 +100,6 @@
         border-radius: 10px;
         background: var(--paper-card);
         border: 1px solid var(--paper-dim);
-        cursor: pointer;
-        transition: background 0.15s ease;
-
-        &:hover {
-            background: var(--paper-dim);
-        }
 
         .avatar {
             width: 32px;
@@ -108,104 +110,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 600;
             font-family: 'Noto Serif KR', serif;
             flex-shrink: 0;
         }
 
-        .user-info {
-            flex: 1;
-            overflow: hidden;
-        }
-
         .name {
             font-size: 13px;
             font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         .role {
             font-size: 11px;
             color: var(--ink-soft);
         }
-
-        .more-icon {
-            color: var(--ink-soft);
-            flex-shrink: 0;
-        }
-    }
-
-    .user-dropdown-menu {
-        position: absolute;
-        bottom: 100%;
-        left: 0;
-        width: 100%;
-        background: var(--paper-card);
-        border: 1px solid var(--paper-dim);
-        border-radius: 12px;
-        padding: 6px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        z-index: 100;
-        animation: fadeIn 0.15s ease-in-out;
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 10px;
-            border: none;
-            background: transparent;
-            border-radius: 8px;
-            font-size: 13px;
-            color: var(--ink);
-            font-family: 'Be Vietnam Pro', sans-serif;
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-            transition: background 0.15s ease;
-
-            svg {
-                color: var(--ink-soft);
-            }
-
-            &:hover {
-                background: var(--paper-dim);
-            }
-
-            &.logout {
-                color: var(--plum);
-
-                svg {
-                    color: var(--plum);
-                }
-
-                &:hover {
-                    background: var(--plum-light);
-                }
-            }
-        }
-
-        .menu-divider {
-            height: 1px;
-            background: var(--paper-dim);
-            margin: 4px 0;
-        }
-    }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(6px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
     }
 }

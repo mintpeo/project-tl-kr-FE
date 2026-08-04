@@ -67,6 +67,12 @@ a {
     &:hover {
         background: #324c37;
     }
+
+    &:disabled {
+        background: var(--paper-dim);
+        color: var(--ink-soft);
+        cursor: not-allowed;
+    }
 }
 
 .btn-ghost {

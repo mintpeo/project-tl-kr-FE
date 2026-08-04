@@ -1,0 +1,166 @@
+.container {
+    display: flex;
+    justify-content: center;
+    margin-top: 10vh;
+
+    .auth-card {
+        width: 100%;
+        max-width: 400px;
+        background: var(--paper-card);
+        border: 1px solid var(--paper-dim);
+        border-radius: 20px;
+        padding: 40px 36px;
+        text-align: center;
+        box-shadow: 0 20px 50px rgba(63,94,69,0.08);
+        align-content: center;
+
+        .mail-icon {
+            width: 62px;
+            height: 62px;
+            border-radius: 16px;
+            background: var(--celadon-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 22px;
+
+            svg {
+                width: 28px;
+                height: 28px;
+                stroke: var(--celadon-dark);
+                fill: none;stroke-width: 1.7;
+            }
+        }
+
+        h1 {
+            font-size: 22px;
+            margin: 0 0 10px;
+        }
+
+        .desc {
+            font-size: 14px;
+            color: var(--ink-soft);
+            line-height: 1.65;
+            margin: 0 0 4px;
+
+            .email {
+                font-weight: 700;
+                color: var(--ink);
+            }
+        }
+
+        .change-email {
+            font-size: 13px;
+            color: var(--celadon-dark);
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0 0 30px;
+            display: inline-block;
+        }
+
+        .otp-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 22px;
+
+            .otp-box {
+                width: 58px;
+                height: 64px;
+                border-radius: 12px;
+                border: 2px solid var(--paper-dim);background: var(--paper);
+                font-family: 'Noto Serif KR',serif;
+                font-size: 26px;
+                font-weight: 700;
+                color: var(--ink);
+                text-align: center;
+                outline: none;
+                transition: border-color .15s ease, background .15s ease;
+
+                &:focus {
+                    border-color: var(--celadon);
+                    background: #fff;
+                }
+
+                .filled {
+                    border-color: var(--celadon-dark);
+                    background: var(--celadon-light);
+                }
+
+                .error {
+                    border-color: var(--plum);
+                    background: var(--plum-light);
+                }
+            }
+        }
+
+        .status-line {
+            min-height: 18px;
+            font-size: 13px;
+            margin-bottom: 18px;
+
+            .error {
+                color: var(--plum);
+                font-weight: 600;
+            }
+
+            .success {
+                color: var(--celadon-dark);
+                font-weight: 600;
+            }
+        }
+
+        .btn {
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            cursor: pointer;
+        }
+
+        .resend-row {
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--ink-soft);
+
+            .resend-link {
+                color: var(--celadon-dark);
+                font-weight: 700;
+                cursor: pointer;
+            }
+
+            .disabled {
+                pointer-events: none;
+                opacity: 0.5;
+                color: var(--ink-soft);
+                cursor: not-allowed;
+            }
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 28px;
+            font-size: 13px;
+            color: var(--ink-soft);
+            cursor: pointer;
+            font-weight: 600;
+
+            svg {
+                width: 14px;
+                height: 14px;
+                stroke: currentColor;
+                fill: none;
+                stroke-width: 2;
+            }
+
+            &:hover {
+                color: var(--ink);
+            }
+        }
+    }
+}
