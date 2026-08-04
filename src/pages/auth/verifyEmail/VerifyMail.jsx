@@ -1,16 +1,17 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './VerifyMail.css';
 import {useLocation, useNavigate} from "react-router-dom";
-import {usePost} from "../../components/usePost.js";
-import {API_URL} from "../../components/API_URL.jsx";
+import {usePost} from "../../../components/usePost.js";
+import {API_URL} from "../../../components/API_URL.jsx";
 
 const VerifyMail = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const {executePost} = usePost(`${API_URL}/verify/email`);
+    const {executePost: verifyEmail} = usePost(`${API_URL}/verify/email`);
+    const {executePost: resendCode} = usePost(`${API_URL}/verify/resend-code`);
 
     const email = location.state?.email;
-    const [timeSendMail, setTimeSendMail] = useState(5);
+    const [timeSendMail, setTimeSendMail] = useState(30);
     const [code, setCode] = useState(['', '', '', '']);
     const inputRefs = useRef([]);
 
@@ -52,7 +53,7 @@ const VerifyMail = () => {
         }
     };
 
-    const verifyEmail = async (e) => {
+    const sendVerifyEmail = async (e) => {
         e.preventDefault();
 
         const verifyEmailReq = {
@@ -61,16 +62,32 @@ const VerifyMail = () => {
         }
 
         try {
-            const res = await executePost(verifyEmailReq);
-            alert("Success");
+            const data = await verifyEmail(verifyEmailReq);
+            if (data) {
+                alert("Xác minh Mail thành công.");
+                navigate("/auth");
+            }
         } catch (e) {
             console.log("Error Verify Email", e);
         }
     };
 
+    const resendCodeEmail = async () => {
+        setTimeSendMail(30)
+
+        const resendCodeReq = {
+            email: email
+        }
+        try {
+            await resendCode(resendCodeReq);
+        } catch (e) {
+            console.log("Error Resen Code", e);
+        }
+    }
+
     return (
         <div className="container">
-            <form className="auth-card" onSubmit={verifyEmail}>
+            <form className="auth-card" onSubmit={sendVerifyEmail}>
                 <div className="mail-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M4 5h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1z"/>
@@ -80,7 +97,7 @@ const VerifyMail = () => {
 
                 <h1>Xác thực email của bạn</h1>
                 <p className="desc">Mình đã gửi mã gồm 4 chữ số đến</p>
-                <p className="desc" style={{marginBottom: '2px'}}><span className="email">minh.tran@nlu.edu.vn</span></p>
+                <p className="desc" style={{marginBottom: '2px'}}><span className="email">{email}</span></p>
                 <span className="change-email">Nhập sai email? Đổi lại</span>
 
                 <div className="otp-row" id="otpRow" onPaste={handlePaste}>
@@ -109,7 +126,7 @@ const VerifyMail = () => {
 
                 <div className="resend-row">
                     Chưa nhận được mã?
-                    <span className="resend-link disabled" id="resendLink"> Gửi lại (<span id="countdown">{timeSendMail}</span>s)</span>
+                    <span className={`resend-link ${timeSendMail > 0 ? `disabled` : ``}`} id="resendLink" onClick={resendCodeEmail}> Gửi lại (<span id="countdown">{timeSendMail}</span>s)</span>
                 </div>
 
                 <div className="back-link" onClick={() => navigate("/auth")}>

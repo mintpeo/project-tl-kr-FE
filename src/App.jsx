@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import {LOCAL_STORAGE_KEYS} from "./components/API_URL.jsx";
 import './App.css';
@@ -10,14 +10,18 @@ import Home from "./pages/loggedPages/home/Home.jsx";
 import Lesson from "./pages/loggedPages/lesson/Lesson.jsx";
 import Practice from "./pages/loggedPages/practice/Practice.jsx";
 import Progress from "./pages/loggedPages/progress/Progress.jsx";
+import Admin from "./pages/admin/Admin.jsx";
 
 // Not Logged
 import HomeNotLogged from "./pages/notLoggedPages/Home.jsx";
 import Auth from "./pages/auth/Auth.jsx";
-import VerifyMail from "./pages/auth/VerifyMail.jsx";
+import VerifyMail from "./pages/auth/verifyEmail/VerifyMail.jsx";
+import ForgetPass from "./pages/auth/forgetPassword/ForgetPass.jsx";
+import ResetPass from "./pages/auth/forgetPassword/ResetPass.jsx";
 
 function App() {
-    const isLogged = !!localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
+    const userInfo = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
+    const isLogged = !!userInfo;
 
   return (
       <BrowserRouter>
@@ -25,8 +29,10 @@ function App() {
               <Route path="/" element={isLogged ? <Navigate to="/home" replace /> : <HomeNotLogged />} />
               <Route path="/auth" element={isLogged ? <Navigate to="/home" replace /> : <Auth />} />
               <Route path="/verify" element={isLogged ? <Navigate to="/home" replace /> : <VerifyMail />} />
+              <Route path="/forget" element={isLogged ? <Navigate to="/home" replace /> : <ForgetPass />} />
+              <Route path="/reset" element={isLogged ? <Navigate to="/home" replace /> : <ResetPass />} />
 
-              <Route element={<ProtectedRoute />}>
+              <Route element={<ProtectedRoute allowedRoles={['USER']}/>}>
                   <Route element={<Layout />}>
                       <Route path="/home" element={<Home />} />
                       <Route path="/lessons" element={<Lesson />} />
@@ -34,6 +40,12 @@ function App() {
                       <Route path="/progress" element={<Progress />} />
                   </Route>
               </Route>
+
+              <Route element={<ProtectedRoute allowedRoles={['ADMIN']}/>}>
+                  <Route path="/admin" element={<Admin/>}/>
+              </Route>
+
+              <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
       </BrowserRouter>
   )

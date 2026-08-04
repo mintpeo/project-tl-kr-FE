@@ -1,0 +1,129 @@
+.sidebar {
+    width: 236px;
+    flex-shrink: 0;
+    padding: 28px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    border-right: 1px solid var(--paper-dim);
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 6px;
+
+        .brand-mark {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: var(--celadon);
+            color: var(--paper-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Noto Serif KR', serif;
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        .brand-name {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        .brand-sub {
+            font-size: 11px;
+            color: var(--ink-soft);
+            margin-top: 1px;
+        }
+    }
+
+    .nav-group-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: var(--ink-soft);
+        font-weight: 700;
+        padding: 0 12px;
+        margin: 4px 0 2px;
+    }
+
+    .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--ink-soft);
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            text-align: left;
+            width: 100%;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            transition: background .15s ease, color .15s ease;
+
+            svg {
+                width: 17px;
+                height: 17px;
+                flex-shrink: 0;
+                stroke: currentColor;
+            }
+
+            &:hover {
+                background: var(--paper-dim);
+                color: var(--ink);
+            }
+        }
+
+        .active {
+            background: var(--celadon-light);
+            color: var(--celadon-dark);
+            font-weight: 600;
+        }
+    }
+
+    .sidebar-foot {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: var(--paper-card);
+        border: 1px solid var(--paper-dim);
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--plum);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12.5px;
+            font-weight: 600;
+            font-family: 'Noto Serif KR', serif;
+            flex-shrink: 0;
+        }
+
+        .name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .role {
+            font-size: 11px;
+            color: var(--ink-soft);
+        }
+    }
+}

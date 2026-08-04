@@ -1,24 +1,20 @@
 import {useState} from "react";
 
-export const usePost = (url) => {
-    // const [data, setData] = useState(null);
+export const usePatch = (url) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const executePost = async (postData) => {
+    const executePatch = async (patchData) => {
         setLoading(true);
         setError(null);
         try {
             const response = await fetch(url, {
-                method: 'POST',
+                method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(postData),
+                body: JSON.stringify(patchData),
             });
 
             if (!response.ok) throw new Error('Có lỗi xảy ra!');
-
-            // const result = await response.json();
-            // setData(result);
             return await response.json();
         } catch (err) {
             setError(err.message);
@@ -28,5 +24,5 @@ export const usePost = (url) => {
         }
     };
 
-    return { executePost, loading, error };
+    return { executePatch, loading, error };
 };

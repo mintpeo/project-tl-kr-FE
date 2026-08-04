@@ -1,6 +1,7 @@
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import './Sidebar.css';
 import {useLocation, useNavigate} from "react-router-dom";
+import {LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
 
 // import Icons
 import {
@@ -14,6 +15,9 @@ import {
 } from "react-icons/ri";
 
 const Sidebar = () => {
+    const USER_INFO = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
+    const user_info = JSON.parse(USER_INFO);
+
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -96,7 +100,7 @@ const Sidebar = () => {
                 )}
 
                 <div className="sidebar-foot" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                    <div className="avatar">TM</div>
+                    <div className="avatar">{user_info.name.charAt(0)}</div>
 
                     <div>
                         <div className="name">Trần Quốc Minh</div>

@@ -131,6 +131,13 @@
                 font-weight: 700;
                 cursor: pointer;
             }
+
+            .disabled {
+                pointer-events: none;
+                opacity: 0.5;
+                color: var(--ink-soft);
+                cursor: not-allowed;
+            }
         }
 
         .back-link {

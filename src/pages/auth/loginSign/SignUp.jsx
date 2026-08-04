@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
-import {API_URL} from "../../components/API_URL.jsx";
+import {API_URL} from "../../../components/API_URL.jsx";
 import './ThemeLS.css'
-import '../../components/loading/BtnSpinner.css';
+import '../../../components/loading/BtnSpinner.css';
 import {useNavigate} from "react-router-dom";
 
 const SignUp = ({isTabLogin}) => {

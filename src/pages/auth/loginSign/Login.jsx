@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
-import {API_URL, LOCAL_STORAGE_KEYS} from "../../components/API_URL.jsx";
+import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
 import {useNavigate} from "react-router-dom";
 
 import './ThemeLS.css';
-import '../../components/loading/BtnSpinner.css';
+import '../../../components/loading/BtnSpinner.css';
 
 const Login = ({isTabLogin}) => {
     const navigate = useNavigate();
@@ -36,7 +36,9 @@ const Login = ({isTabLogin}) => {
             if (data) {
                 localStorage.setItem(LOCAL_STORAGE_KEYS.USER_INFO, JSON.stringify(data));
                 setIsLoading(false);
-                navigate("/home")
+
+                if (data.role === "USER") navigate("/home");
+                else navigate("/admin")
                 alert("Đăng nhập thành công.");
             }
         } catch (e) {
@@ -84,7 +86,7 @@ const Login = ({isTabLogin}) => {
 
             <div className="row-between">
                 <label className="checkbox-row"><input type="checkbox"/> Ghi nhớ đăng nhập</label>
-                <span className="link">Quên mật khẩu?</span>
+                <span onClick={() => navigate("/forget")} className="link">Quên mật khẩu?</span>
             </div>
 
             <button className={`btn btn-primary ${isLoading ? `gs-btn-loading` : ``}`} type="submit" style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
