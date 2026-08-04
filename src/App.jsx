@@ -18,6 +18,7 @@ import Auth from "./pages/auth/Auth.jsx";
 import VerifyMail from "./pages/auth/verifyEmail/VerifyMail.jsx";
 import ForgetPass from "./pages/auth/forgetPassword/ForgetPass.jsx";
 import ResetPass from "./pages/auth/forgetPassword/ResetPass.jsx";
+import LoginSuc from "./pages/auth/loginGoogle/LoginSuc.jsx";
 
 function App() {
     const userInfo = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
@@ -31,6 +32,7 @@ function App() {
               <Route path="/verify" element={isLogged ? <Navigate to="/home" replace /> : <VerifyMail />} />
               <Route path="/forget" element={isLogged ? <Navigate to="/home" replace /> : <ForgetPass />} />
               <Route path="/reset" element={isLogged ? <Navigate to="/home" replace /> : <ResetPass />} />
+              <Route path="/google" element={isLogged ? <Navigate to="/home" replace /> : <LoginSuc />} />
 
               <Route element={<ProtectedRoute allowedRoles={['USER']}/>}>
                   <Route element={<Layout />}>
@@ -45,7 +47,7 @@ function App() {
                   <Route path="/admin" element={<Admin/>}/>
               </Route>
 
-              <Route path="*" element={<Navigate to="/" replace />} />
+              {/*<Route path="*" element={<Navigate to="/" replace />} />*/}
           </Routes>
       </BrowserRouter>
   )
