@@ -7,8 +7,13 @@ import Skeleton from "../../../components/loading/Skeleton.jsx";
 const LoginSuc = () => {
     const navigate = useNavigate();
     const [countdown, setCountdown] = useState(10);
-    const [loading, setLoading] = useState(false);
-    const [user, setUser] = useState();
+    const [loading, setLoading] = useState(true);
+    const [data, setData] = useState();
+    const user = {
+        name: data?.fullName,
+        email: data?.email,
+        isGoogle: data?.google
+    }
 
     useEffect(() => {
         const loadGoogleUser = async () => {
@@ -22,7 +27,7 @@ const LoginSuc = () => {
                 const data = await res.json();
                 if (data) {
                     localStorage.setItem(LOCAL_STORAGE_KEYS.USER_INFO, JSON.stringify(data));
-                    setUser(data);
+                    setData(data);
                     setLoading(false);
 
                     if (data.role === "ADMIN") navigate("/admin");
@@ -58,7 +63,7 @@ const LoginSuc = () => {
         <div className="container">
             <div className="auth-card">
                 <div className="avatar-wrap">
-                    <div className="avatar-lg">{user?.name.charAt(0)}</div>
+                    <div className="avatar-lg">{user.name.charAt(0)}</div>
 
                     <div className="check-badge">
                         <svg viewBox="0 0 24 24">
@@ -68,7 +73,7 @@ const LoginSuc = () => {
                 </div>
 
                 <h1>Đăng nhập thành công!</h1>
-                <p className="desc">Chào mừng trở lại với 글씨, {user?.name} 👋</p>
+                <p className="desc">Chào mừng trở lại với 글씨, {user.name} 👋</p>
 
                 <span className="google-chip">
                     <svg viewBox="0 0 48 48">
@@ -81,11 +86,11 @@ const LoginSuc = () => {
                 </span>
 
                 <div className="profile-card">
-                    <div className="profile-avatar">{user?.name.charAt(0)}</div>
+                    <div className="profile-avatar">{user.name.charAt(0)}</div>
 
                     <div>
-                        <div className="profile-name">{user?.name}</div>
-                        <div className="profile-email">{user?.email}</div>
+                        <div className="profile-name">{user.name}</div>
+                        <div className="profile-email">{user.email}</div>
                     </div>
                 </div>
 

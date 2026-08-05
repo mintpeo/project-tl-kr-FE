@@ -100,7 +100,7 @@ const Sidebar = () => {
                 )}
 
                 <div className="sidebar-foot" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                    <div className="avatar">{user_info.name.charAt(0)}</div>
+                    <div className="avatar">{user_info.fullName.charAt(0)}</div>
 
                     <div>
                         <div className="name">Trần Quốc Minh</div>
