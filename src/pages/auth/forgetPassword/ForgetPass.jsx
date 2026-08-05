@@ -3,6 +3,7 @@ import './ForgetPass.css';
 import {useNavigate} from "react-router-dom";
 import {API_URL} from "../../../components/API_URL.jsx";
 import {usePost} from "../../../components/usePost.js";
+import BtnSpinner from "../../../components/loading/BtnSpinner.jsx";
 
 const ForgetPass = () => {
     const navigate = useNavigate();
@@ -12,17 +13,21 @@ const ForgetPass = () => {
     // 0: input email, 1: noise success send reset pass
     const [currentStep, setCurrentStep] = useState(0);
     const [email, setEmail] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const sendResetPassEmail = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
 
         const send = {
             email: email
         }
 
         try {
-            setCurrentStep(1);
-            await sendResetPass(send);
+            const data = await sendResetPass(send);
+            if (data) setCurrentStep(1);
+            else alert("Email không tồn tại. Vui lòng kiểm tra lại!")
+            setIsLoading(false);
         } catch (e) {
             console.log("Error Send Reset Pass", e);
         }
@@ -50,7 +55,7 @@ const ForgetPass = () => {
                     </div>
 
                     <h1>Quên mật khẩu?</h1>
-                    <p className="desc">Nhập email đã đăng ký, mình sẽ gửi mã xác thực gồm 4 chữ số để đặt lại mật khẩu.</p>
+                    <p className="desc">Nhập email đã đăng ký, mình sẽ gửi một đường <strong>Link</strong> để đặt lại mật khẩu.</p>
 
                     <div className="field">
                         <label>Email</label>
@@ -67,7 +72,7 @@ const ForgetPass = () => {
                         <div className="field-hint" id="emailHint">Dùng email bạn đã đăng ký với 글씨.</div>
                     </div>
 
-                    <button type="submit" className="btn btn-primary">Gửi mã xác thực</button>
+                    <BtnSpinner text={`Gửi mã xác thực`} isLoading={isLoading} />
 
                     <div className="back-link" onClick={() => navigate("/auth")}>
                         <svg viewBox="0 0 24 24">

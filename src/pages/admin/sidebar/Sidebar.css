@@ -4,7 +4,7 @@
     padding: 28px 18px;
     display: flex;
     flex-direction: column;
-    gap: 26px;
+    gap: 28px;
     border-right: 1px solid var(--paper-dim);
 
     .brand {

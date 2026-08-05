@@ -3,7 +3,7 @@ import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
 import {useNavigate} from "react-router-dom";
 
 import './ThemeLS.css';
-import '../../../components/loading/BtnSpinner.css';
+import BtnSpinner from "../../../components/loading/BtnSpinner.jsx";
 
 const Login = ({isTabLogin}) => {
     const navigate = useNavigate();
@@ -11,6 +11,10 @@ const Login = ({isTabLogin}) => {
     const [email, setEmail] = useState("");
     const [pass, setPass] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+
+    const handleLoginGoogle = () => {
+        window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    }
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -89,14 +93,11 @@ const Login = ({isTabLogin}) => {
                 <span onClick={() => navigate("/forget")} className="link">Quên mật khẩu?</span>
             </div>
 
-            <button className={`btn btn-primary ${isLoading ? `gs-btn-loading` : ``}`} type="submit" style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-                <span className="gs-btn-spinner"></span>
-                <span className="gs-btn-label" style={{marginLeft: '5px'}}>Đăng nhập</span>
-            </button>
+            <BtnSpinner text={`Đăng nhập`} isLoading={isLoading} />
 
             <div className="divider">HOẶC</div>
 
-            <button className="btn-google">
+            <button className="btn-google" type="button" onClick={handleLoginGoogle}>
                 <svg viewBox="0 0 48 48">
                     <path fill="#FFC107"
                           d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.5 29.6 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5 43.5 34.8 43.5 24c0-1.2-.1-2.4-.3-3.5z"/>
@@ -107,10 +108,11 @@ const Login = ({isTabLogin}) => {
                     <path fill="#1976D2"
                           d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.2 5.6l6.5 5.5C41.5 35.8 43.5 30.4 43.5 24c0-1.2-.1-2.4-.3-3.5z"/>
                 </svg>
+
                 Đăng nhập bằng Google
             </button>
 
-            <p className="switch-line">Chưa có tài khoản? <span className="link" onClick="switchTab('register')">Đăng ký ngay</span></p>
+            <p className="switch-line">Chưa có tài khoản? <span className="link">Đăng ký ngay</span></p>
         </form>
     );
 };

@@ -73,7 +73,7 @@ const Sidebar = () => {
                     <div className="user-dropdown-menu">
                         <button
                             className="menu-item"
-                            // onClick={() => handleNavigate("/profile")}
+                            onClick={() => navigate("/profile")}
                         >
                             <RiUser3Line size={18} />
                             <span>Thông tin cá nhân</span>

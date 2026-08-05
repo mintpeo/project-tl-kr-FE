@@ -1,0 +1,230 @@
+.container {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+
+    .auth-card {
+        width: 100%;
+        max-width: 400px;
+        background: var(--paper-card);
+        border: 1px solid var(--paper-dim);
+        border-radius: 20px;
+        padding: 40px 36px;
+        text-align: center;
+        box-shadow: 0 20px 50px rgba(63, 94, 69, 0.08);
+        position: relative;
+        z-index: 1;
+
+        .avatar-wrap {
+            position: relative;
+            width: 78px;
+            height: 78px;
+            margin: 0 auto 20px;
+
+            .avatar-lg {
+                width: 78px;
+                height: 78px;
+                border-radius: 50%;
+                background: var(--plum);
+                color: #fff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 24px;
+                font-weight: 600;
+                font-family: 'Noto Serif KR', serif;
+            }
+
+            .check-badge {
+                position: absolute;
+                bottom: -2px;
+                right: -2px;
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background: var(--celadon-dark);
+                border: 3px solid var(--paper-card);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                svg {
+                    width: 13px;
+                    height: 13px;
+                    stroke: #fff;
+                    fill: none;
+                    stroke-width: 3;
+                }
+            }
+        }
+
+        h1 {
+            font-size: 21px;
+            margin: 0 0 6px;
+        }
+
+        .desc {
+            font-size: 14px;
+            color: var(--ink-soft);
+            line-height: 1.6;
+            margin: 0 0 22px;
+        }
+
+        .google-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--paper);
+            border: 1px solid var(--paper-dim);
+            border-radius: 20px;
+            padding: 6px 14px 6px 10px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 24px;
+
+            svg {
+                width: 15px;
+                height: 15px;
+                flex-shrink: 0;
+            }
+        }
+
+        .profile-card {
+            background: var(--paper);
+            border: 1px solid var(--paper-dim);
+            border-radius: 14px;
+            padding: 14px 16px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px;
+
+            .profile-avatar {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                background: var(--plum);
+                color: #fff;
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12.5px;
+                font-weight: 700;
+                font-family: 'Noto Serif KR', serif;
+            }
+
+            .profile-name {
+                font-size: 14px;
+                font-weight: 700;
+                color: var(--ink);
+            }
+
+            .profile-email {
+                font-size: 12px;
+                color: var(--ink-soft);
+                margin-top: 1px;
+            }
+        }
+
+        .streak-teaser {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--gold-light);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 24px;
+            text-align: left;
+
+            svg {
+                width: 20px;
+                height: 20px;
+                stroke: var(--gold);
+                fill: none;
+                stroke-width: 1.8;
+                flex-shrink: 0;
+            }
+
+            p {
+                margin: 0;
+                font-size: 12.5px;
+                color: var(--ink);
+            }
+
+            strong {
+                color: var(--gold);
+                font-family: 'Noto Serif KR', serif;
+            }
+        }
+
+        .progress-track {
+            height: 5px;
+            border-radius: 4px;
+            background: var(--paper-dim);
+            overflow: hidden;
+            margin-bottom: 12px;
+
+            .progress-fill {
+                height: 100%;
+                background: var(--celadon-dark);
+                border-radius: 4px;
+                width: 0;
+                transition: width .1s linear;
+            }
+        }
+
+        .redirect-text {
+            font-size: 12px;
+            color: var(--ink-soft);
+            margin-bottom: 20px;
+
+            strong {
+                color: var(--celadon-dark);
+                font-family: 'JetBrains Mono', monospace;
+            }
+        }
+
+        .btn {
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--celadon-dark);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+
+            &:hover {
+                background: #324c37;
+            }
+
+            svg {
+                width: 16px;
+                height: 16px;
+                stroke: #fff;
+                fill: none;
+                stroke-width: 2;
+            }
+        }
+    }
+}
