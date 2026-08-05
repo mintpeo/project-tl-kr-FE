@@ -16,9 +16,6 @@ export const usePost = (url) => {
             });
 
             if (!response.ok) throw new Error('Có lỗi xảy ra!');
-
-            // const result = await response.json();
-            // setData(result);
             return await response.json();
         } catch (err) {
             setError(err.message);

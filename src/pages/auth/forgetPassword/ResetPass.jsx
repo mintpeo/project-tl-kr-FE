@@ -23,10 +23,14 @@ const ResetPass = () => {
         }
 
         try {
-            const data = await resetPass(resetPassReq);
-            if (data) {
-                navigate("/auth")
-                alert("Đổi mật khẩu thành công.");
+            const res = await resetPass(resetPassReq);
+            if (!res.ok) alert("Link đã hết hạn.");
+            else {
+                const data = await res.json();
+                if (data) {
+                    navigate("/auth")
+                    alert("Đổi mật khẩu thành công.");
+                }
             }
         } catch (e) {
             console.log("Error Reset Pass", e);

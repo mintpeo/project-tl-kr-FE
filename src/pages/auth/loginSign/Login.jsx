@@ -3,7 +3,7 @@ import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
 import {useNavigate} from "react-router-dom";
 
 import './ThemeLS.css';
-import '../../../components/loading/BtnSpinner.css';
+import BtnSpinner from "../../../components/loading/BtnSpinner.jsx";
 
 const Login = ({isTabLogin}) => {
     const navigate = useNavigate();
@@ -93,10 +93,7 @@ const Login = ({isTabLogin}) => {
                 <span onClick={() => navigate("/forget")} className="link">Quên mật khẩu?</span>
             </div>
 
-            <button className={`btn btn-primary ${isLoading ? `gs-btn-loading` : ``}`} type="submit" style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-                <span className="gs-btn-spinner"></span>
-                <span className="gs-btn-label" style={{marginLeft: '5px'}}>Đăng nhập</span>
-            </button>
+            <BtnSpinner text={`Đăng nhập`} isLoading={isLoading} />
 
             <div className="divider">HOẶC</div>
 
@@ -115,7 +112,7 @@ const Login = ({isTabLogin}) => {
                 Đăng nhập bằng Google
             </button>
 
-            <p className="switch-line">Chưa có tài khoản? <span className="link" onClick="switchTab('register')">Đăng ký ngay</span></p>
+            <p className="switch-line">Chưa có tài khoản? <span className="link">Đăng ký ngay</span></p>
         </form>
     );
 };

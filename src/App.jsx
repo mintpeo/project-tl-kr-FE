@@ -19,6 +19,7 @@ import VerifyMail from "./pages/auth/verifyEmail/VerifyMail.jsx";
 import ForgetPass from "./pages/auth/forgetPassword/ForgetPass.jsx";
 import ResetPass from "./pages/auth/forgetPassword/ResetPass.jsx";
 import LoginSuc from "./pages/auth/loginGoogle/LoginSuc.jsx";
+import Profile from "./pages/user/profile/Profile.jsx";
 
 function App() {
     const userInfo = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
@@ -40,6 +41,7 @@ function App() {
                       <Route path="/lessons" element={<Lesson />} />
                       <Route path="/practice" element={<Practice />} />
                       <Route path="/progress" element={<Progress />} />
+                      <Route path="/profile" element={<Profile />} />
                   </Route>
               </Route>
 
