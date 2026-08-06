@@ -23,6 +23,7 @@ const Login = ({isTabLogin}) => {
         try {
             const res = await fetch(`${API_URL}/auth/login`, {
                 method: "Post",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
                 },

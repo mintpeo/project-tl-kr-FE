@@ -1,14 +1,56 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import './Profile.css';
-import {LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
+import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
+import {usePatch} from "../../../components/usePatch.js";
+import {usePost} from "../../../components/usePost.js";
+import {useNavigate} from "react-router-dom";
 
 const Profile = () => {
+    const navigate = useNavigate();
     const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
     const data = JSON.parse(user_info);
     const user = {
-        name: data?.fullName,
-        email: data?.email,
+        name: data?.fullName || "",
+        email: data?.email || "",
         isGoogle: data?.google
+    }
+    const {executePatch: changeProfile} = usePatch(`${API_URL}/user/change-profile`);
+
+    const [fullName, setFullName] = useState(user.name);
+    const [isChange, setIsChange] = useState(false);
+
+    const handleChangeProfile = async () => {
+        const change = {
+            email: user.email,
+            fullName: fullName
+        }
+
+        try {
+            const res = await changeProfile(change);
+            if (!res.ok) alert("Đã xảy ra lỗi!");
+            else {
+                const data = await res.json();
+                if (data) {
+                    alert("Cập nhật thông tin thành công.");
+                    navigate("/home");
+                }
+            }
+        } catch (e) {
+            console.log("Error Change Profile", e);
+        }
+    }
+
+    const setChangeProfile = (e) => {
+        const newValue = e.target.value;
+        setFullName(newValue);
+
+        if (newValue === user.name) setIsChange(false);
+        else setIsChange(true);
+    }
+
+    const handleCancel = () => {
+        setFullName(user.name);
+        setIsChange(false);
     }
 
     return (
@@ -37,7 +79,7 @@ const Profile = () => {
                 <div className="field-grid">
                     <div className="field">
                         <label>Họ và tên</label>
-                        <input type="text" value={user.name} />
+                        <input type="text" value={fullName} onChange={(e) => setChangeProfile(e)}/>
                     </div>
 
                     <div className="field">
@@ -53,8 +95,11 @@ const Profile = () => {
                 </div>
 
                 <div className="card-actions">
-                    <button className="btn btn-ghost">Hủy</button>
-                    <button className="btn btn-primary">Lưu thay đổi</button>
+                    <button className={`btn btn-ghost ${isChange ? `` : `disabled`}`} onClick={handleCancel}>Hủy</button>
+                    <button className={`btn btn-primary ${isChange ? `` : `disabled`}`}
+                        onClick={handleChangeProfile}>
+                        Lưu thay đổi
+                    </button>
                 </div>
             </div>
 
