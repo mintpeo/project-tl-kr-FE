@@ -1,7 +1,33 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import './Home.css';
+import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
+import {usePost} from "../../../components/usePost.js";
 
 const Home = () => {
+    const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
+    const user = JSON.parse(user_info);
+    const {executePost: getInfoUser} = usePost(`${API_URL}/user/me`);
+
+
+    const handleResetInfoUser = async () => {
+        const userReq = {
+            email: user.email
+        }
+
+        try {
+            const data = await getInfoUser(userReq);
+            if (data) {
+                localStorage.setItem(LOCAL_STORAGE_KEYS.USER_INFO, JSON.stringify(data));
+            }
+        } catch (e) {
+            console.log("Error Reset Info User", e);
+        }
+    }
+
+    useEffect(() => {
+        handleResetInfoUser();
+    }, [])
+
     return (
         <>
             <div className="page-head">

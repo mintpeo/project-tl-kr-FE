@@ -38,14 +38,14 @@ const SignUp = ({isTabLogin}) => {
             if (!res.ok) {
                 setIsLoading(false);
                 alert("Email đã tồn tại!");
-            }
-
-            const data = await res.json();
-            if (data) {
-                setIsLoading(false);
-                navigate("/verify", {
-                    state: { email: email }
-                });
+            } else {
+                const data = await res.json();
+                if (data) {
+                    setIsLoading(false);
+                    navigate("/verify", {
+                        state: {email: email}
+                    });
+                }
             }
         } catch (e) {
             console.log("Error SignUp Auth", e);

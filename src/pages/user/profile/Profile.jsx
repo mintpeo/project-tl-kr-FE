@@ -1,16 +1,63 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import './Profile.css';
-import {LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
+import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
+import {usePatch} from "../../../components/usePatch.js";
+import {usePost} from "../../../components/usePost.js";
+import {useNavigate} from "react-router-dom";
 
 const Profile = () => {
+    const navigate = useNavigate();
     const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
-    const user = JSON.parse(user_info);
+    const data = JSON.parse(user_info);
+    const user = {
+        name: data?.fullName || "",
+        email: data?.email || "",
+        isGoogle: data?.google
+    }
+    const {executePatch: changeProfile} = usePatch(`${API_URL}/user/change-profile`);
+
+    const [fullName, setFullName] = useState(user.name);
+    const [isChange, setIsChange] = useState(false);
+
+    const handleChangeProfile = async () => {
+        const change = {
+            email: user.email,
+            fullName: fullName
+        }
+
+        try {
+            const res = await changeProfile(change);
+            if (!res.ok) alert("Đã xảy ra lỗi!");
+            else {
+                const data = await res.json();
+                if (data) {
+                    alert("Cập nhật thông tin thành công.");
+                    navigate("/home");
+                }
+            }
+        } catch (e) {
+            console.log("Error Change Profile", e);
+        }
+    }
+
+    const setChangeProfile = (e) => {
+        const newValue = e.target.value;
+        setFullName(newValue);
+
+        if (newValue === user.name) setIsChange(false);
+        else setIsChange(true);
+    }
+
+    const handleCancel = () => {
+        setFullName(user.name);
+        setIsChange(false);
+    }
 
     return (
         <div className="profile">
             <div className="page-head">
                 <h1>Tài khoản của tôi</h1>
-                <p>Quản lý thông tin cá nhân, mật khẩu và tùy chọn của bạn.</p>
+                <p>Quản lý thông tin cá nhân của bạn.</p>
             </div>
 
             {/* Info */}
@@ -21,7 +68,7 @@ const Profile = () => {
                 </div>
 
                 <div className="avatar-row">
-                    <div className="avatar-lg">{user?.name.charAt(0)}</div>
+                    <div className="avatar-lg">{user.name.charAt(0)}</div>
 
                     <div className="avatar-actions">
                         <button className="btn btn-ghost">Đổi ảnh đại diện</button>
@@ -32,7 +79,7 @@ const Profile = () => {
                 <div className="field-grid">
                     <div className="field">
                         <label>Họ và tên</label>
-                        <input type="text" value={user?.name} />
+                        <input type="text" value={fullName} onChange={(e) => setChangeProfile(e)}/>
                     </div>
 
                     <div className="field">
@@ -42,45 +89,54 @@ const Profile = () => {
 
                     <div className="field full">
                         <label>Email</label>
-                        <input type="email" value={user?.email} disabled />
+                        <input type="email" value={user.email} disabled />
                         <div className="field-hint">Email dùng để đăng nhập, không thể thay đổi trực tiếp — liên hệ hỗ trợ nếu cần.</div>
                     </div>
                 </div>
 
                 <div className="card-actions">
-                    <button className="btn btn-ghost">Hủy</button>
-                    <button className="btn btn-primary">Lưu thay đổi</button>
+                    <button className={`btn btn-ghost ${isChange ? `` : `disabled`}`} onClick={handleCancel}>Hủy</button>
+                    <button className={`btn btn-primary ${isChange ? `` : `disabled`}`}
+                        onClick={handleChangeProfile}>
+                        Lưu thay đổi
+                    </button>
                 </div>
             </div>
 
             {/* Password */}
-            <div className="card">
-                <div className="card-head">
-                    <h3>Đổi mật khẩu</h3>
-                    <p>Nên dùng mật khẩu mạnh và không trùng với các tài khoản khác.</p>
-                </div>
+            {
+                !user.isGoogle ? (
+                    <div className="card">
+                        <div className="card-head">
+                            <h3>Đổi mật khẩu</h3>
+                            <p>Nên dùng mật khẩu mạnh và không trùng với các tài khoản khác.</p>
+                        </div>
 
-                <div className="field full">
-                    <label>Mật khẩu hiện tại</label>
-                    <input type="password" placeholder="••••••••" />
-                </div>
+                        <div className="field full">
+                            <label>Mật khẩu hiện tại</label>
+                            <input type="password" placeholder="••••••••" />
+                        </div>
 
-                <div className="field-grid">
-                    <div className="field">
-                        <label>Mật khẩu mới</label>
-                        <input type="password" placeholder="••••••••" />
+                        <div className="field-grid">
+                            <div className="field">
+                                <label>Mật khẩu mới</label>
+                                <input type="password" placeholder="••••••••" />
+                            </div>
+
+                            <div className="field">
+                                <label>Xác nhận mật khẩu mới</label>
+                                <input type="password" placeholder="••••••••" />
+                            </div>
+                        </div>
+
+                        <div className="card-actions">
+                            <button className="btn btn-primary">Cập nhật mật khẩu</button>
+                        </div>
                     </div>
-
-                    <div className="field">
-                        <label>Xác nhận mật khẩu mới</label>
-                        <input type="password" placeholder="••••••••" />
-                    </div>
-                </div>
-
-                <div className="card-actions">
-                    <button className="btn btn-primary">Cập nhật mật khẩu</button>
-                </div>
-            </div>
+                ) : (
+                    <></>
+                )
+            }
 
             {/* Link Google */}
             <div className="card">
@@ -97,11 +153,11 @@ const Profile = () => {
 
                         <div>
                             <div className="connect-name">Google</div>
-                            <div className="connect-sub">minh.tran@gmail.com</div>
+                            <div className="connect-sub">{user.isGoogle ? user.email : ``}</div>
                         </div>
                     </div>
 
-                    <span className="badge-connected">Đã liên kết</span>
+                    <span className="badge-connected">{user.isGoogle ? (`Đã liên kết`) : (`Chưa liên kết`)}</span>
                 </div>
             </div>
 

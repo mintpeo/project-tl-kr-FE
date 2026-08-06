@@ -14,7 +14,6 @@ export const usePatch = (url) => {
                 credentials: 'include',
                 body: JSON.stringify(patchData),
             });
-
         } catch (err) {
             setError(err.message);
             throw err;

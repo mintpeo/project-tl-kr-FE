@@ -23,6 +23,7 @@ const Login = ({isTabLogin}) => {
         try {
             const res = await fetch(`${API_URL}/auth/login`, {
                 method: "Post",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -34,16 +35,16 @@ const Login = ({isTabLogin}) => {
             if (!res.ok) {
                 setIsLoading(false);
                 alert("Kiểm tra lại Email hoặc Mật khẩu!");
-            }
+            } else {
+                const data = await res.json();
+                if (data) {
+                    localStorage.setItem(LOCAL_STORAGE_KEYS.USER_INFO, JSON.stringify(data));
+                    setIsLoading(false);
 
-            const data = await res.json();
-            if (data) {
-                localStorage.setItem(LOCAL_STORAGE_KEYS.USER_INFO, JSON.stringify(data));
-                setIsLoading(false);
-
-                if (data.role === "USER") navigate("/home");
-                else navigate("/admin")
-                alert("Đăng nhập thành công.");
+                    if (data.role === "USER") navigate("/home");
+                    else navigate("/admin")
+                    alert("Đăng nhập thành công.");
+                }
             }
         } catch (e) {
             console.log("Error Login Auth", e);
