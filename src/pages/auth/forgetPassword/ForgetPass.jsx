@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import './ForgetPass.css';
 import {useNavigate} from "react-router-dom";
 import {API_URL} from "../../../components/API_URL.jsx";
-import {usePost} from "../../../components/usePost.js";
+import {usePost} from "../../../components/use/usePost.js";
 import BtnSpinner from "../../../components/loading/BtnSpinner.jsx";
 
 const ForgetPass = () => {

@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './Sidebar.css';
 import {useLocation, useNavigate} from "react-router-dom";
-import {LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
+import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
 
 // import Icons
 import {
@@ -13,6 +13,7 @@ import {
     RiSettings3Line,
     RiLogoutCircleRLine
 } from "react-icons/ri";
+import {usePost} from "../../../components/use/usePost.js";
 
 const Sidebar = () => {
     const USER_INFO = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
@@ -22,6 +23,7 @@ const Sidebar = () => {
     const location = useLocation();
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const {executePost: getInfoUser} = usePost(`${API_URL}/user/me`);
 
     const dataPages = [
         {id: 1, name: "Trang chủ", navi: "/home", icon: "RiHome2Line"},
@@ -41,6 +43,25 @@ const Sidebar = () => {
         localStorage.clear();
         window.location.reload();
     }
+
+    const handleResetInfoUser = async () => {
+        const userReq = {
+            email: user_info.email
+        }
+
+        try {
+            const data = await getInfoUser(userReq);
+            if (data) {
+                localStorage.setItem(LOCAL_STORAGE_KEYS.USER_INFO, JSON.stringify(data));
+            }
+        } catch (e) {
+            console.log("Error Reset Info User", e);
+        }
+    }
+
+    useEffect(() => {
+        handleResetInfoUser();
+    }, [])
 
     return (
         <div className="sidebar">
@@ -81,7 +102,7 @@ const Sidebar = () => {
 
                         <button
                             className="menu-item"
-                            // onClick={() => handleNavigate("/settings")}
+                            onClick={() => navigate("/setting")}
                         >
                             <RiSettings3Line size={18} />
                             <span>Cài đặt</span>
@@ -103,7 +124,7 @@ const Sidebar = () => {
                     <div className="avatar">{user_info.fullName.charAt(0)}</div>
 
                     <div>
-                        <div className="name">Trần Quốc Minh</div>
+                        <div className="name">{user_info.fullName}</div>
                         <div className="role">Người học</div>
                     </div>
                 </div>

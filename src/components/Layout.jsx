@@ -1,5 +1,5 @@
 import React from 'react';
-import {Outlet} from'react-router-dom';
+import {Outlet} from 'react-router-dom';
 
 // import Pages
 import Sidebar from "../pages/loggedPages/sidebar/Sidebar.jsx";

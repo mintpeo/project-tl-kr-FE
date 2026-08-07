@@ -1,12 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import './Profile.css';
 import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
-import {usePatch} from "../../../components/usePatch.js";
-import {usePost} from "../../../components/usePost.js";
-import {useNavigate} from "react-router-dom";
+import {usePatch} from "../../../components/use/usePatch.js";
 
 const Profile = () => {
-    const navigate = useNavigate();
     const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
     const data = JSON.parse(user_info);
     const user = {
@@ -15,10 +12,39 @@ const Profile = () => {
         isGoogle: data?.google
     }
     const {executePatch: changeProfile} = usePatch(`${API_URL}/user/change-profile`);
+    const {executePatch: changePass} = usePatch(`${API_URL}/user/change-pass-profile`);
 
     const [fullName, setFullName] = useState(user.name);
     const [isChange, setIsChange] = useState(false);
+    const [oldPass, setOldPass] = useState("");
+    const [newPass, setNewPass] = useState("");
+    const [newPassAgain, setNewPassAgain] = useState("");
 
+    // Change Pass
+    const handleChangePass = async () => {
+        if (newPass !== newPassAgain) {
+            alert("Hai mật khẩu mới phải trùng nhau.");
+            return;
+        }
+
+        const req = {
+            email: user.email,
+            oldPassword: oldPass,
+            newPassword: newPass
+        }
+
+        try {
+            const data = await changePass(req);
+            if (data.email) {
+                alert("Thay đổi mật khẩu thành công.")
+                window.location.reload();
+            } else alert("Mật khẩu cũ sai.")
+        } catch (e) {
+            console.log("Error Change Pass Profile", e);
+        }
+    }
+
+    // Info User
     const handleChangeProfile = async () => {
         const change = {
             email: user.email,
@@ -26,14 +52,10 @@ const Profile = () => {
         }
 
         try {
-            const res = await changeProfile(change);
-            if (!res.ok) alert("Đã xảy ra lỗi!");
-            else {
-                const data = await res.json();
-                if (data) {
-                    alert("Cập nhật thông tin thành công.");
-                    navigate("/home");
-                }
+            const data = await changeProfile(change);
+            if (data) {
+                alert("Cập nhật thông tin thành công.");
+                window.location.reload();
             }
         } catch (e) {
             console.log("Error Change Profile", e);
@@ -114,23 +136,23 @@ const Profile = () => {
 
                         <div className="field full">
                             <label>Mật khẩu hiện tại</label>
-                            <input type="password" placeholder="••••••••" />
+                            <input type="password" placeholder="••••••••" onChange={(e) => setOldPass(e.target.value)}/>
                         </div>
 
                         <div className="field-grid">
                             <div className="field">
                                 <label>Mật khẩu mới</label>
-                                <input type="password" placeholder="••••••••" />
+                                <input type="password" placeholder="••••••••" onChange={(e) => setNewPass(e.target.value)}/>
                             </div>
 
                             <div className="field">
                                 <label>Xác nhận mật khẩu mới</label>
-                                <input type="password" placeholder="••••••••" />
+                                <input type="password" placeholder="••••••••" onChange={(e) => setNewPassAgain(e.target.value)}/>
                             </div>
                         </div>
 
                         <div className="card-actions">
-                            <button className="btn btn-primary">Cập nhật mật khẩu</button>
+                            <button className={`btn btn-primary ${newPass.length <= 0 ? `disabled` : ``}`} onClick={handleChangePass}>Cập nhật mật khẩu</button>
                         </div>
                     </div>
                 ) : (
@@ -158,29 +180,6 @@ const Profile = () => {
                     </div>
 
                     <span className="badge-connected">{user.isGoogle ? (`Đã liên kết`) : (`Chưa liên kết`)}</span>
-                </div>
-            </div>
-
-            {/* Noise */}
-            <div className="card">
-                <div className="card-head">
-                    <h3>Tùy chọn thông báo</h3>
-                    <p>Chọn cách bạn muốn nhận nhắc nhở từ 글씨.</p>
-                </div>
-
-                <div className="toggle-row">
-                    <div className="toggle-text"><p>Nhắc học hằng ngày</p><span>Gửi thông báo lúc 20:00 mỗi ngày</span></div>
-                    <div className="switch on"><div className="knob"></div></div>
-                </div>
-
-                <div className="toggle-row">
-                    <div className="toggle-text"><p>Email tổng kết tuần</p><span>Báo cáo tiến độ luyện viết mỗi Chủ nhật</span></div>
-                    <div className="switch on"><div className="knob"></div></div>
-                </div>
-
-                <div className="toggle-row">
-                    <div className="toggle-text"><p>Thông báo tính năng mới</p><span>Cập nhật về bài học và tính năng AI</span></div>
-                    <div className="switch"><div className="knob"></div></div>
                 </div>
             </div>
 

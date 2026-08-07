@@ -8,12 +8,14 @@ export const usePatch = (url) => {
         setLoading(true);
         setError(null);
         try {
-            return await fetch(url, {
+            const res = await fetch(url, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify(patchData),
             });
+            // if (!res.ok) throw new Error('Có lỗi xảy ra!');
+            return await res.json();
         } catch (err) {
             setError(err.message);
             throw err;
