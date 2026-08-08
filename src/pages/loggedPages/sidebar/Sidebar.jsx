@@ -27,7 +27,7 @@ const Sidebar = () => {
 
     const dataPages = [
         {id: 1, name: "Trang chủ", navi: "/home", icon: "RiHome2Line"},
-        {id: 2, name: "Bài học", navi: "/lessons", icon: "RiBook2Line"},
+        {id: 2, name: "Bài học", navi: "/lessons/1", icon: "RiBook2Line"},
         {id: 3, name: "Luyện viết AI", navi: "/practice", icon: "RiPencilAi2Line"},
         {id: 4, name: "Tiến độ", navi: "/progress", icon: "RiBarChart2Line"},
     ];

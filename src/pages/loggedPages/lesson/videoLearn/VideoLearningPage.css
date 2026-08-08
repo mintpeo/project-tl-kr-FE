@@ -1,0 +1,136 @@
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.learning-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 24px;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Player Card & Responsive Ratio 16:9 */
+.player-card {
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.player-wrapper {
+    position: relative;
+    padding-top: 56.25%;
+}
+
+.react-player {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Progress Section */
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Tabs & Notes Section */
+.tabs-header {
+    display: flex;
+    gap: 16px;
+    border-bottom: 1px solid var(--paper-dim);
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+}
+
+.notes-tab {
+    display: flex;
+    flex-direction: column;
+}
+
+.notes-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--paper-dim);
+    font-family: inherit;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.save-btn {
+    margin-top: 12px;
+    align-self: flex-start;
+}
+
+.resources-list {
+    padding-left: 20px;
+    margin: 0;
+}
+
+.resource-link {
+    color: var(--celadon-dark);
+    font-weight: 600;
+}
+
+/* Playlist Sidebar */
+.playlist-title {
+    font-size: 18px;
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+.playlist-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.playlist-item {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--paper-dim);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.playlist-item.active {
+    background: var(--paper-dim);
+}
+
+.lesson-title {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.lesson-title.active-text {
+    font-weight: 600;
+}
+
+.lesson-duration {
+    font-size: 12px;
+    color: var(--ink-soft);
+}
+
+.active-badge {
+    color: var(--celadon-dark);
+    font-size: 12px;
+    font-weight: 600;
+}

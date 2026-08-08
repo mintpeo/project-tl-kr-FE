@@ -12,6 +12,7 @@ import Practice from "./pages/loggedPages/practice/Practice.jsx";
 import Progress from "./pages/loggedPages/progress/Progress.jsx";
 import Admin from "./pages/admin/Admin.jsx";
 import AuthWrapper from "./components/AuthWrapper.jsx";
+import VideoLearningPage from "./pages/loggedPages/lesson/videoLearn/VideoLearningPage.jsx";
 
 // Not Logged
 import HomeNotLogged from "./pages/notLoggedPages/Home.jsx";
@@ -41,11 +42,12 @@ function App() {
                   <Route element={<AuthWrapper />}>
                       <Route element={<Layout />}>
                           <Route path="/home" element={<Home />} />
-                          <Route path="/lessons" element={<Lesson />} />
+                          <Route path="/lessons/:categoryId" element={<Lesson />} />
                           <Route path="/practice" element={<Practice />} />
                           <Route path="/progress" element={<Progress />} />
                           <Route path="/profile" element={<Profile />} />
                           <Route path="/setting" element={<Setting />} />
+                          <Route path="/video/:lessonId" element={<VideoLearningPage />} />
                       </Route>
                   </Route>
               </Route>
@@ -54,7 +56,7 @@ function App() {
                   <Route path="/admin" element={<Admin/>}/>
               </Route>
 
-              {/*<Route path="*" element={<Navigate to="/" replace />} />*/}
+              <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
       </BrowserRouter>
   )
