@@ -13,6 +13,8 @@ import Progress from "./pages/loggedPages/progress/Progress.jsx";
 import Admin from "./pages/admin/Admin.jsx";
 import AuthWrapper from "./components/AuthWrapper.jsx";
 import VideoLearningPage from "./pages/loggedPages/lesson/videoLearn/VideoLearningPage.jsx";
+import Stroke from "./pages/loggedPages/stroke/Stroke.jsx";
+import Combine from "./pages/loggedPages/combine/Combine.jsx";
 
 // Not Logged
 import HomeNotLogged from "./pages/notLoggedPages/Home.jsx";
@@ -48,6 +50,8 @@ function App() {
                           <Route path="/profile" element={<Profile />} />
                           <Route path="/setting" element={<Setting />} />
                           <Route path="/video/:lessonId" element={<VideoLearningPage />} />
+                          <Route path="/strokes" element={<Stroke />} />
+                          <Route path="/combine" element={<Combine />} />
                       </Route>
                   </Route>
               </Route>

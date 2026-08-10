@@ -13,6 +13,8 @@ import {
     RiSettings3Line,
     RiLogoutCircleRLine
 } from "react-icons/ri";
+import { TbAlphabetKorean } from "react-icons/tb";
+import { RxLetterCaseToggle } from "react-icons/rx";
 import {usePost} from "../../../components/use/usePost.js";
 
 const Sidebar = () => {
@@ -26,15 +28,19 @@ const Sidebar = () => {
     const {executePost: getInfoUser} = usePost(`${API_URL}/user/me`);
 
     const dataPages = [
-        {id: 1, name: "Trang chủ", navi: "/home", icon: "RiHome2Line"},
-        {id: 2, name: "Bài học", navi: "/lessons/1", icon: "RiBook2Line"},
-        {id: 3, name: "Luyện viết AI", navi: "/practice", icon: "RiPencilAi2Line"},
-        {id: 4, name: "Tiến độ", navi: "/progress", icon: "RiBarChart2Line"},
+        {name: "Trang chủ", navi: "/home", icon: "RiHome2Line"},
+        {name: "Bài học", navi: "/lessons/1", icon: "RiBook2Line"},
+        {name: "Thứ tự các nét", navi: "/strokes", icon: "TbAlphabetKorean"},
+        {name: 'Cách ghép chữ', navi: "/combine", icon: "RxLetterCaseToggle"},
+        {name: "Luyện viết AI", navi: "/practice", icon: "RiPencilAi2Line"},
+        {name: "Tiến độ", navi: "/progress", icon: "RiBarChart2Line"},
     ];
 
     const ICON_MAP = {
         RiHome2Line: RiHome2Line,
         RiBook2Line: RiBook2Line,
+        TbAlphabetKorean: TbAlphabetKorean,
+        RxLetterCaseToggle: RxLetterCaseToggle,
         RiPencilAi2Line: RiPencilAi2Line,
         RiBarChart2Line: RiBarChart2Line,
     };
@@ -75,11 +81,11 @@ const Sidebar = () => {
             </div>
 
             <div className="nav">
-                {dataPages.map((item) => {
+                {dataPages.map((item, index) => {
                     const IconComponent = ICON_MAP[item.icon];
 
                     return (
-                        <button key={item.id}
+                        <button key={index}
                                 className={`nav-item ${location.pathname === item.navi ? `active` : ``}`}
                                 onClick={() => navigate(`/${item.navi}`)}>
                             {IconComponent && <IconComponent size={24} />}

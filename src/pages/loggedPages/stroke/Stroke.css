@@ -1,0 +1,78 @@
+.stroke {
+    h1 {
+        font-size: 21px;
+        margin: 0 0 6px;
+    }
+
+    .sub {
+        color: var(--ink-soft);
+        font-size: 13px;
+        margin: 0 0 24px;
+        /*line-height: 1.6;*/
+    }
+
+    .demo-card {
+        background: var(--paper-card);
+        border: 1px solid var(--paper-dim);
+        border-radius: 16px;
+        padding: 26px;
+
+        .char-switch {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+
+            button {
+                width: 44px;
+                height: 44px;
+                border-radius: 10px;
+                border: 1px solid var(--paper-dim);
+                background: var(--paper);
+                font-family: 'Noto Serif KR', serif;
+                font-size: 19px;
+                font-weight: 700;
+                color: var(--ink-soft);
+                cursor: pointer;
+            }
+
+            .active {
+                background: var(--ink);
+                color: var(--paper-card);
+                border-color: var(--ink);
+            }
+        }
+
+        .svg-stage {
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 18px;
+            border-radius: 14px;
+            background: var(--paper);
+            border: 1px solid var(--paper-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+
+            svg {
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        .status-line {
+            text-align: center;
+            font-size: 13px;
+            color: var(--ink-soft);
+            margin-bottom: 18px;
+            line-height: 1.6;
+        }
+
+        .error {
+            color: var(--plum);
+            font-weight: 600;
+        }
+    }
+}

@@ -9,8 +9,19 @@ import Skeleton from "../../../../components/loading/Skeleton.jsx";
 const VideoLearningPage = () => {
     const navigate = useNavigate();
     const {lessonId} = useParams();
-    const {data: currentLesson, loading: loading} = useFetch(`${API_URL}/lesson/${lessonId}`);
-    const {data: defaultPlaylist} = useFetch(`${API_URL}/lesson/lessons-custom`);
+    const {data: currentL, loading: loading} = useFetch(`${API_URL}/lesson/${lessonId}`);
+    const {data: defaultP, loading: loadingPlaylist} = useFetch(`${API_URL}/lesson/lessons-custom`);
+
+    const currentLesson = {
+        id: currentL?.id,
+        title: currentL?.title,
+        youtubeId: currentL?.youtubeId
+    }
+
+    const defaultPlaylist = defaultP.map((item) => ({
+        id: item?.id,
+        title: item?.title,
+    }))
 
     const [playedSeconds, setPlayedSeconds] = useState(0);
     const [duration, setDuration] = useState(0);

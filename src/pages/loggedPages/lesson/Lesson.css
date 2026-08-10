@@ -55,13 +55,11 @@
             background: var(--paper);
         }
 
-        svg {
-            width: 17px;
-            height: 17px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 1.8;
-            flex-shrink: 0;
+        .icon {
+            display: flex;
+            font-size: 18px;
+            align-items: center;
+            justify-content: center;
         }
 
         .category-count {

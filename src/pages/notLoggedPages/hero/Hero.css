@@ -41,7 +41,7 @@
             border-radius: 20px;
             margin-bottom: 18px;
 
-            svg {
+            .icon {
                 width: 13px;
                 height: 13px;
                 stroke: currentColor;

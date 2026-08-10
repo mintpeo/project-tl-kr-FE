@@ -4,8 +4,11 @@ import useFetch from "../../../components/use/useFetch.js";
 import {API_URL} from "../../../components/API_URL.jsx";
 import {useNavigate, useParams} from "react-router-dom";
 import Skeleton from "../../../components/loading/Skeleton.jsx";
-import { FaRegCircle } from "react-icons/fa";
-import { FaRegDotCircle } from "react-icons/fa";
+import { MdOutlineGridView } from "react-icons/md";
+import { BsAlphabetUppercase } from "react-icons/bs";
+import { TbAlphabetCyrillic } from "react-icons/tb";
+import { TbAlphabetGreek } from "react-icons/tb";
+import { LuBook } from "react-icons/lu";
 
 const Lesson = () => {
     const navigate = useNavigate();
@@ -20,9 +23,6 @@ const Lesson = () => {
 
     // Get List Category
     const {data: cate, loading: isLoadingCate} = useFetch(`${API_URL}/lesson-cate/all`);
-    // const {data: lessonsWithCate} = useFetch(`${API_URL}/lesson-cate/${categoryId}`);
-
-    const [isEnded, setIsEnded] = useState(false);
     const [chooseCate, setChooseCate] = useState(parseInt(categoryId));
     const [categorySelected, setCategorySelected] = useState([]);
     const [lessonsWithCate, setLessonsWithCate] = useState([]);
@@ -34,6 +34,15 @@ const Lesson = () => {
         name: item.categoryName,
         lessonsSize: item.lessonsLength
     }))
+
+    // SVG
+    const getCateIcon = (orderId) => {
+        if (orderId === 1) return <MdOutlineGridView />
+        if (orderId === 2) return <BsAlphabetUppercase />
+        if (orderId === 3) return <TbAlphabetCyrillic />
+        if (orderId === 4) return <TbAlphabetGreek />
+        return <LuBook />
+    }
 
     // Video
     const handleCardClick = (lessonId) => {
@@ -72,12 +81,6 @@ const Lesson = () => {
         navigate(`/lessons/${id}`);
     }
 
-    // Hàm xử lý khi người dùng xem xong video
-    const handleVideoEnded = useCallback(() => {
-        setIsEnded(true);
-        console.log('Đã hoàn thành bài học!');
-    }, []);
-
     if (isLoading) return <Skeleton />;
     return (
         <>
@@ -100,10 +103,7 @@ const Lesson = () => {
                                     className={`category-item ${chooseCate === item.id ? `active` : ``}`}
                                     onClick={() => handleSelectCategory(item.id)}
                                 >
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
-                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
-                                    </svg>
+                                    <i className="icon">{getCateIcon(item.orderIndex)}</i>
                                     {item.name}
                                     <span className="category-count">{item.lessonsSize}</span>
                                 </div>
@@ -123,7 +123,7 @@ const Lesson = () => {
                                 lessonsWithCate.map((item) => (
                                     <div key={item.id} className="video-card" onClick={() => handleCardClick(item.id)}>
                                         <div className="video-thumb">
-                                            <img src="https://picsum.photos/800/450" alt="Video thumbnail" className="thumb-img" />
+                                            {/*<img src="https://picsum.photos/800/450" alt="Video thumbnail" className="thumb-img" />*/}
                                             <span className="ghost-char">가</span>
 
                                             <div className="play-btn">
@@ -147,22 +147,6 @@ const Lesson = () => {
                     </div>
                 </div>
             </div>
-
-            {/*<div>*/}
-            {/*    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>*/}
-            {/*        <h2>Bài học: Hướng dẫn học tiếng Hàn cơ bản</h2>*/}
-
-            {/*        /!* Wrapper giữ tỉ lệ khung hình 16:9 responsive *!/*/}
-            {/*        <VideoPlayer url={videoUrl} onEnded={handleVideoEnded} />*/}
-
-            {/*        /!* Thông báo trạng thái *!/*/}
-            {/*        {isEnded && (*/}
-            {/*            <div style={{ marginTop: '15px', color: 'green', fontWeight: 'bold' }}>*/}
-            {/*                ✅ Bạn đã xem xong bài học này!*/}
-            {/*            </div>*/}
-            {/*        )}*/}
-            {/*    </div>*/}
-            {/*</div>*/}
         </>
     );
 };
