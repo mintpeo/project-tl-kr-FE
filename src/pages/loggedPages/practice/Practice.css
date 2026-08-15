@@ -89,24 +89,46 @@
             .char-switch {
                 display: flex;
                 gap: 6px;
+                align-items: center;
 
-                button {
-                    width: 34px;
-                    height: 34px;
-                    border-radius: 8px;
-                    border: 1px solid var(--paper-dim);
-                    background: var(--paper);
-                    font-family: 'Noto Serif KR',serif;
-                    font-size: 15px;
+                .toggle-btn {
+                    width: 40px;
+                    height: 20px;
+                    background-color: #cccccc;
+                    border-radius: 9999px;
+                    border: none;
+                    padding: 4px;
                     cursor: pointer;
-                    color: var(--ink-soft);
+                    display: flex;
+                    align-items: center;
+                    transition: background-color 0.3s ease;
+                    outline: none;
                 }
 
-                .active {
-                    background: var(--ink);
-                    color: var(--paper-card);
-                    border-color: var(--ink);
+                .toggle-btn.active {
+                    background-color: #34e0a1;
                 }
+
+                .toggle-thumb {
+                    width: 12px;
+                    height: 12px;
+                    background-color: #ffffff;
+                    border-radius: 50%;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+                    transition: transform 0.3s ease;
+                    transform: translateX(0);
+                }
+
+                .toggle-btn.active .toggle-thumb {
+                    transform: translateX(20px);
+                }
+            }
+
+            .selected-char {
+                margin: 2px 0 0;
+                font-size: 26px;
+                font-weight: 600;
+                font-family: JetBrains Mono, monospace;
             }
         }
 
@@ -135,11 +157,11 @@
                     height: 300px;
                     opacity: 0.15;
                 }
+            }
 
-                .hide-stroke-order .stroke-number,
-                .hide-stroke-order .order-arrow {
-                    display: none;
-                }
+            .hide-stroke-order .stroke-number,
+            .hide-stroke-order .order-arrow {
+                opacity: 0;
             }
 
             canvas {

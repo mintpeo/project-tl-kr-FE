@@ -8,7 +8,9 @@ function useFetch(url) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await fetch(url);
+                const res = await fetch(url, {
+                    credentials: "include"
+                });
 
                 if (!res.ok) {
                     throw new Error("Failed to fetch");

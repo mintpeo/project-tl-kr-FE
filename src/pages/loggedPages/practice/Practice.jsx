@@ -1,25 +1,99 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './Practice.css';
-import {CHAR_CONSONANT, CHAR_VOWELS} from "../../../components/hangul/hangulHelper.js";
+import { CHAR_CONSONANT, CHAR_VOWELS } from "../../../components/hangul/hangulHelper.js";
 
 const Practice = () => {
     const [selectedCate, setSelectedCate] = useState(0);
     const [charList, setCharList] = useState([]);
-    const [selectedChar, setSelectedChar] = useState(0);
+    const [selectedChar, setSelectedChar] = useState(-1);
+    const [checked, setChecked] = useState(true);
+    const [predict, setPredict] = useState([]);
 
     const cateList = [
-        {name: 'Nguyên âm'},
-        {name: 'Phụ âm'},
-        {name: 'Âm ghép'}
+        { name: 'Nguyên âm' },
+        { name: 'Phụ âm' },
+        { name: 'Âm ghép' }
     ];
+
+    useEffect(() => {
+        setSelectedChar(-1);
+    }, [selectedCate])
+
+    console.log(charList[selectedChar])
+
+    const changeChar = (label) => {
+        return charList.filter(item => item.transcription === label);
+    }
 
     const canvasRef = useRef(null);
     const isDrawing = useRef(false);
 
+    const clearCanvas = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    };
+
+    const savePNG = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+
+        const tempCtx = tempCanvas.getContext("2d");
+        tempCtx.fillStyle = "#FFFFFF";
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        tempCtx.drawImage(canvas, 0, 0);
+
+        // Lấy dữ liệu ảnh Base64 (Nền trắng, nét đen)
+        const image = tempCanvas.toDataURL("image/png");
+
+        // Tải ảnh về máy để test với Python model
+        const link = document.createElement("a");
+        link.href = image;
+        link.download = "jamo-test.png";
+        link.click();
+    }
+
+    const submitCanvas = async () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        // Tao canvas tam de to nen trang (giong logic cu)
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext("2d");
+        tempCtx.fillStyle = "white";
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        tempCtx.drawImage(canvas, 0, 0);
+
+        const dataUrl = tempCanvas.toDataURL("image/png");
+
+        try {
+            const res = await fetch("http://localhost:8080/api/predict/data-url", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ dataUrl }),
+            });
+
+            const data = await res.json();
+            console.log("Ket qua du doan:", data);
+            setPredict(data.predictions);
+        } catch (e) {
+            console.error("Loi khi goi API predict data url:", e);
+        }
+    };
+
     const startDrawing = (e) => {
         const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
+        if (!canvas) return;
 
+        const ctx = canvas.getContext("2d");
         isDrawing.current = true;
 
         ctx.beginPath();
@@ -30,9 +104,12 @@ const Practice = () => {
         if (!isDrawing.current) return;
 
         const canvas = canvasRef.current;
+        if (!canvas) return;
         const ctx = canvas.getContext("2d");
 
-        ctx.lineWidth = 8;
+        // Cấu hình nét vẽ chuẩn
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 14; // Tăng độ dày nét chữ để CNN nhận diện dễ hơn
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
 
@@ -48,24 +125,14 @@ const Practice = () => {
         isDrawing.current = false;
     };
 
-    const clearCanvas = () => {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
-
-        ctx.clearRect(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-    };
-
-    console.log(selectedChar)
-
     useEffect(() => {
         if (selectedCate === 0) setCharList(CHAR_VOWELS);
         if (selectedCate === 1) setCharList(CHAR_CONSONANT);
     }, [selectedCate]);
+
+    const toggle = () => {
+        setChecked(!checked);
+    };
 
     return (
         <>
@@ -84,10 +151,13 @@ const Practice = () => {
                     <div className="cat-pills">
                         {
                             cateList.map((item, index) => (
-                                <div key={index}
+                                <div
+                                    key={index}
                                     onClick={() => setSelectedCate(index)}
-                                    className={`cat-pill ${selectedCate === index ? `active` : ``}`}
-                                >{item.name}</div>
+                                    className={`cat-pill ${selectedCate === index ? 'active' : ''}`}
+                                >
+                                    {item.name}
+                                </div>
                             ))
                         }
                     </div>
@@ -97,13 +167,16 @@ const Practice = () => {
                     <div className="cat-pills">
                         {
                             charList.map((item, index) => (
-                                <div key={index}
+                                <div
+                                    key={index}
                                     onClick={() => {
                                         setSelectedChar(index);
                                         clearCanvas();
                                     }}
-                                    className={`cat-pill ${selectedChar === index ? `active` : ``}`}
-                                >{item.name}</div>
+                                    className={`cat-pill ${selectedChar === index ? 'active' : ''}`}
+                                >
+                                    {item.name}
+                                </div>
                             ))
                         }
                     </div>
@@ -115,27 +188,34 @@ const Practice = () => {
             <div className="practice-layout">
                 <div className="card canvas-card">
                     <div className="canvas-top-row">
-                        <div>
-                            <p style={{margin: 0, fontSize: '12.5px', color: 'var(--ink-soft)'}}>Chữ đang luyện</p>
-                            <p style={{
-                                margin: '2px 0 0',
-                                fontSize: '13px',
-                                fontWeight: 600,
-                                fontFamily: 'JetBrains Mono, monospace'
-                            }}>HAN · 한</p>
+                        <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
+                            <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--ink-soft)' }}>Chữ đang luyện:</p>
+                            <p className={`${selectedChar >= 0 ? `selected-char` : ``}`}>
+                                {selectedChar >= 0 ? charList[selectedChar]?.name + `-` + charList[selectedChar]?.transcription : 'Chưa chọn'}
+                            </p>
                         </div>
 
-                        <div className="char-switch"></div>
+                        <div className="char-switch">
+                            <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--ink-soft)' }}>Hiện thứ tự nét</p>
+
+                            <button
+                                type="button"
+                                className={`toggle-btn ${checked ? 'active' : ''}`}
+                                onClick={toggle}
+                            >
+                                <span className="toggle-thumb" />
+                            </button>
+                        </div>
                     </div>
 
                     <div className="canvas-wrap">
                         {
-                            selectedChar <= 0 ? (
+                            selectedChar >= 0 && (
                                 <div
-                                    className="char-guide hide-stroke-order"
+                                    className={`char-guide ${checked ? '' : 'hide-stroke-order'}`}
                                     dangerouslySetInnerHTML={{ __html: charList[selectedChar].content }}
                                 />
-                            ) : (<></>)
+                            )
                         }
 
                         <canvas
@@ -150,16 +230,23 @@ const Practice = () => {
                     </div>
 
                     <div className="canvas-actions">
-                        <button className="btn btn-ghost" onClick={() => clearCanvas()}>Xóa</button>
-                        <button className="btn btn-ghost">Viết lại</button>
-                        <button className="btn btn-primary">Gửi để AI chấm điểm</button>
+                        <button className="btn btn-ghost" onClick={clearCanvas}>Xóa</button>
+                        <button className="btn btn-ghost" onClick={savePNG}>Save PNG</button>
+                        <button className="btn btn-primary" onClick={submitCanvas}>Gửi để AI chấm điểm</button>
                     </div>
                 </div>
 
                 <div className="feedback-panel">
                     <div className="card score-wrap" id="scoreCard">
-                        <div className="fb-empty" id="fbEmpty">Viết chữ mẫu rồi bấm<br/><strong>"Gửi để AI chấm
-                            điểm"</strong> để xem kết quả.
+                        <div className="fb-empty" id="fbEmpty">
+                            Viết chữ mẫu rồi bấm<br /><strong>"Gửi để AI chấm điểm"</strong> để xem kết quả.
+                            {
+                                predict.map((item) => (
+                                    changeChar(item.label).map((label) => (
+                                        <p>{item.label} - {label.name} - {item.confidence * 100}</p>
+                                    ))
+                                ))
+                            }
                         </div>
 
                         <div className="scoreResult">
