@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {CHAR_VOWELS, CHAR_CONSONANT, CHAR_VOWELS_PAIR, CHAR_VOWELS_SINGLE, CHAR_CONSONANT_SINGLE, CHAR_CONSONANT_PAIR} from "./hangulHelper.js";
 
 const CharHangul = ({selectedChar, isVowels}) => {
@@ -6,11 +6,16 @@ const CharHangul = ({selectedChar, isVowels}) => {
     const char_single = isVowels ? CHAR_VOWELS_SINGLE : CHAR_CONSONANT_SINGLE;
     const char_pair = isVowels ? CHAR_VOWELS_PAIR : CHAR_CONSONANT_PAIR
 
-    const [selectedSingleIndex, setSelectedSingleIndex] = useState(selectedChar);
-    const selectedSingle = char_single[selectedSingleIndex];
+    const [selectedSingleIndex, setSelectedSingleIndex] = useState(0);
+    const selectedSingle = char_single[selectedSingleIndex] || char_single[0];
 
-    const [selectedPairIndex, setSelectedPairIndex] = useState(selectedChar);
-    const selectedPair = char_pair[selectedPairIndex];
+    const [selectedPairIndex, setSelectedPairIndex] = useState(0);
+    const selectedPair = char_pair[selectedPairIndex] || char_pair[0];
+
+    useEffect(() => {
+        setSelectedSingleIndex(0);
+        setSelectedPairIndex(0);
+    }, [isVowels]);
 
     return (
         <>
@@ -25,6 +30,7 @@ const CharHangul = ({selectedChar, isVowels}) => {
                             className={index === selectedSingleIndex ? 'active' : ''}
                         >
                             {item.name}
+                            <p>{item.transcription}</p>
                         </button>
                     ))
                 }
@@ -43,7 +49,10 @@ const CharHangul = ({selectedChar, isVowels}) => {
                             key={index}
                             onClick={() => setSelectedPairIndex(index)}
                             className={index === selectedPairIndex ? 'active' : ''}
-                        >{item.name}</button>
+                        >
+                            {item.name}
+                            <p>{item.transcription}</p>
+                        </button>
                     ))
                 }
             </div>

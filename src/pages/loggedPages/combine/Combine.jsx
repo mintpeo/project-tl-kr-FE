@@ -8,7 +8,7 @@ const Combine = () => {
     const combinedChar = composeHangul(selectedConsonant, selectedVowels);
 
     return (
-        <div className="card combine-card" id="combinePanel">
+        <div className="combine-card" id="combinePanel">
             <div className="combine-head">
                 <h3>Ghép phụ âm và nguyên âm thành âm tiết</h3>
                 <p>Chọn 1 phụ âm và 1 nguyên âm bên dưới để tạo thành một âm tiết Hangul hoàn chỉnh.</p>

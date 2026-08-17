@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import './Sidebar.css';
 import {useLocation, useNavigate} from "react-router-dom";
 import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
+import {usePost} from "../../../components/use/usePost.js";
 
 // import Icons
 import {
@@ -15,7 +16,7 @@ import {
 } from "react-icons/ri";
 import { TbAlphabetKorean } from "react-icons/tb";
 import { RxLetterCaseToggle } from "react-icons/rx";
-import {usePost} from "../../../components/use/usePost.js";
+import { PiRoadHorizonBold } from "react-icons/pi";
 
 const Sidebar = () => {
     const USER_INFO = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
@@ -29,19 +30,20 @@ const Sidebar = () => {
 
     const dataPages = [
         {name: "Trang chủ", navi: "/home", icon: "RiHome2Line"},
-        {name: "Lộ trình học", navi: "/route", icon: "RiHome2Line"},
-        {name: "Bài học", navi: "/lessons/1", icon: "RiBook2Line"},
-        {name: "Thứ tự các nét", navi: "/strokes", icon: "TbAlphabetKorean"},
-        {name: 'Cách ghép chữ', navi: "/combine", icon: "RxLetterCaseToggle"},
+        {name: "Lộ trình học", navi: "/route", icon: "PiRoadHorizonBold"},
+        {name: "Bài học khác", navi: "/lessons/1", icon: "RiBook2Line"},
+        // {name: "Thứ tự các nét", navi: "/strokes", icon: "TbAlphabetKorean"},
+        // {name: 'Cách ghép chữ', navi: "/combine", icon: "TbAlphabetKorean"},
         {name: "Luyện viết AI", navi: "/practice", icon: "RiPencilAi2Line"},
         {name: "Tiến độ", navi: "/progress", icon: "RiBarChart2Line"},
     ];
 
     const ICON_MAP = {
         RiHome2Line: RiHome2Line,
+        PiRoadHorizonBold: PiRoadHorizonBold,
         RiBook2Line: RiBook2Line,
+        // TbAlphabetKorean: TbAlphabetKorean,
         TbAlphabetKorean: TbAlphabetKorean,
-        RxLetterCaseToggle: RxLetterCaseToggle,
         RiPencilAi2Line: RiPencilAi2Line,
         RiBarChart2Line: RiBarChart2Line,
     };
