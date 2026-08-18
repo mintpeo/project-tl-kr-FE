@@ -1,25 +1,29 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './Practice.css';
-import { CHAR_CONSONANT, CHAR_VOWELS } from "../../../components/hangul/hangulHelper.js";
+import useFetch from "../../../components/use/useFetch.js";
+import {API_URL} from "../../../components/API_URL.jsx";
+import Skeleton from "../../../components/loading/Skeleton.jsx";
 
 const Practice = () => {
+    const {data: characters, loading: isLoading} = useFetch(`${API_URL}/character/all`);
+    const vowels = characters.filter(char => char.type === "VOWEL");
+    const consonants = characters.filter(char => char.type === "CONSONANT");
+
     const [selectedCate, setSelectedCate] = useState(0);
     const [charList, setCharList] = useState([]);
     const [selectedChar, setSelectedChar] = useState(-1);
     const [checked, setChecked] = useState(true);
     const [predict, setPredict] = useState([]);
 
+    useEffect(() => {
+        setCharList(vowels);
+    }, [characters]);
+
     const cateList = [
         { name: 'Nguyên âm' },
         { name: 'Phụ âm' },
-        { name: 'Âm ghép' }
+        // { name: 'Âm ghép' }
     ];
-
-    useEffect(() => {
-        setSelectedChar(-1);
-    }, [selectedCate])
-
-    console.log(charList[selectedChar])
 
     const changeChar = (label) => {
         return charList.filter(item => item.transcription === label);
@@ -82,7 +86,7 @@ const Practice = () => {
             });
 
             const data = await res.json();
-            console.log("Ket qua du doan:", data);
+            // console.log("Ket qua du doan:", data);
             setPredict(data.predictions);
         } catch (e) {
             console.error("Loi khi goi API predict data url:", e);
@@ -126,14 +130,16 @@ const Practice = () => {
     };
 
     useEffect(() => {
-        if (selectedCate === 0) setCharList(CHAR_VOWELS);
-        if (selectedCate === 1) setCharList(CHAR_CONSONANT);
+        if (selectedCate === 0) setCharList(vowels);
+        if (selectedCate === 1) setCharList(consonants);
+        setSelectedChar(-1);
     }, [selectedCate]);
 
     const toggle = () => {
         setChecked(!checked);
     };
 
+    if (isLoading) return <Skeleton />
     return (
         <>
             <div className="page-head">
@@ -188,7 +194,7 @@ const Practice = () => {
             <div className="practice-layout">
                 <div className="card canvas-card">
                     <div className="canvas-top-row">
-                        <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
+                        <div style={{display: "flex", alignItems: "center"}}>
                             <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--ink-soft)' }}>Chữ đang luyện:</p>
                             <p className={`${selectedChar >= 0 ? `selected-char` : ``}`}>
                                 {selectedChar >= 0 ? charList[selectedChar]?.name + `-` + charList[selectedChar]?.transcription : 'Chưa chọn'}
@@ -211,10 +217,9 @@ const Practice = () => {
                     <div className="canvas-wrap">
                         {
                             selectedChar >= 0 && (
-                                <div
-                                    className={`char-guide ${checked ? '' : 'hide-stroke-order'}`}
-                                    dangerouslySetInnerHTML={{ __html: charList[selectedChar].content }}
-                                />
+                                <div className={`char-guide ${checked ? '' : 'hide-stroke-order'}`}>
+                                    <img className="hide-stroke-order" src={`http://localhost:8080${charList[selectedChar]?.strokeSvgUrl}`} alt={charList[selectedChar]?.name}/>
+                                </div>
                             )
                         }
 

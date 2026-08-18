@@ -152,10 +152,14 @@
                 z-index: 1;
                 pointer-events: none;
 
-                svg {
+                img {
                     width: 300px;
                     height: 300px;
                     opacity: 0.15;
+
+                    svg {
+                        opacity: 0;
+                    }
                 }
             }
 

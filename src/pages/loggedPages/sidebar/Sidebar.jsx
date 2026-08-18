@@ -30,7 +30,7 @@ const Sidebar = () => {
 
     const dataPages = [
         {name: "Trang chủ", navi: "/home", icon: "RiHome2Line"},
-        {name: "Lộ trình học", navi: "/route", icon: "PiRoadHorizonBold"},
+        {name: "Lộ trình học", navi: "/road", icon: "PiRoadHorizonBold"},
         {name: "Bài học khác", navi: "/lessons/1", icon: "RiBook2Line"},
         // {name: "Thứ tự các nét", navi: "/strokes", icon: "TbAlphabetKorean"},
         // {name: 'Cách ghép chữ', navi: "/combine", icon: "TbAlphabetKorean"},

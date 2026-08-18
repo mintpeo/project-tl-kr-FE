@@ -16,6 +16,7 @@ import VideoLearningPage from "./pages/loggedPages/lesson/videoLearn/VideoLearni
 import Stroke from "./pages/loggedPages/stroke/Stroke.jsx";
 import Combine from "./pages/loggedPages/combine/Combine.jsx";
 import LessonRoute from "./pages/loggedPages/lessonRoute/LessonRoute.jsx";
+import LessonRoad from "./pages/loggedPages/lessonRoad/LessonRoad.jsx";
 
 // Not Logged
 import HomeNotLogged from "./pages/notLoggedPages/Home.jsx";
@@ -53,7 +54,7 @@ function App() {
                           <Route path="/video/:lessonId" element={<VideoLearningPage />} />
                           <Route path="/strokes" element={<Stroke />} />
                           <Route path="/combine" element={<Combine />} />
-                          <Route path="/route" element={<LessonRoute />} />
+                          <Route path="/road" element={<LessonRoad />} />
                       </Route>
                   </Route>
               </Route>

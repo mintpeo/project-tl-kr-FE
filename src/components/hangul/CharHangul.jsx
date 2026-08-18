@@ -1,10 +1,20 @@
 import React, {useEffect, useState} from 'react';
-import {CHAR_VOWELS, CHAR_CONSONANT, CHAR_VOWELS_PAIR, CHAR_VOWELS_SINGLE, CHAR_CONSONANT_SINGLE, CHAR_CONSONANT_PAIR} from "./hangulHelper.js";
+import useFetch from "../use/useFetch.js";
+import {API_URL} from "../API_URL.jsx";
 
-const CharHangul = ({selectedChar, isVowels}) => {
-    const char = isVowels ? CHAR_VOWELS : CHAR_CONSONANT;
-    const char_single = isVowels ? CHAR_VOWELS_SINGLE : CHAR_CONSONANT_SINGLE;
-    const char_pair = isVowels ? CHAR_VOWELS_PAIR : CHAR_CONSONANT_PAIR
+const CharHangul = ({isVowels}) => {
+    const {data: characters} = useFetch(`${API_URL}/character/all`);
+    const vowels = characters.filter(char => char.type === "VOWEL");
+    const consonants = characters.filter(char => char.type === "CONSONANT");
+
+    const vowelsSingle = vowels.filter(vowel => vowel.double === false);
+    const vowelsPair = vowels.filter(vowel => vowel.double === true);
+    const consonantsSingle = consonants.filter(consonant => consonant.double === false);
+    const consonantsPair = consonants.filter(consonant => consonant.double === true);
+
+    const char = isVowels ? vowels : consonants;
+    const char_single = isVowels ? vowelsSingle : consonantsSingle;
+    const char_pair = isVowels ? vowelsPair : consonantsPair
 
     const [selectedSingleIndex, setSelectedSingleIndex] = useState(0);
     const selectedSingle = char_single[selectedSingleIndex] || char_single[0];
@@ -20,7 +30,7 @@ const CharHangul = ({selectedChar, isVowels}) => {
     return (
         <>
             <p>{isVowels ? 'Nguyên âm' : 'Phụ âm'} có tổng cộng <strong>{char.length} kí tự</strong> được chia thành:</p>
-            <p><strong>{isVowels ? CHAR_VOWELS_SINGLE.length : CHAR_CONSONANT_SINGLE.length}</strong> {isVowels ? 'Nguyên âm đơn' : 'Phụ âm đơn'}:</p>
+            <p><strong>{isVowels ? vowelsSingle.length : consonantsSingle.length}</strong> {isVowels ? 'Nguyên âm đơn' : 'Phụ âm đơn'}:</p>
             <div className="char-switch" id="charSwitch">
                 {
                     char_single.map((item, index) => (
@@ -36,12 +46,11 @@ const CharHangul = ({selectedChar, isVowels}) => {
                 }
             </div>
 
-            <div
-                className="svg-stage"
-                dangerouslySetInnerHTML={{ __html: selectedSingle.content }}
-            />
+            <div className="svg-stage">
+                <img src={`http://localhost:8080${selectedSingle?.strokeSvgUrl}`} alt={selectedSingle?.name}/>
+            </div>
 
-            <p><strong>{isVowels ? CHAR_VOWELS_PAIR.length : CHAR_CONSONANT_PAIR.length}</strong> {isVowels ? 'Nguyên âm đôi' : 'Phụ âm kép'}:</p>
+            <p><strong>{isVowels ? vowelsPair.length : consonantsPair.length}</strong> {isVowels ? 'Nguyên âm đôi' : 'Phụ âm kép'}:</p>
             <div className="char-switch" id="charSwitch">
                 {
                     char_pair.map((item, index) => (
@@ -57,10 +66,9 @@ const CharHangul = ({selectedChar, isVowels}) => {
                 }
             </div>
 
-            <div
-                className="svg-stage"
-                dangerouslySetInnerHTML={{ __html: selectedPair.content }}
-            />
+            <div className="svg-stage">
+                <img src={`http://localhost:8080${selectedPair?.strokeSvgUrl}`} alt={selectedPair?.name}/>
+            </div>
         </>
     );
 };
