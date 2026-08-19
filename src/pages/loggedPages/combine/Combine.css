@@ -1,0 +1,122 @@
+.combine-card {
+    /*padding: 28px;*/
+
+    .combine-head {
+        margin-bottom: 20px;
+
+        h3 {
+            font-size: 16px;
+            margin: 0 0 4px;
+        }
+
+        p {
+            font-size: 13px;
+            color: var(--ink-soft);
+            margin: 0;
+        }
+    }
+
+    .chip-group {
+        margin-bottom: 18px;
+
+        .chip-group-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ink-soft);
+            margin-bottom: 9px;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+
+        .chip-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+
+            .chip {
+                padding: 8px 14px;
+                border-radius: 9px;
+                border: 1px solid var(--paper-dim);
+                background: var(--paper);
+                font-family: 'Noto Serif KR', serif;
+                font-size: 15px;
+                font-weight: 600;
+                color: var(--ink);
+                cursor: pointer;
+
+                &:hover {
+                    border-color: var(--celadon);
+                }
+            }
+
+            .selected.initial {
+                background: var(--celadon-dark);
+                color: #fff;
+                border-color: var(--celadon-dark);
+            }
+
+            .selected.medial {
+                background: var(--gold);
+                color: #fff;
+                border-color: var(--gold);
+            }
+        }
+    }
+
+    .combine-preview {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        margin-top: 24px;
+        padding: 22px;
+        background: var(--paper);
+        border-radius: 14px;
+        border: 1px solid var(--paper-dim);
+
+        .preview-box {
+            width: 100px;
+            height: 100px;
+            border-radius: 14px;
+            background: var(--paper-card);
+            border: 1px dashed var(--paper-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            .preview-glyph {
+                font-family: 'Noto Serif KR', serif;
+                font-size: 52px;
+                font-weight: 700;
+                color: var(--celadon-dark);
+            }
+
+            .placeholder {
+                color: var(--paper-dim);
+                font-size: 40px;
+            }
+        }
+
+        .preview-info {
+            p {
+                margin: 0;
+                font-size: 13px;
+                color: var(--ink-soft);
+                line-height: 1.6;
+            }
+
+            .formula {
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 12px;
+                color: var(--celadon-dark);
+                margin-top: 6px;
+            }
+
+            .preview-text {
+                font-size: 16px;
+                color: var(--celadon-dark);
+                margin-top: 6px;
+            }
+        }
+    }
+}

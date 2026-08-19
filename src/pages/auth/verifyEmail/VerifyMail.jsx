@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './VerifyMail.css';
 import {useLocation, useNavigate} from "react-router-dom";
-import {usePost} from "../../../components/usePost.js";
+import {usePost} from "../../../components/use/usePost.js";
 import {API_URL} from "../../../components/API_URL.jsx";
 
 const VerifyMail = () => {

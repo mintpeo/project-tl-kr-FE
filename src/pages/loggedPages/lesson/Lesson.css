@@ -26,3 +26,180 @@
     grid-template-columns: repeat(6,1fr);
     gap: 12px;
 }
+
+.lesson-shell {
+    display: grid;
+    grid-template-columns:220px 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.category-list {
+    background: var(--paper-card);
+    border: 1px solid var(--paper-dim);
+    border-radius: var(--radius);
+    padding: 10px;
+
+    .category-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ink-soft);
+
+        &:hover {
+            background: var(--paper);
+        }
+
+        .icon {
+            display: flex;
+            font-size: 18px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .category-count {
+            margin-left: auto;
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--paper-dim);
+            color: var(--ink-soft);
+            padding: 2px 7px;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+    }
+}
+
+.category-item.active {
+    background: var(--celadon-light);
+    color: var(--celadon-dark);
+}
+
+.category-item.active .category-count {
+    background: var(--celadon-dark);
+    color: #fff;
+}
+
+.category-section {
+    .category-section-head {
+        margin-bottom: 16px;
+
+        h2 {
+            font-size: 19px;
+            margin: 0 0 4px;
+        }
+
+        p {
+            font-size: 13px;
+            color: var(--ink-soft);
+            margin: 0;
+        }
+    }
+
+    .video-grid {
+        display: grid;
+        grid-template-columns:repeat(3, 1fr);
+        gap: 16px;
+
+        .video-card {
+            background: var(--paper-card);
+            border: 1px solid var(--paper-dim);
+            border-radius: 14px;
+            overflow: hidden;
+            cursor: pointer;
+
+            &:hover {
+                border-color: var(--celadon);
+            }
+
+            .video-thumb {
+                position: relative;
+                width: 100%;
+                aspect-ratio: 16/9;
+                background: linear-gradient(160deg, var(--celadon-dark), var(--celadon));
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+
+                .thumb-img {
+                    position: absolute;
+                    inset: 0;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    z-index: 1;
+                }
+
+                .ghost-char {
+                    position: absolute;
+                    font-family: 'Noto Serif KR', serif;
+                    font-weight: 700;
+                    font-size: 96px;
+                    color: rgba(255, 255, 255, 0.14);
+                    right: -6px;
+                    bottom: -18px;
+                    z-index: 2;
+                    pointer-events: none;
+                }
+
+                .play-btn {
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.95);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                    z-index: 3;
+
+                    svg {
+                        width: 16px;
+                        height: 16px;
+                        fill: var(--celadon-dark);
+                        margin-left: 2px;
+                    }
+                }
+
+                .duration-badge {
+                    position: absolute;
+                    bottom: 8px;
+                    right: 8px;
+                    background: rgba(0, 0, 0, 0.55);
+                    color: #fff;
+                    font-size: 11px;
+                    font-weight: 600;
+                    padding: 2px 7px;
+                    border-radius: 5px;
+                    font-family: 'JetBrains Mono', monospace;
+                    z-index: 3; /* Nổi lên trên ảnh */
+                }
+            }
+
+            .video-info {
+                padding: 13px 14px;
+
+                h4 {
+                    font-size: 14px;
+                    margin: 0 0 5px;
+                    font-family: 'Be Vietnam Pro', sans-serif;
+                    font-weight: 700;
+                    line-height: 1.4;
+                }
+
+                p {
+                    font-size: 12px;
+                    color: var(--ink-soft);
+                    margin: 0;
+                    line-height: 1.5;
+                }
+            }
+        }
+    }
+}

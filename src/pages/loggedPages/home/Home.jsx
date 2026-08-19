@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import './Home.css';
 import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
-import {usePost} from "../../../components/usePost.js";
+import {usePost} from "../../../components/use/usePost.js";
 
 const Home = () => {
     const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);

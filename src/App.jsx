@@ -11,6 +11,12 @@ import Lesson from "./pages/loggedPages/lesson/Lesson.jsx";
 import Practice from "./pages/loggedPages/practice/Practice.jsx";
 import Progress from "./pages/loggedPages/progress/Progress.jsx";
 import Admin from "./pages/admin/Admin.jsx";
+import AuthWrapper from "./components/AuthWrapper.jsx";
+import VideoLearningPage from "./pages/loggedPages/lesson/videoLearn/VideoLearningPage.jsx";
+import Stroke from "./pages/loggedPages/stroke/Stroke.jsx";
+import Combine from "./pages/loggedPages/combine/Combine.jsx";
+import LessonRoute from "./pages/loggedPages/lessonRoute/LessonRoute.jsx";
+import LessonRoad from "./pages/loggedPages/lessonRoad/LessonRoad.jsx";
 
 // Not Logged
 import HomeNotLogged from "./pages/notLoggedPages/Home.jsx";
@@ -20,6 +26,7 @@ import ForgetPass from "./pages/auth/forgetPassword/ForgetPass.jsx";
 import ResetPass from "./pages/auth/forgetPassword/ResetPass.jsx";
 import LoginSuc from "./pages/auth/loginGoogle/LoginSuc.jsx";
 import Profile from "./pages/user/profile/Profile.jsx";
+import Setting from "./pages/user/setting/Setting.jsx";
 
 function App() {
     const userInfo = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
@@ -36,12 +43,19 @@ function App() {
               <Route path="/google" element={isLogged ? <Navigate to="/home" replace /> : <LoginSuc />} />
 
               <Route element={<ProtectedRoute allowedRoles={['USER']}/>}>
-                  <Route element={<Layout />}>
-                      <Route path="/home" element={<Home />} />
-                      <Route path="/lessons" element={<Lesson />} />
-                      <Route path="/practice" element={<Practice />} />
-                      <Route path="/progress" element={<Progress />} />
-                      <Route path="/profile" element={<Profile />} />
+                  <Route element={<AuthWrapper />}>
+                      <Route element={<Layout />}>
+                          <Route path="/home" element={<Home />} />
+                          <Route path="/lessons/:categoryId" element={<Lesson />} />
+                          <Route path="/practice" element={<Practice />} />
+                          <Route path="/progress" element={<Progress />} />
+                          <Route path="/profile" element={<Profile />} />
+                          <Route path="/setting" element={<Setting />} />
+                          <Route path="/video/:lessonId" element={<VideoLearningPage />} />
+                          <Route path="/strokes" element={<Stroke />} />
+                          <Route path="/combine" element={<Combine />} />
+                          <Route path="/road" element={<LessonRoad />} />
+                      </Route>
                   </Route>
               </Route>
 
@@ -49,7 +63,7 @@ function App() {
                   <Route path="/admin" element={<Admin/>}/>
               </Route>
 
-              {/*<Route path="*" element={<Navigate to="/" replace />} />*/}
+              <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
       </BrowserRouter>
   )

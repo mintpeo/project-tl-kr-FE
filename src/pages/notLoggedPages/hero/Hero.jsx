@@ -1,6 +1,8 @@
 import React from 'react';
 import './Hero.css';
 
+import { BsLightningCharge } from "react-icons/bs";
+
 const Hero = () => {
     return (
         <>
@@ -8,7 +10,10 @@ const Hero = () => {
                 <div className="hero-grid">
 
                     <div>
-                        <span className="eyebrow-pill"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 11-14h-7l1-6z"/></svg>Được hỗ trợ bởi AI</span>
+                        <span className="eyebrow-pill">
+                            <i className="icon"><BsLightningCharge /></i>
+                            Được hỗ trợ bởi AI
+                        </span>
                         <h1>Học viết chữ Hangul, <span className="accent">được AI chấm điểm</span> ngay tức thì.</h1>
                         <p className="lead">Nền tảng học tiếng Hàn trực tuyến dành cho người mới bắt đầu — luyện viết trên
                             giao diện tương tác và nhận phản hồi chi tiết về từng nét chữ chỉ trong vài giây.</p>

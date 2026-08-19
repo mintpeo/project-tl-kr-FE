@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import './ForgetPass.css';
 import {useNavigate, useSearchParams} from "react-router-dom";
-import {usePatch} from "../../../components/usePatch.js";
+import {usePatch} from "../../../components/use/usePatch.js";
 import {API_URL} from "../../../components/API_URL.jsx";
 
 const ResetPass = () => {
@@ -23,15 +23,11 @@ const ResetPass = () => {
         }
 
         try {
-            const res = await resetPass(resetPassReq);
-            if (!res.ok) alert("Link đã hết hạn.");
-            else {
-                const data = await res.json();
-                if (data) {
-                    navigate("/auth")
-                    alert("Đổi mật khẩu thành công.");
-                }
-            }
+            const data = await resetPass(resetPassReq);
+            if (data.email) {
+                navigate("/auth")
+                alert("Đổi mật khẩu thành công.");
+            } else alert("Link đã hết hạn.");
         } catch (e) {
             console.log("Error Reset Pass", e);
         }
