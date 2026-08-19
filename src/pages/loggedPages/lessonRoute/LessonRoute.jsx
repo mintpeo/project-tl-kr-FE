@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import './LessonRoute.css';
 import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
 import Skeleton from "../../../components/loading/Skeleton.jsx";
@@ -6,18 +6,25 @@ import ReactPlayer from "react-player";
 import CharHangul from "../../../components/hangul/CharHangul.jsx";
 import Combine from "../combine/Combine.jsx";
 import {usePost} from "../../../components/use/usePost.js";
+import lesson from "../lesson/Lesson.jsx";
 
 const LessonRoute = () => {
     const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
     const user = JSON.parse(user_info);
 
     const {executePost: loadCategories, loading: loadingCate} = usePost(`${API_URL}/lesson-cate-route/user`);
+    const {executePost: completeLesson} = usePost(`${API_URL}/user-lesson-progress/complete`);
+
     const [categories, setCategories] = useState([]);
     const [selectedCateId, setSelectedCateId] = useState(-1);
     const [lessonByCateId, setLessonByCateId] = useState([]);
     const [selectedLessonRoute, setSelectedLessonRoute] = useState(1);
     const [lessonRoute, setLessonRoute] = useState();
     const [isLessonContent, setIsLessonContent] = useState(true);
+    const [hasCompleted, setHasCompleted] = useState(false);
+    const playerRef = useRef(null);
+    const [track, setTrack] = useState(0);
+    const [countLesson, setCountLesson] = useState(0);
 
     const fetchCategories = async () => {
         const req = {
@@ -34,6 +41,12 @@ const LessonRoute = () => {
                 lessonsSize: item.lessonsSize,
                 learned: item.learned
             }));
+
+            const count = res.filter(item => item.learned).length;
+            const per = Math.round((count / res.length) * 100);
+            setCountLesson(count);
+            setTrack(per);
+
             setCategories(res);
         } catch (e) {
             console.log("Error Loading Categories User", e);
@@ -55,6 +68,35 @@ const LessonRoute = () => {
         learnContent: item?.learnContent
     }));
 
+    const handleProgress = async (event) => {
+        const video = event.currentTarget;
+        if (!video.duration) return;
+
+        // console.log("currentTime:", video.currentTime);
+        // console.log("duration:", video.duration);
+
+        const progress = video.currentTime / video.duration;
+
+        // console.log(
+        //     "Tiến độ phát:",
+        //     Math.round(progress * 100) + "%"
+        // );
+
+        if (!hasCompleted && progress >= 0.8) {
+            const req = {
+                userId: user?.userId,
+                lessonId: lessonRoute?.id
+            }
+
+            try {
+                const data = await completeLesson(req);
+                if (data) setHasCompleted(true);
+            } catch (e) {
+                console.log("Error Complete Lesson", e);
+            }
+        }
+    };
+
     useEffect(() => {
         if (lessons.length > 0) {
             const currentLesson = lessons.find((item) => item.orderIndex === selectedLessonRoute) || lessons[0];
@@ -64,14 +106,11 @@ const LessonRoute = () => {
         }
     }, [selectedLessonRoute, lessonByCateId]);
 
-    useEffect(() => {
-        setSelectedLessonRoute(1)
-    }, [selectedCateId]);
-
     // Get lessons by category id
     useEffect(() => {
-        if (selectedCateId === -1) return;
+        setSelectedLessonRoute(1);
 
+        if (selectedCateId === -1) return;
         const getLessonByCateId = async () => {
             const req = {
                 userId: user.userId,
@@ -117,8 +156,8 @@ const LessonRoute = () => {
                 <div className="card curriculum">
                     <div className="curriculum-head">
                         <h3>Lộ trình học</h3>
-                        <div className="ov-track"><div className="ov-fill" style={{width: '25%'}} /></div>
-                        <p>1/4 chương đã hoàn thành</p>
+                        <div className="ov-track"><div className="ov-fill" style={{width: `${track}%`}} /></div>
+                        <p>{countLesson}/4 chương đã hoàn thành</p>
                     </div>
 
                     {
@@ -199,10 +238,13 @@ const LessonRoute = () => {
                                     {
                                         lessonRoute?.youtubeId ? (
                                             <ReactPlayer
+                                                ref={playerRef}
                                                 src={`https://www.youtube.com/watch?v=${lessonRoute?.youtubeId}`}
                                                 width="100%"
                                                 height="100%"
                                                 controls={true}
+                                                onProgress={handleProgress}
+                                                progressInterval={1000}
                                             />
                                         ) : (
                                             <>
@@ -218,10 +260,14 @@ const LessonRoute = () => {
                                 <div className="content-head">
                                     <h2>{lessonRoute?.name}</h2>
                                     <p>{lessonRoute?.des}</p>
+                                    {
+                                        hasCompleted && (
+                                            <div style={{textAlign: "right", marginBottom: "10px"}}><button className="btn" style={{padding: '5px 10px'}} onClick={() => window.location.reload()}>Qua bài học tiếp theo</button></div>
+                                        )
+                                    }
                                 </div>
 
                                 {
-                                    // category => list => 0 1 2 3, selectedCateId = cateRouteId => 1 2 3
                                     lessonRoute?.learnContent && (
                                         <>
                                             <div className="content-tabs">

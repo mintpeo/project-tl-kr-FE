@@ -87,7 +87,7 @@ const Lesson = () => {
         getLessonsWithCate();
     }, [categoryId])
 
-    console.log(lessonsWithCate)
+    // console.log(lessonsWithCate)
 
     const handleSelectCategory = (id) => {
         setChooseCate(id);

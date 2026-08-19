@@ -81,6 +81,7 @@ const Practice = () => {
         try {
             const res = await fetch("http://localhost:8080/api/predict/data-url", {
                 method: "POST",
+                credentials: 'include',
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ dataUrl }),
             });
