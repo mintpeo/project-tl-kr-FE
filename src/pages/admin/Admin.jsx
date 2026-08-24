@@ -5,7 +5,9 @@ import Main from "./main/Main.jsx";
 
 const Admin = () => {
     return (
-        <div className="app">
+        <div className="app"
+             // style={{minWidth: '1700px'}}
+        >
             <Sidebar />
 
             <Main />

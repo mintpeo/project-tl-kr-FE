@@ -52,7 +52,7 @@
         position: relative;
     }
 
-    .sidebar-foot {
+    .sidebar-foot-logged {
         display: flex;
         align-items: center;
         gap: 10px;

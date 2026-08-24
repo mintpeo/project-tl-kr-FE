@@ -6,7 +6,6 @@ import ReactPlayer from "react-player";
 import CharHangul from "../../../components/hangul/CharHangul.jsx";
 import Combine from "../combine/Combine.jsx";
 import {usePost} from "../../../components/use/usePost.js";
-import lesson from "../lesson/Lesson.jsx";
 
 const LessonRoute = () => {
     const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
