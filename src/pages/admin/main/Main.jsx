@@ -10,7 +10,7 @@ import {useDelete} from "../../../components/use/useDelete.js";
 const Main = () => {
     const {data: loadAuth, loading: isLoadingAuth} = useFetch(`${API_URL}/admin/all`);
     const {executePost: handleFindByEmail} = usePost(`${API_URL}/admin/email`);
-    const {executePatch: handleChangeProfile} = usePatch(`${API_URL}/user/change-profile`);
+    const {executePatch: handleChangeProfile} = usePatch(`${API_URL}/admin/change`);
     const {executePost: handleCreateUser} = usePost(`${API_URL}/admin/create`);
     const {executeDelete: handleDeleteUser} = useDelete(`${API_URL}/admin/delete`);
 
@@ -179,7 +179,7 @@ const Main = () => {
         { name: "Tổng số tài khoản", number: authList.length, iconKey: "user" },
         { name: "Đang hoạt động", number: authActive, iconKey: "active" },
         { name: "Chưa kích hoạt", number: authNoActive, iconKey: "lock" },
-        { name: "Mới trong tuần", number: "-", iconKey: "new" },
+        // { name: "Mới trong tuần", number: "-", iconKey: "new" },
     ]
     const ICONS = {
         user: (
@@ -209,7 +209,7 @@ const Main = () => {
 
     if (isLoadingAuth) return <Skeleton />
     return (
-        <div className="main">
+        <div className="main-admin">
             <div className="page-head">
                 <div>
                     <span className="eyebrow">Quản trị hệ thống</span>
@@ -283,9 +283,9 @@ const Main = () => {
                         <th>Mail</th>
                         <th>Vai trò</th>
                         <th>Ngày tham gia</th>
-                        <th>Hành động</th>
+                        <th>Hoạt động</th>
                         <th>Đăng nhập Google</th>
-                        <th></th>
+                        <th>Hành động</th>
                     </tr>
                     </thead>
                     <tbody id="userTableBody">
@@ -293,8 +293,7 @@ const Main = () => {
                         authListCustom.map((auth, index) => (
                             <tr
                                 className={selectedUser === auth.id ? `activeTR` : ``}
-                                style={{cursor: "pointer"}} key={index}
-                                onClick={() => setSelectedUser(auth.id)}
+                                key={index}
                             >
                                 <td>{index + 1}</td>
                                 <td>{auth.id}</td>
@@ -303,10 +302,23 @@ const Main = () => {
                                 <td>{auth.createAt}</td>
                                 <td>{auth.enabled ? `Đang hoạt động` : `Chưa kích hoạt`}</td>
                                 <td>{auth.isGoogle ? `Có` : `Không`}</td>
-                                <td><button onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteUserAdmin(auth.id);
-                                }} className="btn btn-ghost">Xoá</button></td>
+                                <td>
+                                    <div className="row-actions">
+                                        <button className="icon-btn" title="Chỉnh sửa" onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedUser(auth.id);
+                                        }}>
+                                            <svg viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" /></svg>
+                                        </button>
+
+                                        <button className="icon-btn danger" title="Xóa" onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeleteUserAdmin(auth.id);
+                                        }}>
+                                            <svg viewBox="0 0 24 24"><path d="M3 6h18" /><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0l-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6" /></svg>
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                         ))
                     }
@@ -330,107 +342,112 @@ const Main = () => {
                 </div>
             </div>
 
-            {selectedUser !== 0 && (
-                <div className="card detail-panel">
+            <div
+                className={`drawer-backdrop ${selectedUser !== 0 ? 'open' : ''}`}
+                // onClick={() => setSelectedUser(0)}
+            >
+                <div className={`card detail-panel-drawer ${selectedUser !== 0 ? 'open' : ''}`}>
                     <div className="detail-header">
                         <h3>Thông tin chi tiết</h3>
                         <button className="btn-close" onClick={() => setSelectedUser(0)}>✕</button>
                     </div>
 
-                    <div className="detail-body">
-                        <div className="detail-item">
-                            <span className="detail-label">Mã tài khoản (ID):</span>
-                            <span className="detail-value">{userDetail?.id}</span>
-                        </div>
+                    {userDetail && (
+                        <div className="detail-body">
+                            <div className="detail-item">
+                                <span className="detail-label">Mã tài khoản (ID):</span>
+                                <span className="detail-value">{userDetail?.id}</span>
+                            </div>
 
-                        <div className="detail-item">
-                            <span className="detail-label">Tên:</span>
-                            {
-                                !editUser ? (
-                                    <span className="detail-value">{userDetail?.fullName}</span>
-                                ) : (
-                                    <span className="detail-valute">
+                            <div className="detail-item">
+                                <span className="detail-label">Tên:</span>
+                                {
+                                    !editUser ? (
+                                        <span className="detail-value">{userDetail?.fullName}</span>
+                                    ) : (
+                                        <span className="detail-valute">
                                         <input
                                             onChange={(e) => setFullName(e.target.value)}
                                             type="text" style={{textAlign: "right"}}
                                             defaultValue={userDetail?.fullName || ''}/>
                                     </span>
-                                )
-                            }
-                        </div>
+                                    )
+                                }
+                            </div>
 
-                        <div className="detail-item">
-                            <span className="detail-label">Số điện thoại:</span>
-                            {
-                                !editUser ? (
-                                    <span className="detail-value">{userDetail?.phone}</span>
-                                ) : (
-                                    <span className="detail-valute">
+                            <div className="detail-item">
+                                <span className="detail-label">Số điện thoại:</span>
+                                {
+                                    !editUser ? (
+                                        <span className="detail-value">{userDetail?.phone}</span>
+                                    ) : (
+                                        <span className="detail-valute">
                                         <input
                                             onChange={(e) => setPhone(e.target.value)}
                                             type="text"
                                             style={{textAlign: "right"}}
                                             defaultValue={userDetail?.phone}/>
                                     </span>
-                                )
-                            }
-                        </div>
+                                    )
+                                }
+                            </div>
 
-                        <div className="detail-item">
-                            <span className="detail-label">Email:</span>
-                            <span className="detail-value">{userDetail?.email}</span>
-                        </div>
+                            <div className="detail-item">
+                                <span className="detail-label">Email:</span>
+                                <span className="detail-value">{userDetail?.email}</span>
+                            </div>
 
-                        <div className="detail-item">
-                            <span className="detail-label">Vai trò:</span>
-                            {
-                                !editUser ? (
-                                    <span className={`badge ${userDetail?.role === 'ADMIN' ? 'badge-admin' : 'badge-user'}`}>
+                            <div className="detail-item">
+                                <span className="detail-label">Vai trò:</span>
+                                {
+                                    !editUser ? (
+                                        <span className={`badge ${userDetail?.role === 'ADMIN' ? 'badge-admin' : 'badge-user'}`}>
                                         {userDetail?.role === 'USER' ? 'Người học' : 'Quản trị viên'}
                                     </span>
-                                ) : (
-                                    <select onChange={(e) => setRole(e.target.value)} className="select filter-select" id="statusFilter">
-                                        <option value={userDetail?.role === 'USER' ? 'USER' : 'ADMIN'}>{userDetail?.role === 'USER' ? 'Người học' : 'Quản trị viên'}</option>
-                                        <option value={userDetail?.role !== 'USER' ? 'USER' : 'ADMIN'}>{userDetail?.role !== 'USER' ? 'Người học' : 'Quản trị viên'}</option>
-                                    </select>
-                                )
-                            }
-                        </div>
+                                    ) : (
+                                        <select onChange={(e) => setRole(e.target.value)} className="select filter-select" id="statusFilter">
+                                            <option value={userDetail?.role === 'USER' ? 'USER' : 'ADMIN'}>{userDetail?.role === 'USER' ? 'Người học' : 'Quản trị viên'}</option>
+                                            <option value={userDetail?.role !== 'USER' ? 'USER' : 'ADMIN'}>{userDetail?.role !== 'USER' ? 'Người học' : 'Quản trị viên'}</option>
+                                        </select>
+                                    )
+                                }
+                            </div>
 
-                        <div className="detail-item">
-                            <span className="detail-label">Trạng thái:</span>
-                            {
-                                !editUser ? (
-                                    <span className={`badge ${userDetail?.enabled ? 'badge-success' : 'badge-danger'}`}>
+                            <div className="detail-item">
+                                <span className="detail-label">Trạng thái:</span>
+                                {
+                                    !editUser ? (
+                                        <span className={`badge ${userDetail?.enabled ? 'badge-success' : 'badge-danger'}`}>
                                         {userDetail?.enabled ? 'Đang hoạt động' : 'Chưa kích hoạt'}
                                     </span>
-                                ) : (
-                                    <select onChange={(e) => setIsActive(e.target.value)} className="select filter-select" id="statusFilter">
-                                        <option value={String(userDetail?.enabled)}>{userDetail?.enabled ? 'Đang hoạt động' : 'Chưa kích hoạt'}</option>
-                                        <option value={String(!userDetail?.enabled)}>{!userDetail?.enabled ? 'Đang hoạt động' : 'Chưa kích hoạt'}</option>
-                                    </select>
-                                )
-                            }
-                        </div>
+                                    ) : (
+                                        <select onChange={(e) => setIsActive(e.target.value)} className="select filter-select" id="statusFilter">
+                                            <option value={String(userDetail?.enabled)}>{userDetail?.enabled ? 'Đang hoạt động' : 'Chưa kích hoạt'}</option>
+                                            <option value={String(!userDetail?.enabled)}>{!userDetail?.enabled ? 'Đang hoạt động' : 'Chưa kích hoạt'}</option>
+                                        </select>
+                                    )
+                                }
+                            </div>
 
-                        <div className="detail-item">
-                            <span className="detail-label">Đăng nhập Google:</span>
-                            <span className="detail-value">{userDetail?.isGoogle ? 'Có' : 'Không'}</span>
-                        </div>
+                            <div className="detail-item">
+                                <span className="detail-label">Đăng nhập Google:</span>
+                                <span className="detail-value">{userDetail?.isGoogle ? 'Có' : 'Không'}</span>
+                            </div>
 
-                        <div className="detail-item">
-                            <span className="detail-label">Ngày tạo:</span>
-                            <span className="detail-value">{userDetail?.createAt}</span>
-                        </div>
+                            <div className="detail-item">
+                                <span className="detail-label">Ngày tạo:</span>
+                                <span className="detail-value">{userDetail?.createAt}</span>
+                            </div>
 
-                        <button className={`btn btn-primary ${editUser ? `disable` : ``}`} onClick={() => setEditUser(!editUser)}>Chỉnh sửa</button>
-                        <button className={`btn btn-primary ${editUser ? `` : `disable`}`} onClick={() => {
-                            handleChangeUserProfile();
-                            setEditUser(!editUser);
-                        }}>Lưu</button>
-                    </div>
+                            <button className={`btn btn-primary ${editUser ? `disable` : ``}`} style={{justifyContent: "center"}} onClick={() => setEditUser(!editUser)}>Chỉnh sửa</button>
+                            <button className={`btn btn-primary ${editUser ? `` : `disable`}`} style={{justifyContent: "center"}} onClick={() => {
+                                handleChangeUserProfile();
+                                setEditUser(!editUser);
+                            }}>Lưu</button>
+                        </div>
+                    )}
                 </div>
-            )}
+            </div>
 
             {isOpenAddModal && (
                 <div className="modal-overlay" onClick={() => setIsOpenAddModal(false)}>

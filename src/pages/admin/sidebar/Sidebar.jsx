@@ -12,19 +12,25 @@ import {
     RiLogoutCircleRLine
 } from "react-icons/ri";
 import { TbAlphabetKorean } from "react-icons/tb";
+import {useNavigate} from "react-router-dom";
 
 const Sidebar = () => {
+    const navigate = useNavigate();
     const [selectedPage, setSelectedPage] = useState(0);
 
     const dataPages = [
-        {name: "Tài khoản", navi: "/home", icon: "RiUser3Line"},
-        {name: "Bài học", navi: "/lessons/1", icon: "RiBook2Line"},
-        {name: "Ký tự tiếng Hàn", navi: "/strokes", icon: "TbAlphabetKorean"},
-        {name: 'Chữ mẫu', navi: "/combine", icon: "RiBattery2Line"},
-        {name: "Bài luyện tập", navi: "/practice", icon: "RiBriefcase2Line"},
+        {name: "Tài khoản", navi: "/", icon: "RiUser3Line"},
+        {name: "Bài học", navi: "/lesson", icon: "RiBook2Line"},
+        {name: "Ký tự tiếng Hàn", navi: "/character", icon: "TbAlphabetKorean"},
+        {name: 'Chữ mẫu', navi: "/sample", icon: "RiBattery2Line"},
+        {name: "Bài luyện tập", navi: "/exercise", icon: "RiBriefcase2Line"},
         {name: "Thứ tự nét", navi: "/progress", icon: "RiDatabase2Line"},
         {name: "Theo dõi hoạt động học tập", navi: "/progress", icon: "RiBarChart2Line"},
     ];
+
+    const changeNavi = (navi) => {
+        navigate(`/admin${navi}`);
+    }
 
     const ICON_MAP = {
         RiUser3Line: RiUser3Line,
@@ -56,7 +62,10 @@ const Sidebar = () => {
                             const IconComponent = ICON_MAP[item.icon];
 
                             return (
-                                <button key={index} className={`nav-item ${selectedPage === index ? `active` : ``}`} onClick={() => setSelectedPage(index)}>
+                                <button key={index} className={`nav-item ${selectedPage === index ? `active` : ``}`} onClick={() => {
+                                    setSelectedPage(index);
+                                    changeNavi(item.navi);
+                                }}>
                                     {IconComponent && <IconComponent size={24} />}
                                     {item.name}
                                 </button>

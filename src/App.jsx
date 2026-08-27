@@ -4,7 +4,7 @@ import {LOCAL_STORAGE_KEYS} from "./components/API_URL.jsx";
 import './App.css';
 
 // import Pages
-import Layout from "./components/Layout.jsx";
+import Layout from "./utils/Layout.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Home from "./pages/loggedPages/home/Home.jsx";
 import Lesson from "./pages/loggedPages/lesson/Lesson.jsx";
@@ -15,8 +15,14 @@ import AuthWrapper from "./components/AuthWrapper.jsx";
 import VideoLearningPage from "./pages/loggedPages/lesson/videoLearn/VideoLearningPage.jsx";
 import Stroke from "./pages/loggedPages/stroke/Stroke.jsx";
 import Combine from "./pages/loggedPages/combine/Combine.jsx";
-import LessonRoute from "./pages/loggedPages/lessonRoute/LessonRoute.jsx";
 import LessonRoad from "./pages/loggedPages/lessonRoad/LessonRoad.jsx";
+// Admin
+import LayoutAdmin from "./utils/LayoutAdmin.jsx";
+import MainAdmin from "./pages/admin/main/Main.jsx"
+import AdminLesson from "./pages/admin/lesson/AdminLesson.jsx";
+import AdminCharacter from "./pages/admin/character/AdminCharacter.jsx";
+import AdminExercise from "./pages/admin/exercise/AdminExercise.jsx";
+import AdminSample from "./pages/admin/sample/AdminSample.jsx";
 
 // Not Logged
 import HomeNotLogged from "./pages/notLoggedPages/Home.jsx";
@@ -60,10 +66,16 @@ function App() {
               </Route>
 
               <Route element={<ProtectedRoute allowedRoles={['ADMIN']}/>}>
-                  <Route path="/admin" element={<Admin/>}/>
+                  <Route element={<LayoutAdmin />}>
+                      <Route path="/admin" element={<MainAdmin />}/>
+                      <Route path="/admin/lesson" element={<AdminLesson />}/>
+                      <Route path="/admin/character" element={<AdminCharacter />}/>
+                      <Route path="/admin/sample" element={<AdminSample />}/>
+                      <Route path="/admin/exercise" element={<AdminExercise />}/>
+                  </Route>
               </Route>
 
-              <Route path="*" element={<Navigate to="/" replace />} />
+              {/*<Route path="*" element={<Navigate to="/" replace />} />*/}
           </Routes>
       </BrowserRouter>
   )
