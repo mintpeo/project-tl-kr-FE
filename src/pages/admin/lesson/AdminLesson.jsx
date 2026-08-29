@@ -1,36 +1,13 @@
-import React, { useMemo, useState } from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import './AdminLesson.css';
 import useFetch from "../../../components/use/useFetch.js";
 import {API_URL} from "../../../components/API_URL.jsx";
-
-/* ============================================================
-   DỮ LIỆU MẪU — thay bằng dữ liệu thật từ API /api/admin/lessons
-   ============================================================ */
-const CATEGORY_OPTIONS = [
-    { value: 'alphabet', label: 'Bảng chữ cái' },
-    { value: 'vowel', label: 'Nguyên âm' },
-    { value: 'consonant', label: 'Phụ âm' },
-    { value: 'syllable', label: 'Âm tiết ghép' },
-];
-
-const INITIAL_LESSONS = [
-    { id: 1, title: 'Giới thiệu bảng chữ cái Hangul', category: 'alphabet', videoCount: 1, duration: '3:20', status: 'published', updatedAt: '12/06/2026' },
-    { id: 2, title: 'Cách ghép nguyên âm và phụ âm', category: 'alphabet', videoCount: 1, duration: '4:10', status: 'published', updatedAt: '12/06/2026' },
-    { id: 3, title: '10 nguyên âm cơ bản', category: 'vowel', videoCount: 1, duration: '8:45', status: 'published', updatedAt: '28/07/2026' },
-    { id: 4, title: 'Phân biệt ㅓ và ㅗ', category: 'vowel', videoCount: 1, duration: '2:55', status: 'published', updatedAt: '28/07/2026' },
-    { id: 5, title: 'Luyện phát âm nguyên âm đôi', category: 'vowel', videoCount: 1, duration: '5:12', status: 'draft', updatedAt: '02/08/2026' },
-    { id: 6, title: '14 phụ âm cơ bản', category: 'consonant', videoCount: 1, duration: '9:30', status: 'published', updatedAt: '30/07/2026' },
-    { id: 7, title: 'Thứ tự nét của ㄱ, ㄴ, ㄷ, ㄹ', category: 'consonant', videoCount: 1, duration: '4:48', status: 'draft', updatedAt: '05/08/2026' },
-    { id: 8, title: 'Nguyên tắc ghép âm tiết', category: 'syllable', videoCount: 1, duration: '6:15', status: 'draft', updatedAt: '10/08/2026' },
-];
+import {usePost} from "../../../components/use/usePost.js";
 
 const EMPTY_FORM = { title: '', category: 'alphabet', duration: '', status: 'draft', description: '' };
 
-/* ============================================================
-   COMPONENT
-   ============================================================ */
 const AdminLesson = () => {
-    const {data: lessonsRoad, loading: loadingLessonsRoad} = useFetch(`${API_URL}/admin/all-lessons-road`)
+    const {data: lessonsRoad, loading: loadingLessonsRoad} = useFetch(`${API_URL}/admin/all-lessons-road`);
     const lessonsRoadRes = lessonsRoad.map((lesson) => ({
         id: lesson.id,
         createdAt: lesson.createdAt,
@@ -41,36 +18,121 @@ const AdminLesson = () => {
         updateAt: lesson.updateAt,
         youtubeId: lesson.youtubeId,
         duration: lesson.duration,
-        cate: lesson.cateRoute.name
+        cateName: lesson.cateRoute.name,
+        cateId: lesson.cateRoute.id
+    }));
+    const [lessonsRoadListRes, setLessonsRoadListRes] = useState([]);
+
+    // Handle Filter Status
+    const [statusFilter, setStatusFilter] = useState(-1);
+    useEffect(() => {
+        if (statusFilter === -1) {
+            setLessonsRoadListRes(lessonsRoadRes);
+        } else if (statusFilter === 1) {
+            const lessonsWithStatus = lessonsRoadRes.filter(lesson => lesson.active === true);
+            setLessonsRoadListRes(lessonsWithStatus);
+        } else {
+            const lessonsWithStatus = lessonsRoadRes.filter(lesson => lesson.active === false);
+            setLessonsRoadListRes(lessonsWithStatus)
+        }
+    }, [statusFilter]);
+
+    // Handle Filter Category
+    const [categoryFilter, setCategoryFilter] = useState(0);
+    useEffect(() => {
+        if (categoryFilter === 0) {
+            setLessonsRoadListRes(lessonsRoadRes);
+            return;
+        }
+        const lessonsWithCate = lessonsRoadRes.filter(lesson => lesson.cateId === categoryFilter);
+        setLessonsRoadListRes(lessonsWithCate);
+    }, [categoryFilter]);
+
+    // Get All Cate Road
+    const {data: getAllCateRoad} = useFetch(`${API_URL}/admin/all-cate-road`);
+    const cateList = getAllCateRoad.map((cate) => ({
+        id: cate.id,
+        name: cate.name,
     }))
 
-    const [lessons, setLessons] = useState(INITIAL_LESSONS);
-    const [search, setSearch] = useState('');
-    const [categoryFilter, setCategoryFilter] = useState('all');
-    const [statusFilter, setStatusFilter] = useState('all');
+    // Search Name Lesson
+    const {executePost: handleSearch} = usePost(`${API_URL}/admin/search-lessons-name`);
+    const [searchName, setSearchName] = useState("");
+    useEffect(() => {
+        const handleSearchNameLesson = async () => {
+            const req = {
+                lessonRoadName: searchName
+            }
 
-    const [modalOpen, setModalOpen] = useState(false);
-    const [editingId, setEditingId] = useState(null); // null = đang thêm mới
-    const [form, setForm] = useState(EMPTY_FORM);
+            try {
+                const data = await handleSearch(req);
+                const res = data.map((lesson) => ({
+                    id: lesson.id,
+                    createdAt: lesson.createdAt,
+                    des: lesson.description,
+                    active: lesson.active,
+                    name: lesson.name,
+                    orderIndex: lesson.orderIndex,
+                    updateAt: lesson.updateAt,
+                    youtubeId: lesson.youtubeId,
+                    duration: lesson.duration,
+                    cate: lesson.cateRoute.name
+                }));
+                setLessonsRoadListRes(res);
+            } catch (e) {
+                console.log("Error Search Name Lesson", e);
+            }
+        }
+        handleSearchNameLesson();
+    }, [searchName]);
+    useEffect(() => {
+        setLessonsRoadListRes(lessonsRoadRes);
+    }, []);
 
+    // Handle Stat
+    const lessonsActiveLength = lessonsRoad.filter(lesson => lesson.active).length;
+    const lessonsNoActiveLength = lessonsRoad.filter(lesson => !lesson.active).length;
+    // Stat Row
+    const statRows = [
+        {name: "Tổng số bài học", amount: lessonsRoadRes.length, icon: "lessons", tone: "tone-a"},
+        {name: "Đang hiển thị", amount: lessonsActiveLength, icon: "active", tone: "tone-b"},
+        {name: "Đang ẩn", amount: lessonsNoActiveLength, icon: "noActive", tone: "tone-c"},
+        {name: "Danh mục", amount: cateList.length, icon: "cate", tone: "tone-d"},
+    ];
+    const iconStatRows = {
+        lessons: (
+            <svg viewBox="0 0 24 24">
+                <path d="M4 5a2 2 0 012-2h11v16H6a2 2 0 00-2 2V5z" />
+                <path d="M17 3v16" />
+            </svg>
+        ),
+        active: (
+            <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg>
+        ),
+        noActive: (
+            <svg viewBox="0 0 24 24"><path d="M12 20h9" />
+                <path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" />
+            </svg>
+        ),
+        cate: (
+            <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" /></svg>
+        )
+    };
+
+    // Spilt Text
     const truncateText = (text, maxLength) => {
         if (!text || text.length <= maxLength) return text;
         return text.slice(0, maxLength) + '...';
     };
 
-    const stats = useMemo(() => ({
-        total: lessons.length,
-        published: lessons.filter((l) => l.status === 'published').length,
-        draft: lessons.filter((l) => l.status === 'draft').length,
-        categories: CATEGORY_OPTIONS.length,
-    }), [lessons]);
-
+    const [modalOpen, setModalOpen] = useState(false);
+    const [editingId, setEditingId] = useState(null); // null = đang thêm mới
+    const [form, setForm] = useState(EMPTY_FORM);
     function openAddModal() {
         setEditingId(null);
         setForm(EMPTY_FORM);
         setModalOpen(true);
     }
-
     function openEditModal(lesson) {
         setEditingId(lesson.id);
         setForm({
@@ -82,11 +144,9 @@ const AdminLesson = () => {
         });
         setModalOpen(true);
     }
-
     function closeModal() {
         setModalOpen(false);
     }
-
     function handleSubmit(e) {
         e.preventDefault();
         if (!form.title.trim()) return;
@@ -109,7 +169,6 @@ const AdminLesson = () => {
         }
         setModalOpen(false);
     }
-
     function deleteLesson(id) {
         if (!window.confirm('Xóa bài học này khỏi hệ thống?')) return;
         setLessons((prev) => prev.filter((l) => l.id !== id));
@@ -130,26 +189,20 @@ const AdminLesson = () => {
             </div>
 
             <div className="stat-row">
-                <div className="card stat-card">
-                    <div className="stat-icon tone-a"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 012-2h11v16H6a2 2 0 00-2 2V5z" /><path d="M17 3v16" /></svg></div>
-                    <div><div className="stat-num">{stats.total}</div><div className="stat-label">Tổng số bài học</div></div>
-                </div>
-                <div className="card stat-card">
-                    <div className="stat-icon tone-b"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg></div>
-                    <div><div className="stat-num">{stats.published}</div><div className="stat-label">Đã xuất bản</div></div>
-                </div>
-                <div className="card stat-card">
-                    <div className="stat-icon tone-c"><svg viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" /></svg></div>
-                    <div><div className="stat-num">{stats.draft}</div><div className="stat-label">Bản nháp</div></div>
-                </div>
-                <div className="card stat-card">
-                    <div className="stat-icon tone-d"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" /></svg></div>
+                {
+                    statRows.map((stat, index) => (
+                        <div key={index} className="card stat-card">
+                            <div className={`stat-icon ${stat.tone}`}>
+                                {iconStatRows[stat.icon]}
+                            </div>
 
-                    <div>
-                        <div className="stat-num">{stats.categories}</div>
-                        <div className="stat-label">Danh mục</div>
-                    </div>
-                </div>
+                            <div>
+                                <div className="stat-num">{stat.amount}</div>
+                                <div className="stat-label">{stat.name}</div>
+                            </div>
+                        </div>
+                    ))
+                }
             </div>
 
             <div className="toolbar">
@@ -158,23 +211,23 @@ const AdminLesson = () => {
                     <input
                         type="text"
                         placeholder="Tìm theo tên bài học..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
+                        value={searchName || ""}
+                        onChange={(e) => setSearchName(e.target.value)}
                     />
                 </div>
 
-                <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
-                    <option value="all">Tất cả danh mục</option>
+                <select value={categoryFilter} onChange={(e) => setCategoryFilter(Number(e.target.value))}>
+                    <option value={0}>Tất cả danh mục</option>
 
-                    {CATEGORY_OPTIONS.map((c) => (
-                        <option key={c.value} value={c.value}>{c.label}</option>
+                    {cateList.map((c) => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
                 </select>
 
-                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-                    <option value="all">Tất cả trạng thái</option>
-                    <option value="published">Đã xuất bản</option>
-                    <option value="draft">Bản nháp</option>
+                <select value={statusFilter} onChange={(e) => setStatusFilter(Number(e.target.value))}>
+                    <option value={-1}>Tất cả trạng thái</option>
+                    <option value={1}>Đang hiển thị</option>
+                    <option value={0}>Đang ẩn</option>
                 </select>
             </div>
 
@@ -183,6 +236,7 @@ const AdminLesson = () => {
                     <thead>
                         <tr>
                             <th>STT</th>
+                            <th>ID</th>
                             <th>Bài học</th>
                             <th>Mô tả</th>
                             <th>Danh mục</th>
@@ -194,12 +248,13 @@ const AdminLesson = () => {
                     </thead>
 
                     <tbody>
-                        {lessonsRoadRes.map((l, index) => (
+                        {lessonsRoadListRes .map((l, index) => (
                             <tr key={l.id}>
                                 <td>{index + 1}</td>
+                                <td>{l.id}</td>
                                 <td>{truncateText(l.name, 20)}</td>
                                 <td>{truncateText(l.des, 20)}</td>
-                                <td>{l.cate}</td>
+                                <td>{l.cateName}</td>
                                 <td>{l.active ? 'Đang hiển thị' : 'Đang ẩn'}</td>
                                 <td className="muted">{l.createdAt}</td>
                                 <td className="muted">{l.updatedAt}</td>
@@ -217,7 +272,7 @@ const AdminLesson = () => {
                             </tr>
                         ))}
 
-                        {lessonsRoadRes.length === 0 && (
+                        {lessonsRoadListRes.length === 0 && (
                             <tr><td colSpan={6} className="empty-row">Không tìm thấy bài học phù hợp.</td></tr>
                         )}
                     </tbody>
