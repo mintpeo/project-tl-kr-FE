@@ -7,53 +7,26 @@ import {usePost} from "../../../components/use/usePost.js";
 const EMPTY_FORM = { title: '', category: 'alphabet', duration: '', status: 'draft', description: '' };
 
 const AdminLesson = () => {
-    const {data: lessonsRoad, loading: loadingLessonsRoad} = useFetch(`${API_URL}/admin/all-lessons-road`);
-    const lessonsRoadRes = lessonsRoad.map((lesson) => ({
-        id: lesson.id,
-        createdAt: lesson.createdAt,
-        des: lesson.description,
-        active: lesson.active,
-        name: lesson.name,
-        orderIndex: lesson.orderIndex,
-        updateAt: lesson.updateAt,
-        youtubeId: lesson.youtubeId,
-        duration: lesson.duration,
-        cateName: lesson.cateRoute.name,
-        cateId: lesson.cateRoute.id
-    }));
+    const {data: lessonsRoad} = useFetch(`${API_URL}/admin/all-lessons-road`);
+    // Format
+    const mapLessonRoad = (lesson) => ({
+        id: lesson?.id,
+        createdAt: lesson?.createdAt,
+        des: lesson?.description,
+        active: lesson?.active,
+        name: lesson?.name,
+        orderIndex: lesson?.orderIndex,
+        updateAt: lesson?.updateAt,
+        youtubeId: lesson?.youtubeId,
+        duration: lesson?.duration,
+        cateName: lesson?.cateRoute?.name || 'Chưa phân loại',
+        cateId: lesson?.cateRoute?.id || 0
+    });
+    const lessonsRoadRes = lessonsRoad.map(mapLessonRoad);
     const [lessonsRoadListRes, setLessonsRoadListRes] = useState([]);
-
-    // Handle Filter Status
-    const [statusFilter, setStatusFilter] = useState(-1);
     useEffect(() => {
-        if (statusFilter === -1) {
-            setLessonsRoadListRes(lessonsRoadRes);
-        } else if (statusFilter === 1) {
-            const lessonsWithStatus = lessonsRoadRes.filter(lesson => lesson.active === true);
-            setLessonsRoadListRes(lessonsWithStatus);
-        } else {
-            const lessonsWithStatus = lessonsRoadRes.filter(lesson => lesson.active === false);
-            setLessonsRoadListRes(lessonsWithStatus)
-        }
-    }, [statusFilter]);
-
-    // Handle Filter Category
-    const [categoryFilter, setCategoryFilter] = useState(0);
-    useEffect(() => {
-        if (categoryFilter === 0) {
-            setLessonsRoadListRes(lessonsRoadRes);
-            return;
-        }
-        const lessonsWithCate = lessonsRoadRes.filter(lesson => lesson.cateId === categoryFilter);
-        setLessonsRoadListRes(lessonsWithCate);
-    }, [categoryFilter]);
-
-    // Get All Cate Road
-    const {data: getAllCateRoad} = useFetch(`${API_URL}/admin/all-cate-road`);
-    const cateList = getAllCateRoad.map((cate) => ({
-        id: cate.id,
-        name: cate.name,
-    }))
+        setLessonsRoadListRes(lessonsRoadRes);
+    }, []);
 
     // Search Name Lesson
     const {executePost: handleSearch} = usePost(`${API_URL}/admin/search-lessons-name`);
@@ -66,18 +39,7 @@ const AdminLesson = () => {
 
             try {
                 const data = await handleSearch(req);
-                const res = data.map((lesson) => ({
-                    id: lesson.id,
-                    createdAt: lesson.createdAt,
-                    des: lesson.description,
-                    active: lesson.active,
-                    name: lesson.name,
-                    orderIndex: lesson.orderIndex,
-                    updateAt: lesson.updateAt,
-                    youtubeId: lesson.youtubeId,
-                    duration: lesson.duration,
-                    cate: lesson.cateRoute.name
-                }));
+                const res = data.map(mapLessonRoad);
                 setLessonsRoadListRes(res);
             } catch (e) {
                 console.log("Error Search Name Lesson", e);
@@ -85,9 +47,26 @@ const AdminLesson = () => {
         }
         handleSearchNameLesson();
     }, [searchName]);
+
+    // Handle Filter Cate, Status
+    const [statusFilter, setStatusFilter] = useState(-1);
+    const [categoryFilter, setCategoryFilter] = useState(0);
     useEffect(() => {
-        setLessonsRoadListRes(lessonsRoadRes);
-    }, []);
+        let list = [...lessonsRoadRes];
+        if (categoryFilter !== 0) list = list.filter(l => l.cateId === categoryFilter);
+
+        if (statusFilter === 1) list = list.filter(l => l.active);
+        if (statusFilter === 0) list = list.filter(l => !l.active);
+
+        setLessonsRoadListRes(list);
+    }, [searchName, categoryFilter, statusFilter, lessonsRoad]);
+
+    // Get All Cate Road
+    const {data: getAllCateRoad} = useFetch(`${API_URL}/admin/all-cate-road`);
+    const cateList = getAllCateRoad.map((cate) => ({
+        id: cate.id,
+        name: cate.name,
+    }))
 
     // Handle Stat
     const lessonsActiveLength = lessonsRoad.filter(lesson => lesson.active).length;

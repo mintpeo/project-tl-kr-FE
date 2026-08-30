@@ -1,26 +1,36 @@
 import React, {useEffect, useState} from 'react';
 import './Main.css';
-import useFetch from "../../../components/use/useFetch.js";
 import {API_URL} from "../../../components/API_URL.jsx";
 import Skeleton from "../../../components/loading/Skeleton.jsx";
+import useFetch from "../../../components/use/useFetch.js";
 import {usePost} from "../../../components/use/usePost.js";
 import {usePatch} from "../../../components/use/usePatch.js";
 import {useDelete} from "../../../components/use/useDelete.js";
 
 const Main = () => {
     const {data: loadAuth, loading: isLoadingAuth} = useFetch(`${API_URL}/admin/all`);
+    const mapAuth = (auth) => ({
+        id: auth?.authId,
+        email: auth?.mail,
+        role: auth?.role,
+        createAt: auth?.authCreateAt,
+        enabled: auth?.active,
+        isGoogle: auth?.google,
+        userId: auth?.userId,
+        fullName: auth?.fullName,
+        phone: auth?.phone
+    });
+    const authList = loadAuth.map(mapAuth);
+    const [authListCustom, setAuthListCustom] = useState([]);
+    useEffect(() => {
+        setAuthListCustom(authList);
+    }, []);
+
     const {executePost: handleFindByEmail} = usePost(`${API_URL}/admin/email`);
     const {executePatch: handleChangeProfile} = usePatch(`${API_URL}/admin/change`);
     const {executePost: handleCreateUser} = usePost(`${API_URL}/admin/create`);
     const {executeDelete: handleDeleteUser} = useDelete(`${API_URL}/admin/delete`);
 
-    const [authListCustom, setAuthListCustom] = useState([]);
-    const [selectedRole, setSelectedRole] = useState("");
-    const [selectedUser, setSelectedUser] = useState(0);
-    const [userDetail, setUserDetail] = useState();
-    const [editUser, setEditUser] = useState(false);
-    const [isEnabled, setIsEnabled] = useState("");
-    const [findByEmail, setFindByEmail] = useState("");
     const [isOpenAddModal, setIsOpenAddModal] = useState(false);
 
     // Create New User
@@ -30,55 +40,7 @@ const Main = () => {
     const [createPhone, setCreatePhone] = useState("");
     const [createActive, setCreateActive] = useState("true");
     const [createRole, setCreateRole] = useState("USER");
-
-    // Change Profile
-    const [fullName, setFullName] = useState("");
-    const [phone, setPhone] = useState("");
-    const [role, setRole] = useState("");
-    const [isActive, setIsActive] = useState("");
-
-    const authList = loadAuth.map((item) => ({
-        id: item.authId,
-        email: item.mail,
-        role: item.role,
-        createAt: item.authCreateAt,
-        enabled: item.active,
-        isGoogle: item.google,
-        userId: item.userId,
-        fullName: item.fullName,
-        phone: item.phone
-    }));
-    const authActive = authList.filter(auth => auth.enabled).length;
-    const authNoActive = authList.filter(auth => !auth.enabled).length;
-    const authListUser = authList.filter(auth => auth.role === 'USER');
-    const authListAdmin = authList.filter(auth => auth.role === 'ADMIN');
-    const authListEnabled = authList.filter(auth => auth.enabled);
-    const authListNoEnabled = authList.filter(auth => !auth.enabled);
-
-    const handleDeleteUserAdmin = async (authId) => {
-        const req = {
-            authId: authId
-        }
-
-        try {
-            const data = await handleDeleteUser(req);
-            if (data) {
-                alert("Xoá tài khoản thành công.")
-                window.location.reload();
-            } else alert("Xoá tài khoản thất bại.")
-        } catch (e) {
-            console.log("Error Delete User", e);
-        }
-    }
-
-    const dataInput = [
-        {name: "Họ và tên", type: "fullName", typeInput: "text", placeholderInput: "Nhập họ và tên...", valueInput: createFullName},
-        {name: "Số điện thoại", type: "phone", typeInput: "text", placeholderInput: "0987654321", valueInput: createPhone},
-        {name: "Email", type: "email", typeInput: "text", placeholderInput: "example@gmail.com", valueInput: createEmail},
-        {name: "Mật khẩu", type: "pass", typeInput: "password", placeholderInput: "Tối thiểu 6 ký tự...", valueInput: createPassword},
-    ];
-
-    const handleChangeCreateUser = (value, type) => {
+    const setChangeCreateUser = (value, type) => {
         switch (type) {
             case "fullName": setCreateFullName(value); return;
             case "email": setCreateEmail(value); return;
@@ -86,7 +48,6 @@ const Main = () => {
             case "phone": setCreatePhone(value); return;
         }
     }
-
     const handleCreateNewUser = async (e) => {
         e.preventDefault();
 
@@ -111,6 +72,11 @@ const Main = () => {
         }
     }
 
+    // Change Profile
+    const [fullName, setFullName] = useState("");
+    const [phone, setPhone] = useState("");
+    const [role, setRole] = useState("");
+    const [isActive, setIsActive] = useState("");
     const handleChangeUserProfile = async () => {
         const req = {
             email: userDetail?.email,
@@ -131,6 +97,25 @@ const Main = () => {
         }
     }
 
+    // Handle Deleted
+    const handleDeleteUserAdmin = async (authId) => {
+        const req = {
+            authId: authId
+        }
+
+        try {
+            const data = await handleDeleteUser(req);
+            if (data) {
+                alert("Xoá tài khoản thành công.")
+                window.location.reload();
+            } else alert("Xoá tài khoản thất bại.")
+        } catch (e) {
+            console.log("Error Delete User", e);
+        }
+    }
+
+    // Handle Filter Email
+    const [findByEmail, setFindByEmail] = useState("");
     useEffect(() => {
         const handleSearchUserByEmail = async () => {
             const body = {
@@ -158,23 +143,41 @@ const Main = () => {
         handleSearchUserByEmail();
     }, [findByEmail]);
 
+    // Handle Filter Role, Enabled
+    const [selectedRole, setSelectedRole] = useState("");
+    const [isEnabled, setIsEnabled] = useState("");
     useEffect(() => {
-        if (selectedRole === "USER") setAuthListCustom(authListUser);
-        else if (selectedRole === "ADMIN") setAuthListCustom(authListAdmin);
-        else setAuthListCustom(authList);
-    }, [loadAuth, selectedRole]);
-    useEffect(() => {
-        if (isEnabled === "true") setAuthListCustom(authListEnabled);
-        else if (isEnabled === "false") setAuthListCustom(authListNoEnabled);
-        else setAuthListCustom(authList);
-    }, [isEnabled]);
+        let list = [...authList];
 
+        // Role
+        if (selectedRole === "USER") list = list.filter(auth => auth.role === 'USER');
+        if (selectedRole === "ADMIN") list = list.filter(auth => auth.role === 'ADMIN');
+
+        // Enabled
+        if (isEnabled === "true") list = list.filter(auth => auth.enabled);
+        if (isEnabled === "false") list = list.filter(auth => !auth.enabled);
+
+        setAuthListCustom(list);
+    }, [loadAuth, selectedRole, isEnabled]);
+
+    // Handle Selected User
+    const [userDetail, setUserDetail] = useState();
+    const [editUser, setEditUser] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(0);
     useEffect(() => {
         const res = authList.find(auth => auth.id === selectedUser);
         setUserDetail(res);
         setEditUser(false);
     }, [selectedUser]);
 
+    const dataInput = [
+        {name: "Họ và tên", type: "fullName", typeInput: "text", placeholderInput: "Nhập họ và tên...", valueInput: createFullName},
+        {name: "Số điện thoại", type: "phone", typeInput: "text", placeholderInput: "0987654321", valueInput: createPhone},
+        {name: "Email", type: "email", typeInput: "text", placeholderInput: "example@gmail.com", valueInput: createEmail},
+        {name: "Mật khẩu", type: "pass", typeInput: "password", placeholderInput: "Tối thiểu 6 ký tự...", valueInput: createPassword},
+    ];
+    const authActive = authList.filter(auth => auth.enabled).length;
+    const authNoActive = authList.filter(auth => !auth.enabled).length;
     const dataPagesCate = [
         { name: "Tổng số tài khoản", number: authList.length, iconKey: "user" },
         { name: "Đang hoạt động", number: authActive, iconKey: "active" },
@@ -471,7 +474,7 @@ const Main = () => {
                                             required
                                             placeholder={input.placeholderInput}
                                             value={input.valueInput || ""}
-                                            onChange={(e) => handleChangeCreateUser(e.target.value, input.type)}
+                                            onChange={(e) => setChangeCreateUser(e.target.value, input.type)}
                                         />
                                     </div>
                                 ))
