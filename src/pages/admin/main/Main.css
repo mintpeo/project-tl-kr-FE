@@ -234,45 +234,19 @@
         }
     }
 
-    .detail-panel-drawer {
+    /* Modal Overlay */
+    .modal-overlay {
         position: fixed;
-        top: 2%;
+        top: 0;
+        left: 0;
         right: 0;
-        max-width: 90vw;
-        /*height: 100vh;*/
-        background-color: #ffffff;
-        z-index: 1050;
-        box-sizing: border-box;
-        overflow-y: auto;
-        width: 440px;
-        padding: 20px;
-        border-radius: 8px;
-        background: var(--paper-card);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-
-        transform: translateX(100%);
-        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-
-        .detail-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 12px;
-            margin-bottom: 16px;
-
-            h3 {
-                margin: 0;
-                font-size: 1.1rem;
-            }
-
-            .btn-close {
-                background: none;
-                border: none;
-                font-size: 1.1rem;
-                cursor: pointer;
-                color: var(--ink);
-            }
-        }
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        backdrop-filter: blur(2px);
 
         .detail-body {
             display: flex;
@@ -296,54 +270,25 @@
             }
         }
 
-
-        .detail-footer {
+        .detail-item {
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            padding-top: 16px;
-            border-top: 1px solid var(--ink);
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
 
-            .btn {
-                flex: 1;
+            .detail-label {
+                color: var(--ink);
+            }
+
+            .detail-value {
+                font-weight: 500;
+                color: var(--ink-soft);
             }
         }
 
         .disable {
             display: none;
         }
-    }
-
-    .detail-panel-drawer.open {
-        transform: translateX(0);
-    }
-
-    .drawer-backdrop {
-        position: fixed;
-        background-color: rgba(0, 0, 0, 0.35);
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.35s ease, visibility 0.35s ease;
-    }
-
-    .drawer-backdrop.open {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    /* Modal Overlay */
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        backdrop-filter: blur(2px);
 
         .modal-content {
             background: #ffffff;

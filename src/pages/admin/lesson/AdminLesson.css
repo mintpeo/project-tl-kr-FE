@@ -283,22 +283,117 @@
             color: var(--ink-soft);
         }
     }
+
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(35, 40, 35, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+
+        .modal-card {
+            width: 100%;
+            max-width: 470px;
+            background: var(--paper-card);
+            border-radius: 16px;
+            padding: 26px;
+            max-height: 90vh;
+            overflow-y: auto;
+
+            h3 {
+                font-size: 17px;
+                margin: 0 0 18px;
+            }
+
+            .field {
+                margin-bottom: 14px;
+                flex: 1;
+
+                label {
+                    display: block;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: var(--ink);
+                    margin-bottom: 6px;
+                }
+
+                input, select, textarea {
+                    width: 100%;
+                    padding: 9px 12px;
+                    border-radius: 9px;
+                    border: 1px solid var(--paper-dim);
+                    background: var(--paper);
+                    font-size: 13px;
+                    color: var(--ink);
+                    outline: none;
+                    font-family: 'Be Vietnam Pro', sans-serif;
+                    resize: vertical;
+
+                    &:focus {
+                        border-color: var(--celadon);
+                    }
+                }
+            }
+
+            .field-row {
+                display: flex;
+                gap: 12px;
+                flex: 1;
+            }
+
+            .toggle-field {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                label {
+                    margin: 0;
+                }
+
+                .switch {
+                    width: 42px;
+                    height: 24px;
+                    border-radius: 20px;
+                    background: var(--paper-dim);
+                    position: relative;
+                    cursor: pointer;
+                    transition: background .2s ease;
+                }
+
+                .knob {
+                    position: absolute;
+                    top: 2px;
+                    left: 2px;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    background: #fff;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+                    transition: transform .2s ease;
+                }
+
+                .switch.on {
+                    background: var(--celadon-dark);
+                }
+
+                .switch.on .knob {
+                    transform: translateX(18px);
+                }
+            }
+
+            .modal-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+                margin-top: 20px;
+            }
+        }
+    }
 }
 /* ---- modal ---- */
-.modal-overlay{ position:fixed; inset:0; background:rgba(35,40,35,0.45); display:flex; align-items:center; justify-content:center; z-index:100; padding:20px; }
-.modal-card{ width:100%; max-width:440px; background:var(--paper-card); border-radius:16px; padding:26px; max-height:90vh; overflow-y:auto; }
-.modal-card h3{ font-size:17px; margin:0 0 18px; }
-
-.field{ margin-bottom:14px; }
-.field label{ display:block; font-size:12px; font-weight:600; color:var(--ink); margin-bottom:6px; }
-.field input, .field select, .field textarea{
-    width:100%; padding:9px 12px; border-radius:9px; border:1px solid var(--paper-dim);
-    background:var(--paper); font-size:13px; color:var(--ink); outline:none; font-family:'Be Vietnam Pro',sans-serif; resize:vertical;
-}
-.field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--celadon); }
-.field-row{ display:flex; gap:12px; }
-.field-row .field{ flex:1; }
-
 .upload-box{
     border:1.5px dashed var(--paper-dim); border-radius:10px; padding:20px; text-align:center;
     color:var(--ink-soft); font-size:12px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:8px;
@@ -306,17 +401,7 @@
 .upload-box svg{ width:22px; height:22px; stroke:var(--ink-soft); fill:none; stroke-width:1.6; }
 .upload-box:hover{ border-color:var(--celadon); color:var(--celadon-dark); }
 
-.toggle-field{ display:flex; justify-content:space-between; align-items:center; }
-.toggle-field label{ margin:0; }
-.switch{ width:42px; height:24px; border-radius:20px; background:var(--paper-dim); position:relative; cursor:pointer; transition:background .2s ease; }
-.switch .knob{ position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.25); transition:transform .2s ease; }
-.switch.on{ background:var(--celadon-dark); }
-.switch.on .knob{ transform:translateX(18px); }
-
-.modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }
-
 .mono{ font-family:'JetBrains Mono',monospace; }
-
 .card{ background:var(--paper-card); border:1px solid var(--paper-dim); border-radius:14px; }
 
 /* ---- toolbar ---- */

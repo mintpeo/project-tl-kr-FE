@@ -1,10 +1,8 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './AdminLesson.css';
 import useFetch from "../../../components/use/useFetch.js";
 import {API_URL} from "../../../components/API_URL.jsx";
 import {usePost} from "../../../components/use/usePost.js";
-
-const EMPTY_FORM = { title: '', category: 'alphabet', duration: '', status: 'draft', description: '' };
 
 const AdminLesson = () => {
     const {data: lessonsRoad} = useFetch(`${API_URL}/admin/all-lessons-road`);
@@ -16,7 +14,7 @@ const AdminLesson = () => {
         active: lesson?.active,
         name: lesson?.name,
         orderIndex: lesson?.orderIndex,
-        updateAt: lesson?.updateAt,
+        updateAt: lesson?.updatedAt,
         youtubeId: lesson?.youtubeId,
         duration: lesson?.duration,
         cateName: lesson?.cateRoute?.name || 'Chưa phân loại',
@@ -27,6 +25,86 @@ const AdminLesson = () => {
     useEffect(() => {
         setLessonsRoadListRes(lessonsRoadRes);
     }, []);
+
+    // Edit Lesson
+    const [editName, setEditName] = useState("");
+    const [editCateId, setEditCateId] = useState("");
+    const [editOrderIndex, setEditOrderIndex] = useState(1);
+    const [editIsActive, setEditIsActive] = useState("");
+    const [editDuration, setEditDuration] = useState("");
+    const [editDes, setEditDes] = useState("");
+    const [editYoutubeId, setEditYoutubeId] = useState("");
+    const setEditInput = (name, value) => {
+        switch (name) {
+            case "name": setEditName(value); return;
+            case "cateId": setEditCateId(value); return;
+            case "orderIndex": setEditOrderIndex(value); return;
+            case "isActive": setEditIsActive(value); return;
+            case "duration": setEditDuration(value); return;
+            case "des": setEditDes(value); return;
+            case "youtube": setEditYoutubeId(value); return;
+        }
+    }
+    // Modal
+    const EMPTY_FORM = { title: '', category: 'alphabet', duration: '', status: 'draft', description: '' };
+    const [modalOpen, setModalOpen] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+    const [form, setForm] = useState(EMPTY_FORM);
+    const [isEditVideoLink, setIsEditVideoLink] = useState(true);
+    const openEditModal = (lesson)  => {
+        setEditingId(lesson.id);
+        const res = {
+            id: lesson?.id,
+            createdAt: lesson?.createdAt,
+            des: lesson?.des,
+            active: lesson?.active,
+            name: lesson?.name,
+            orderIndex: lesson?.orderIndex,
+            updateAt: lesson?.updateAt,
+            youtubeId: lesson?.youtubeId,
+            duration: lesson?.duration,
+            cateName: lesson?.cateName || 'Chưa phân loại',
+            cateId: lesson?.cateId || 0
+        };
+        setForm(res);
+        setModalOpen(true);
+    };
+    const closeModal = () => {
+        setModalOpen(false);
+    }
+    const {executePost: handleEdit} = usePost(`${API_URL}/admin/edit-lesson`);
+    const handleEditLessonRoute = async (e) => {
+        e.preventDefault();
+
+        if (editOrderIndex <= 0) {
+            alert("Vị trí hiện thị trong danh mục không thể <= 0");
+            return;
+        }
+
+        let active = "";
+        if (editIsActive.trim() !== "") active = JSON.parse(editIsActive);
+
+        const req = {
+            id: editingId,
+            name: editName,
+            cateRouteId: editCateId,
+            orderIndex: editOrderIndex,
+            isActive: active,
+            duration: editDuration,
+            description: editDes,
+            youtubeId: editYoutubeId
+        }
+
+        try {
+            const data = await handleEdit(req);
+            if (data) {
+                alert("OK");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error Edit Lesson", e);
+        }
+    }
 
     // Search Name Lesson
     const {executePost: handleSearch} = usePost(`${API_URL}/admin/search-lessons-name`);
@@ -103,55 +181,37 @@ const AdminLesson = () => {
         if (!text || text.length <= maxLength) return text;
         return text.slice(0, maxLength) + '...';
     };
-
-    const [modalOpen, setModalOpen] = useState(false);
-    const [editingId, setEditingId] = useState(null); // null = đang thêm mới
-    const [form, setForm] = useState(EMPTY_FORM);
     function openAddModal() {
         setEditingId(null);
         setForm(EMPTY_FORM);
         setModalOpen(true);
     }
-    function openEditModal(lesson) {
-        setEditingId(lesson.id);
-        setForm({
-            title: lesson.title,
-            category: lesson.category,
-            duration: lesson.duration,
-            status: lesson.status,
-            description: lesson.description ?? '',
-        });
-        setModalOpen(true);
-    }
-    function closeModal() {
-        setModalOpen(false);
-    }
-    function handleSubmit(e) {
-        e.preventDefault();
-        if (!form.title.trim()) return;
-
-        if (editingId === null) {
-            const newLesson = {
-                id: Math.max(0, ...lessons.map((l) => l.id)) + 1,
-                title: form.title.trim(),
-                category: form.category,
-                videoCount: 1,
-                duration: form.duration || '0:00',
-                status: form.status,
-                updatedAt: 'Vừa xong',
-            };
-            setLessons((prev) => [newLesson, ...prev]);
-        } else {
-            setLessons((prev) =>
-                prev.map((l) => (l.id === editingId ? { ...l, ...form, updatedAt: 'Vừa xong' } : l))
-            );
-        }
-        setModalOpen(false);
-    }
-    function deleteLesson(id) {
-        if (!window.confirm('Xóa bài học này khỏi hệ thống?')) return;
-        setLessons((prev) => prev.filter((l) => l.id !== id));
-    }
+    // function handleSubmit(e) {
+    //     e.preventDefault();
+    //     if (!form.title.trim()) return;
+    //
+    //     if (editingId === null) {
+    //         const newLesson = {
+    //             id: Math.max(0, ...lessons.map((l) => l.id)) + 1,
+    //             title: form.title.trim(),
+    //             category: form.category,
+    //             videoCount: 1,
+    //             duration: form.duration || '0:00',
+    //             status: form.status,
+    //             updatedAt: 'Vừa xong',
+    //         };
+    //         setLessons((prev) => [newLesson, ...prev]);
+    //     } else {
+    //         setLessons((prev) =>
+    //             prev.map((l) => (l.id === editingId ? { ...l, ...form, updatedAt: 'Vừa xong' } : l))
+    //         );
+    //     }
+    //     setModalOpen(false);
+    // }
+    // function deleteLesson(id) {
+    //     if (!window.confirm('Xóa bài học này khỏi hệ thống?')) return;
+    //     setLessons((prev) => prev.filter((l) => l.id !== id));
+    // }
 
     return (
         <div className="admin-lessons">
@@ -217,8 +277,8 @@ const AdminLesson = () => {
                             <th>STT</th>
                             <th>ID</th>
                             <th>Bài học</th>
-                            <th>Mô tả</th>
                             <th>Danh mục</th>
+                            <th>Vị trí hiển thị</th>
                             <th>Trạng thái</th>
                             <th>Ngày tạo</th>
                             <th>Cập nhật</th>
@@ -232,18 +292,18 @@ const AdminLesson = () => {
                                 <td>{index + 1}</td>
                                 <td>{l.id}</td>
                                 <td>{truncateText(l.name, 20)}</td>
-                                <td>{truncateText(l.des, 20)}</td>
                                 <td>{l.cateName}</td>
+                                <td>{l.orderIndex}</td>
                                 <td>{l.active ? 'Đang hiển thị' : 'Đang ẩn'}</td>
-                                <td className="muted">{l.createdAt}</td>
-                                <td className="muted">{l.updatedAt}</td>
+                                <td>{l.createdAt}</td>
+                                <td>{l.updateAt}</td>
                                 <td>
                                     <div className="row-actions">
                                         <button className="icon-btn" title="Chỉnh sửa" onClick={() => openEditModal(l)}>
                                             <svg viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" /></svg>
                                         </button>
 
-                                        <button className="icon-btn danger" title="Xóa" onClick={() => deleteLesson(l.id)}>
+                                        <button className="icon-btn danger" title="Xóa">
                                             <svg viewBox="0 0 24 24"><path d="M3 6h18" /><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0l-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6" /></svg>
                                         </button>
                                     </div>
@@ -263,13 +323,13 @@ const AdminLesson = () => {
                     <div className="modal-card" onClick={(e) => e.stopPropagation()}>
                         <h3>{editingId === null ? 'Thêm bài học mới' : 'Chỉnh sửa bài học'}</h3>
 
-                        <form onSubmit={handleSubmit}>
+                        <form onSubmit={handleEditLessonRoute}>
                             <div className="field">
                                 <label>Tên bài học</label>
                                 <input
                                     type="text"
-                                    value={form.title}
-                                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                                    defaultValue={form.name}
+                                    onChange={(e) => setEditInput("name", e.target.value)}
                                     placeholder="VD: 10 nguyên âm cơ bản"
                                     required
                                 />
@@ -279,20 +339,45 @@ const AdminLesson = () => {
                                 <div className="field">
                                     <label>Danh mục</label>
                                     <select
-                                        value={form.category}
-                                        onChange={(e) => setForm({ ...form, category: e.target.value })}
+                                        defaultValue={form.cateId}
+                                        onChange={(e) => setEditInput("cateId", e.target.value)}
                                     >
-                                        {CATEGORY_OPTIONS.map((c) => (
-                                            <option key={c.value} value={c.value}>{c.label}</option>
+                                        {cateList.map((c) => (
+                                            <option key={c.id} value={c.id}>{c.name}</option>
                                         ))}
                                     </select>
                                 </div>
+
+                                <div className="field">
+                                    <label>Vị trí hiện thị trong danh mục</label>
+                                    <input
+                                        type="text"
+                                        defaultValue={form.orderIndex}
+                                        onChange={(e) => setEditInput("orderIndex", Number(e.target.value))}
+                                        placeholder="VD: 1"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="field-row">
+                                <div className="field">
+                                    <label>Trạng thái</label>
+                                    <select
+                                        defaultValue={String(form.active)}
+                                        onChange={(e) => setEditInput("isActive", e.target.value)}
+                                    >
+                                        <option value={String(form.active)}>{form.active ? `Đang hiển thị` : `Đang ẩn`}</option>
+                                        <option value={String(!form.active)}>{!form.active ? `Đang hiển thị` : `Đang ẩn`}</option>
+                                    </select>
+                                </div>
+
                                 <div className="field">
                                     <label>Thời lượng video</label>
                                     <input
                                         type="text"
-                                        value={form.duration}
-                                        onChange={(e) => setForm({ ...form, duration: e.target.value })}
+                                        defaultValue={form.duration}
+                                        onChange={(e) => setEditInput("duration", e.target.value)}
                                         placeholder="VD: 5:30"
                                     />
                                 </div>
@@ -300,26 +385,44 @@ const AdminLesson = () => {
 
                             <div className="field">
                                 <label>Mô tả</label>
+
                                 <textarea
-                                    rows={3}
-                                    value={form.description}
-                                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                                    rows={5}
+                                    defaultValue={form.des}
+                                    onChange={(e) => setEditInput("des", e.target.value)}
                                     placeholder="Mô tả ngắn về nội dung bài học..."
                                 />
                             </div>
 
                             <div className="field">
                                 <label>Video</label>
-                                <div className="upload-box">
-                                    <svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z" /><rect x="1" y="5" width="15" height="14" rx="2" /></svg>
-                                    <span>Kéo thả file video hoặc bấm để chọn</span>
-                                </div>
+
+                                {isEditVideoLink ? (
+                                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ccc', borderRadius: '4px', overflow: 'hidden' }}>
+                                        <span style={{ padding: '8px 10px', background: '#f1f5f9', color: '#64748b', fontSize: '14px', borderRight: '1px solid #ccc' }}>
+                                            https://www.youtube.com/watch?v=
+                                        </span>
+                                        <input
+                                            type="text"
+                                            style={{ border: 'none', outline: 'none', padding: '8px', flex: 1 }}
+                                            placeholder="Nhập ID video..."
+                                            defaultValue={form.youtubeId}
+                                            onChange={(e) => setEditInput("youtube", e.target.value)}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="upload-box">
+                                        <svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z" /><rect x="1" y="5" width="15" height="14" rx="2" /></svg>
+                                        <span>Kéo thả file video hoặc bấm để chọn</span>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="field toggle-field">
                                 <label>Xuất bản ngay</label>
+
                                 <div
-                                    className={`switch ${form.status === 'published' ? 'on' : ''}`}
+                                    className={`switch ${form.active === 'published' ? 'on' : ''}`}
                                     onClick={() => setForm({ ...form, status: form.status === 'published' ? 'draft' : 'published' })}
                                 >
                                     <div className="knob" />
