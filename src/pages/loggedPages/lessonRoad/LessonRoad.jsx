@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import './LessonRoad.css';
 import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
 import LessonRoute from "../lessonRoute/LessonRoute.jsx";
@@ -12,6 +12,29 @@ const LessonRoad = () => {
 
     const {data: categories, loading: isLoading} = useFetch(`${API_URL}/lesson-cate-route/all`);
     const {executePost: createRoad} = usePost(`${API_URL}/user-lesson-progress/create-road`);
+
+    // If have new Lesson Road => Add User
+    const hasInitialized = useRef(false);
+    useEffect(() => {
+        if (hasInitialized.current) return;
+        if (!user?.lessonRoad) return;
+        hasInitialized.current = true;
+
+        const handleWhenHaveNewLesson = async () => {
+
+            const req = {
+                userId: user.userId,
+            }
+
+            try {
+                 await createRoad(req);
+            } catch (e) {
+                console.log("Error When Have New Lesson", e);
+            }
+        }
+
+        handleWhenHaveNewLesson();
+    }, []);
 
     const handleCreateRoad = async () => {
         const req = {

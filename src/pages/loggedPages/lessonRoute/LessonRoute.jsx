@@ -163,62 +163,62 @@ const LessonRoute = () => {
                         categories.map((item, index) => {
                             const isPrevLearned = index === 0 || categories[index - 1]?.learned;
                             return (
-                            <div
-                                key={item.id}
-                                className={`module ${selectedCateId === item.id ? `expanded active` : ``}`}
-                            >
-                                <div className="module-head" onClick={() => selectedClickAgain(item.id)}>
-                                    {
-                                        item.learned ? (
-                                            <div className="module-status done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-                                        ) : isPrevLearned ? (
-                                            <div className="module-status current"></div>
-                                        ) : (
-                                            <div className="module-status locked"><svg viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/><path d="M8 11V7a4 4 0 118 0v4"/></svg></div>
-                                        )
-                                    }
-                                    <div className="module-title"><p>{item.name}</p><span>{item.lessonsSize} video · {item.des}</span></div>
-                                </div>
+                                <div
+                                    key={item.id}
+                                    className={`module ${selectedCateId === item.id ? `expanded active` : ``}`}
+                                >
+                                    <div className="module-head" onClick={() => selectedClickAgain(item.id)}>
+                                        {
+                                            item.learned ? (
+                                                <div className="module-status done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                                            ) : isPrevLearned ? (
+                                                <div className="module-status current"></div>
+                                            ) : (
+                                                <div className="module-status locked"><svg viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/><path d="M8 11V7a4 4 0 118 0v4"/></svg></div>
+                                            )
+                                        }
+                                        <div className="module-title"><p>{item.name}</p><span>{item.lessonsSize} video · {item.des}</span></div>
+                                    </div>
 
-                                <div className="submodule-list">
-                                    {
-                                        lessons && lessons.length > 0 ?
-                                            lessons
-                                                .sort((a, b) => a.orderIndex - b.orderIndex)
-                                                .map((lesson) => (
-                                                    <>
-                                                        <div className={`sub-item ${selectedLessonRoute === lesson.orderIndex ? `active` : ``}`} onClick={() => setSelectedLessonRoute(lesson.orderIndex)}>
+                                    <div className="submodule-list">
+                                        {
+                                            lessons && lessons.length > 0 ?
+                                                lessons
+                                                    .sort((a, b) => a.orderIndex - b.orderIndex)
+                                                    .map((lesson) => (
+                                                        <>
+                                                            <div className={`sub-item ${selectedLessonRoute === lesson.orderIndex ? `active` : ``}`} onClick={() => setSelectedLessonRoute(lesson.orderIndex)}>
+                                                                {
+                                                                    lesson.learned ? (
+                                                                        <div className="done-tick">
+                                                                            <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                                                                    )
+                                                                }
+                                                                {lesson.name}
+                                                            </div>
+
                                                             {
-                                                                lesson.learned ? (
-                                                                    <div className="done-tick">
-                                                                        <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                                                                lesson.learnContent && (
+                                                                    <div className={`sub-item ${selectedLessonRoute === lesson.orderIndex ? `active` : ``}`}
+                                                                         onClick={() => {
+                                                                        scrollToElement("lesson-content");
+                                                                        setSelectedLessonRoute(lesson.orderIndex)
+                                                                    }}>
+                                                                        <svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 012-2h11v16H6a2 2 0 00-2 2V5z"/><path d="M17 3v16"/></svg>
+                                                                        Nội dung bài học
                                                                     </div>
-                                                                ) : (
-                                                                    <svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
                                                                 )
                                                             }
-                                                            {lesson.name}
-                                                        </div>
-
-                                                        {
-                                                            lesson.learnContent && (
-                                                                <div className={`sub-item ${selectedLessonRoute === lesson.orderIndex ? `active` : ``}`}
-                                                                     onClick={() => {
-                                                                    scrollToElement("lesson-content");
-                                                                    setSelectedLessonRoute(lesson.orderIndex)
-                                                                }}>
-                                                                    <svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 012-2h11v16H6a2 2 0 00-2 2V5z"/><path d="M17 3v16"/></svg>
-                                                                    Nội dung bài học
-                                                                </div>
-                                                            )
-                                                        }
-                                                    </>
-                                            )) : (
-                                                <Skeleton />
-                                            )
-                                    }
+                                                        </>
+                                                )) : (
+                                                    <Skeleton />
+                                                )
+                                        }
+                                    </div>
                                 </div>
-                            </div>
                             )})
                     }
 

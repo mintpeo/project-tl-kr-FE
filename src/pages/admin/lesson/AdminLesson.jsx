@@ -3,6 +3,7 @@ import './AdminLesson.css';
 import useFetch from "../../../components/use/useFetch.js";
 import {API_URL} from "../../../components/API_URL.jsx";
 import {usePost} from "../../../components/use/usePost.js";
+import {useDelete} from "../../../components/use/useDelete.js";
 
 const AdminLesson = () => {
     const {data: lessonsRoad} = useFetch(`${API_URL}/admin/all-lessons-road`);
@@ -26,6 +27,24 @@ const AdminLesson = () => {
         setLessonsRoadListRes(lessonsRoadRes);
     }, []);
 
+    // Delete Lesson
+     const {executeDelete: handleDeleteLesson} = useDelete(`${API_URL}/admin/delete-lesson`);
+     const handleDeleteLessonAdmin = async (lessonId) => {
+         const req = {
+             lessonId: lessonId
+         };
+
+         try {
+             const data = await handleDeleteLesson(req);
+             if (data) {
+                 alert("Xoá bài học thành công.");
+                 window.location.reload();
+             }
+         } catch (e) {
+             console.log("Error Delete Lesson", e);
+         }
+     }
+
     // Edit Lesson
     const [editName, setEditName] = useState("");
     const [editCateId, setEditCateId] = useState("");
@@ -46,11 +65,51 @@ const AdminLesson = () => {
         }
     }
     // Modal
-    const EMPTY_FORM = { title: '', category: 'alphabet', duration: '', status: 'draft', description: '' };
+    const EMPTY_FORM = { name: '', cateId: 1, orderIndex: 1, active: true, duration: '', description: '', youtubeId: '' };
     const [modalOpen, setModalOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [form, setForm] = useState(EMPTY_FORM);
     const [isEditVideoLink, setIsEditVideoLink] = useState(true);
+    // Handle Submit
+    const handleSubmitForm = (e) => {
+        e.preventDefault();
+
+        if (editingId !== null) {
+            handleEditLessonRoute();
+            return;
+        }
+        createNewLesson();
+    }
+    // Create New Lesson
+    const {executePost: handleCreateNewLesson} = usePost(`${API_URL}/admin/add-lesson`);
+    const createNewLesson = async () => {
+        let active = form.active;
+        if (editIsActive.trim() !== "") active = JSON.parse(editIsActive);
+
+        let cateId = form.cateId;
+        if (editCateId !== "") cateId = editCateId;
+
+        const req = {
+            name: editName,
+            cateRouteId: cateId,
+            orderIndex: editOrderIndex,
+            isActive: active,
+            duration: editDuration,
+            description: editDes,
+            youtubeId: editYoutubeId
+        }
+
+        try {
+            const data = await handleCreateNewLesson(req);
+            if (data) {
+                alert("Tạo bài học mới thành công.");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error Edit Lesson", e);
+        }
+    }
+    // Open Modal Edit
     const openEditModal = (lesson)  => {
         setEditingId(lesson.id);
         const res = {
@@ -69,13 +128,19 @@ const AdminLesson = () => {
         setForm(res);
         setModalOpen(true);
     };
+    // Close Modal
     const closeModal = () => {
         setModalOpen(false);
     }
+    // Open Modal
+    const openAddModal = () => {
+        setEditingId(null);
+        setForm(EMPTY_FORM);
+        setModalOpen(true);
+    }
+    // Edit Lesson
     const {executePost: handleEdit} = usePost(`${API_URL}/admin/edit-lesson`);
-    const handleEditLessonRoute = async (e) => {
-        e.preventDefault();
-
+    const handleEditLessonRoute = async () => {
         if (editOrderIndex <= 0) {
             alert("Vị trí hiện thị trong danh mục không thể <= 0");
             return;
@@ -98,7 +163,7 @@ const AdminLesson = () => {
         try {
             const data = await handleEdit(req);
             if (data) {
-                alert("OK");
+                alert("Chỉnh sửa bài học thành công.");
                 window.location.reload();
             }
         } catch (e) {
@@ -181,37 +246,6 @@ const AdminLesson = () => {
         if (!text || text.length <= maxLength) return text;
         return text.slice(0, maxLength) + '...';
     };
-    function openAddModal() {
-        setEditingId(null);
-        setForm(EMPTY_FORM);
-        setModalOpen(true);
-    }
-    // function handleSubmit(e) {
-    //     e.preventDefault();
-    //     if (!form.title.trim()) return;
-    //
-    //     if (editingId === null) {
-    //         const newLesson = {
-    //             id: Math.max(0, ...lessons.map((l) => l.id)) + 1,
-    //             title: form.title.trim(),
-    //             category: form.category,
-    //             videoCount: 1,
-    //             duration: form.duration || '0:00',
-    //             status: form.status,
-    //             updatedAt: 'Vừa xong',
-    //         };
-    //         setLessons((prev) => [newLesson, ...prev]);
-    //     } else {
-    //         setLessons((prev) =>
-    //             prev.map((l) => (l.id === editingId ? { ...l, ...form, updatedAt: 'Vừa xong' } : l))
-    //         );
-    //     }
-    //     setModalOpen(false);
-    // }
-    // function deleteLesson(id) {
-    //     if (!window.confirm('Xóa bài học này khỏi hệ thống?')) return;
-    //     setLessons((prev) => prev.filter((l) => l.id !== id));
-    // }
 
     return (
         <div className="admin-lessons">
@@ -303,7 +337,7 @@ const AdminLesson = () => {
                                             <svg viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" /></svg>
                                         </button>
 
-                                        <button className="icon-btn danger" title="Xóa">
+                                        <button className="icon-btn danger" title="Xóa" onClick={() => handleDeleteLessonAdmin(l.id)}>
                                             <svg viewBox="0 0 24 24"><path d="M3 6h18" /><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0l-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6" /></svg>
                                         </button>
                                     </div>
@@ -323,7 +357,7 @@ const AdminLesson = () => {
                     <div className="modal-card" onClick={(e) => e.stopPropagation()}>
                         <h3>{editingId === null ? 'Thêm bài học mới' : 'Chỉnh sửa bài học'}</h3>
 
-                        <form onSubmit={handleEditLessonRoute}>
+                        <form onSubmit={handleSubmitForm}>
                             <div className="field">
                                 <label>Tên bài học</label>
                                 <input
