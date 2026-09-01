@@ -13,7 +13,8 @@ const Practice = () => {
     const [charList, setCharList] = useState([]);
     const [selectedChar, setSelectedChar] = useState(-1);
     const [checked, setChecked] = useState(true);
-    const [predict, setPredict] = useState([]);
+    const [predict, setPredict] = useState();
+    const [feedBack, setFeedBack] = useState([]);
 
     useEffect(() => {
         setCharList(vowels);
@@ -87,8 +88,9 @@ const Practice = () => {
             });
 
             const data = await res.json();
-            // console.log("Ket qua du doan:", data);
-            setPredict(data.predictions);
+            console.log("Ket qua du doan:", data);
+            setPredict(data.prediction);
+            setFeedBack(data.assessment.feedback);
         } catch (e) {
             console.error("Loi khi goi API predict data url:", e);
         }
@@ -246,11 +248,11 @@ const Practice = () => {
                     <div className="card score-wrap" id="scoreCard">
                         <div className="fb-empty" id="fbEmpty">
                             Viết chữ mẫu rồi bấm<br /><strong>"Gửi để AI chấm điểm"</strong> để xem kết quả.
+
+                            <p>Chu nhan dien: {predict?.label}, voi do chinh xac: {predict?.confidence}</p>
                             {
-                                predict.map((item) => (
-                                    changeChar(item.label).map((label) => (
-                                        <p>{item.label} - {label.name} - {item.confidence * 100}</p>
-                                    ))
+                                feedBack.map((fb) => (
+                                    <p>{fb.text}</p>
                                 ))
                             }
                         </div>

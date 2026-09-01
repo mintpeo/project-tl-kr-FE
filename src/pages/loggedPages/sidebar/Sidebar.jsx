@@ -15,7 +15,6 @@ import {
     RiLogoutCircleRLine
 } from "react-icons/ri";
 import { TbAlphabetKorean } from "react-icons/tb";
-import { RxLetterCaseToggle } from "react-icons/rx";
 import { PiRoadHorizonBold } from "react-icons/pi";
 
 const Sidebar = () => {
@@ -129,7 +128,7 @@ const Sidebar = () => {
                     </div>
                 )}
 
-                <div className="sidebar-foot" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                <div className="sidebar-foot-logged" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                     <div className="avatar">{user_info.fullName.charAt(0)}</div>
 
                     <div>
