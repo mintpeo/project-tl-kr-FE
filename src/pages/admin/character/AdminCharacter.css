@@ -1,94 +1,227 @@
-.admin-chars{ font-family:'Be Vietnam Pro',sans-serif; color:var(--ink); }
-.admin-chars h1,.admin-chars h3{ font-family:'Noto Serif KR',serif; font-weight:600; letter-spacing:-0.01em; }
-.mono{ font-family:'JetBrains Mono',monospace; }
+.admin-chars {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    color: var(--ink);
 
-.page-head{ display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:24px; }
-.page-head h1{ font-size:25px; margin:0 0 4px; }
-.page-head p{ margin:0; color:var(--ink-soft); font-size:13.5px; }
-.eyebrow{ display:inline-block; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--celadon-dark); font-weight:700; margin-bottom:6px; }
+    h1, h3 {
+        font-family: 'Noto Serif KR', serif;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+    }
 
-.card{ background:var(--paper-card); border:1px solid var(--paper-dim); border-radius:14px; }
+    .mono {
+        font-family: 'JetBrains Mono', monospace;
+    }
 
-.btn{ border:none; border-radius:9px; padding:10px 16px; font-size:13.5px; font-weight:700; font-family:'Be Vietnam Pro',sans-serif; cursor:pointer; display:inline-flex; align-items:center; gap:7px; }
-.btn svg{ width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2; }
-.btn-primary{ background:var(--celadon-dark); color:#fff; }
-.btn-primary:hover{ background:#324c37; }
-.btn-ghost{ background:transparent; color:var(--ink-soft); border:1px solid var(--paper-dim); }
-.btn-ghost:hover{ border-color:var(--celadon); color:var(--celadon-dark); }
+    .table-card {
+        .glyph-cell {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 22px;
+            font-weight: 700;
+            width: 40px;
+            height: 40px;
+            border-radius: 9px;
+            background: var(--paper);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-/* ---- stats ---- */
-.stat-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px; }
-.stat-card{ padding:18px 20px; display:flex; align-items:center; gap:14px; }
-.stat-icon{ width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.stat-icon svg{ width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.8; }
-.stat-icon.tone-a{ background:var(--celadon-light); color:var(--celadon-dark); }
-.stat-icon.tone-b{ background:var(--gold-light); color:var(--gold); }
-.stat-icon.tone-c{ background:var(--plum-light); color:var(--plum); }
-.stat-icon.tone-d{ background:var(--plum-light); color:var(--plum); }
-.stat-num{ font-family:'Noto Serif KR',serif; font-size:21px; font-weight:700; color:var(--ink); }
-.stat-label{ font-size:11.5px; color:var(--ink-soft); margin-top:1px; }
+        .category-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
 
-/* ---- toolbar ---- */
-.toolbar{ display:flex; gap:10px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
-.search-wrap{ position:relative; flex:1; min-width:220px; }
-.search-wrap svg{ position:absolute; left:13px; top:50%; transform:translateY(-50%); width:15px; height:15px; stroke:var(--ink-soft); fill:none; stroke-width:2; }
-.search-wrap input{ width:100%; padding:9px 14px 9px 36px; border-radius:9px; border:1px solid var(--paper-dim); background:var(--paper-card); font-size:13px; color:var(--ink); outline:none; font-family:'Be Vietnam Pro',sans-serif; }
-.search-wrap input:focus{ border-color:var(--celadon); }
-.toolbar select{ padding:9px 30px 9px 13px; border-radius:9px; border:1px solid var(--paper-dim); background:var(--paper-card); font-size:13px; color:var(--ink); outline:none; cursor:pointer; font-family:'Be Vietnam Pro',sans-serif; }
-.toolbar select:focus{ border-color:var(--celadon); }
+        .category-badge.vowel {
+            background: var(--celadon-light);
+            color: var(--celadon-dark);
+        }
 
-/* ---- table ---- */
-.table-card{ overflow:hidden; }
-table{ width:100%; border-collapse:collapse; }
-thead th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft); font-weight:700; padding:13px 20px; border-bottom:1px solid var(--paper-dim); background:var(--paper); }
-tbody td{ padding:12px 20px; border-bottom:1px solid var(--paper-dim); font-size:13.5px; vertical-align:middle; }
-tbody tr:last-child td{ border-bottom:none; }
-tbody tr:hover{ background:rgba(95,133,103,0.04); }
+        .category-badge.consonant {
+            background: var(--gold-light);
+            color: var(--gold);
+        }
 
-.glyph-cell{ font-family:'Noto Serif KR',serif; font-size:22px; font-weight:700; width:40px; height:40px; border-radius:9px; background:var(--paper); display:flex; align-items:center; justify-content:center; }
+        .category-badge.syllable {
+            background: var(--plum-light);
+            color: var(--plum);
+        }
 
-.category-badge{ font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; display:inline-block; }
-.category-badge.vowel{ background:var(--celadon-light); color:var(--celadon-dark); }
-.category-badge.consonant{ background:var(--gold-light); color:var(--gold); }
-.category-badge.syllable{ background:var(--plum-light); color:var(--plum); }
+        .stroke-badge {
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
 
-.stroke-badge{ font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; }
-.stroke-badge svg{ width:12px; height:12px; stroke:currentColor; fill:none; stroke-width:2.4; flex-shrink:0; }
-.stroke-badge.has{ background:var(--celadon-light); color:var(--celadon-dark); }
-.stroke-badge.missing{ background:var(--plum-light); color:var(--plum); }
+        .stroke-badge img {
+            width: 12px;
+            height: 12px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2.4;
+            flex-shrink: 0;
+        }
 
-.row-actions{ display:flex; gap:6px; justify-content:flex-end; }
-.icon-btn{ width:30px; height:30px; border-radius:8px; border:1px solid var(--paper-dim); background:var(--paper-card); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--ink-soft); }
-.icon-btn svg{ width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2; }
-.icon-btn:hover{ border-color:var(--celadon); color:var(--celadon-dark); }
-.icon-btn.danger:hover{ border-color:var(--plum); color:var(--plum); }
+        .stroke-badge.has {
+            background: var(--celadon-light);
+            color: var(--celadon-dark);
+        }
 
-.empty-row{ text-align:center; padding:40px 20px; color:var(--ink-soft); }
+        .stroke-badge.missing {
+            background: var(--plum-light);
+            color: var(--plum);
+        }
 
-/* ---- modal ---- */
-.modal-overlay{ position:fixed; inset:0; background:rgba(35,40,35,0.45); display:flex; align-items:center; justify-content:center; z-index:100; padding:20px; }
-.modal-card{ width:100%; max-width:460px; background:var(--paper-card); border-radius:16px; padding:26px; max-height:90vh; overflow-y:auto; }
-.modal-card h3{ font-size:17px; margin:0 0 18px; }
+        .row-actions {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
 
-.field{ margin-bottom:14px; }
-.field label{ display:block; font-size:12px; font-weight:600; color:var(--ink); margin-bottom:6px; }
-.field input, .field select, .field textarea{
-    width:100%; padding:9px 12px; border-radius:9px; border:1px solid var(--paper-dim);
-    background:var(--paper); font-size:13px; color:var(--ink); outline:none; font-family:'Be Vietnam Pro',sans-serif;
+            .icon-btn svg {
+                width: 14px;
+                height: 14px;
+                stroke: currentColor;
+                fill: none;
+                stroke-width: 2;
+
+                &:hover {
+                    border-color: var(--celadon);
+                    color: var(--celadon-dark);
+                }
+            }
+
+            .icon-btn.danger:hover {
+                border-color: var(--plum);
+                color: var(--plum);
+            }
+        }
+
+        .empty-row {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--ink-soft);
+        }
+    }
+
+    /* ---- modal ---- */
+
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(35, 40, 35, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+
+        .modal-card {
+            width: 100%;
+            max-width: 460px;
+            background: var(--paper-card);
+            border-radius: 16px;
+            padding: 26px;
+            max-height: 90vh;
+            overflow-y: auto;
+
+            h3 {
+                font-size: 17px;
+                margin: 0 0 18px;
+            }
+
+            .field-row {
+                display: flex;
+                gap: 12px;
+
+                .modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }
+            }
+
+            .field {
+                flex: 1;
+                margin-bottom: 14px;
+
+                label {
+                    display: block;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: var(--ink);
+                    margin-bottom: 6px;
+                }
+
+                input, select, textarea {
+                    width: 100%;
+                    padding: 9px 12px;
+                    border-radius: 9px;
+                    border: 1px solid var(--paper-dim);
+                    background: var(--paper);
+                    font-size: 13px;
+                    color: var(--ink);
+                    outline: none;
+                    font-family: 'Be Vietnam Pro', sans-serif;
+
+                    &:focus {
+                        border-color: var(--celadon);
+                    }
+                }
+
+                .glyph-input {
+                    text-align: center;
+                    font-family: 'Noto Serif KR', serif;
+                    font-size: 20px;
+                    font-weight: 700;
+                }
+
+                .upload-box {
+                    border: 1px dashed var(--paper-dim);
+                    border-radius: 10px;
+                    padding: 18px;
+                    text-align: center;
+                    color: var(--ink-soft);
+                    font-size: 12px;
+                    cursor: pointer;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 8px;
+
+                    svg {
+                        width: 20px;
+                        height: 20px;
+                        stroke: var(--ink-soft);
+                        fill: none;
+                        stroke-width: 1.6;
+                    }
+
+                    &:hover {
+                        border-color: var(--celadon);
+                        color: var(--celadon-dark);
+                    }
+                }
+
+                .upload-box.disabled {
+                    display: none;
+                }
+
+                .field-hint {
+                    font-size: 11px;
+                    color: var(--ink-soft);
+                    margin: 6px 0 0;
+                    line-height: 1.5;
+
+                    code {
+                        background: var(--paper-dim);
+                        padding: 1px 5px;
+                        border-radius: 4px;
+                        font-family: 'JetBrains Mono', monospace;
+                    }
+                }
+            }
+        }
+    }
 }
-.field input:focus, .field select:focus{ border-color:var(--celadon); }
-.field-row{ display:flex; gap:12px; }
-.field-row .field{ flex:1; }
-.field-hint{ font-size:11px; color:var(--ink-soft); margin:6px 0 0; line-height:1.5; }
-.field-hint code{ background:var(--paper-dim); padding:1px 5px; border-radius:4px; font-family:'JetBrains Mono',monospace; }
-
-.glyph-input{ text-align:center; font-family:'Noto Serif KR',serif; font-size:20px; font-weight:700; }
-
-.upload-box{
-    border:1.5px dashed var(--paper-dim); border-radius:10px; padding:18px; text-align:center;
-    color:var(--ink-soft); font-size:12px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:8px;
-}
-.upload-box svg{ width:20px; height:20px; stroke:var(--ink-soft); fill:none; stroke-width:1.6; }
-.upload-box:hover{ border-color:var(--celadon); color:var(--celadon-dark); }
-
-.modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }

@@ -22,9 +22,6 @@ const Main = () => {
     });
     const authList = loadAuth.map(mapAuth);
     const [authListCustom, setAuthListCustom] = useState([]);
-    useEffect(() => {
-        setAuthListCustom(authList);
-    }, []);
 
     const {executePost: handleFindByEmail} = usePost(`${API_URL}/admin/email`);
     const {executePatch: handleChangeProfile} = usePatch(`${API_URL}/admin/change`);
@@ -122,7 +119,12 @@ const Main = () => {
     // Handle Filter Email
     const [findByEmail, setFindByEmail] = useState("");
     useEffect(() => {
-        const handleSearchUserByEmail = async () => {
+        const timer = setTimeout(async () => {
+            if (!findByEmail.trim()) {
+                setAuthListCustom(authList);
+                return;
+            }
+
             const body = {
                 email: findByEmail
             }
@@ -144,9 +146,10 @@ const Main = () => {
             } catch (e) {
                 console.log("Error Find By Email", e);
             }
-        }
-        handleSearchUserByEmail();
-    }, [findByEmail]);
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [findByEmail, loadAuth]);
 
     // Handle Filter Role, Enabled
     const [selectedRole, setSelectedRole] = useState("");

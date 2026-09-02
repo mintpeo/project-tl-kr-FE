@@ -23,9 +23,6 @@ const AdminLesson = () => {
     });
     const lessonsRoadRes = lessonsRoad.map(mapLessonRoad);
     const [lessonsRoadListRes, setLessonsRoadListRes] = useState([]);
-    useEffect(() => {
-        setLessonsRoadListRes(lessonsRoadRes);
-    }, []);
 
     // Delete Lesson
      const {executeDelete: handleDeleteLesson} = useDelete(`${API_URL}/admin/delete-lesson`);
@@ -45,92 +42,38 @@ const AdminLesson = () => {
          }
      }
 
-    // Edit Lesson
-    const [editName, setEditName] = useState("");
-    const [editCateId, setEditCateId] = useState("");
-    const [editOrderIndex, setEditOrderIndex] = useState(1);
-    const [editIsActive, setEditIsActive] = useState("");
-    const [editDuration, setEditDuration] = useState("");
-    const [editDes, setEditDes] = useState("");
-    const [editYoutubeId, setEditYoutubeId] = useState("");
-    const setEditInput = (name, value) => {
-        switch (name) {
-            case "name": setEditName(value); return;
-            case "cateId": setEditCateId(value); return;
-            case "orderIndex": setEditOrderIndex(value); return;
-            case "isActive": setEditIsActive(value); return;
-            case "duration": setEditDuration(value); return;
-            case "des": setEditDes(value); return;
-            case "youtube": setEditYoutubeId(value); return;
-        }
+    // Handle Field Change
+    const handleFieldChange = (field, value) => {
+        setForm(prev => ({
+            ...prev,
+            [field]: value
+        }));
     }
     // Modal
-    const EMPTY_FORM = { name: '', cateId: 1, orderIndex: 1, active: true, duration: '', description: '', youtubeId: '' };
+    const EMPTY_FORM = { name: '', cateRouteId: 1, orderIndex: 1, active: true, duration: '', description: '', youtubeId: '' };
     const [modalOpen, setModalOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [form, setForm] = useState(EMPTY_FORM);
     const [isEditVideoLink, setIsEditVideoLink] = useState(true);
-    // Handle Submit
-    const handleSubmitForm = (e) => {
-        e.preventDefault();
-
-        if (editingId !== null) {
-            handleEditLessonRoute();
-            return;
-        }
-        createNewLesson();
-    }
-    // Create New Lesson
-    const {executePost: handleCreateNewLesson} = usePost(`${API_URL}/admin/add-lesson`);
-    const createNewLesson = async () => {
-        let active = form.active;
-        if (editIsActive.trim() !== "") active = JSON.parse(editIsActive);
-
-        let cateId = form.cateId;
-        if (editCateId !== "") cateId = editCateId;
-
-        const req = {
-            name: editName,
-            cateRouteId: cateId,
-            orderIndex: editOrderIndex,
-            isActive: active,
-            duration: editDuration,
-            description: editDes,
-            youtubeId: editYoutubeId
-        }
-
-        try {
-            const data = await handleCreateNewLesson(req);
-            if (data) {
-                alert("Tạo bài học mới thành công.");
-                window.location.reload();
-            }
-        } catch (e) {
-            console.log("Error Edit Lesson", e);
-        }
-    }
     // Open Modal Edit
     const openEditModal = (lesson)  => {
         setEditingId(lesson.id);
-        const res = {
-            id: lesson?.id,
-            createdAt: lesson?.createdAt,
-            des: lesson?.des,
-            active: lesson?.active,
-            name: lesson?.name,
-            orderIndex: lesson?.orderIndex,
-            updateAt: lesson?.updateAt,
-            youtubeId: lesson?.youtubeId,
-            duration: lesson?.duration,
-            cateName: lesson?.cateName || 'Chưa phân loại',
-            cateId: lesson?.cateId || 0
-        };
-        setForm(res);
+        setForm({
+            id: lesson.id,
+            name: lesson.name,
+            cateRouteId: lesson.cateId,
+            orderIndex: lesson.orderIndex,
+            active: lesson.active,
+            duration: lesson.duration,
+            description: lesson.des,
+            youtubeId: lesson.youtubeId
+        });
         setModalOpen(true);
     };
     // Close Modal
     const closeModal = () => {
         setModalOpen(false);
+        setForm(EMPTY_FORM);
     }
     // Open Modal
     const openAddModal = () => {
@@ -138,36 +81,47 @@ const AdminLesson = () => {
         setForm(EMPTY_FORM);
         setModalOpen(true);
     }
-    // Edit Lesson
+    // Handle Submit
     const {executePost: handleEdit} = usePost(`${API_URL}/admin/edit-lesson`);
-    const handleEditLessonRoute = async () => {
-        if (editOrderIndex <= 0) {
-            alert("Vị trí hiện thị trong danh mục không thể <= 0");
+    const {executePost: handleCreateNewLesson} = usePost(`${API_URL}/admin/add-lesson`);
+    const handleSubmitForm = async (e) => {
+        e.preventDefault();
+
+        if (form.orderIndex <= 0) {
+            alert("Vị trí hiển thị trong danh mục phải > 0");
             return;
         }
 
-        let active = "";
-        if (editIsActive.trim() !== "") active = JSON.parse(editIsActive);
-
         const req = {
             id: editingId,
-            name: editName,
-            cateRouteId: editCateId,
-            orderIndex: editOrderIndex,
-            isActive: active,
-            duration: editDuration,
-            description: editDes,
-            youtubeId: editYoutubeId
+            name: form.name,
+            cateRouteId: form.cateRouteId,
+            orderIndex: form.orderIndex,
+            isActive: form.active,
+            duration: form.duration,
+            description: form.description,
+            youtubeId: form.youtubeId
         }
+        console.log(req);
 
         try {
-            const data = await handleEdit(req);
-            if (data) {
-                alert("Chỉnh sửa bài học thành công.");
-                window.location.reload();
+            if (editingId !== null) {
+                // Edit Lesson
+                const data = await handleEdit(req);
+                if (data) {
+                    alert("Chỉnh sửa bài học thành công.");
+                    window.location.reload();
+                }
+            } else {
+                // Create New Lesson
+                const res = await handleCreateNewLesson(req);
+                if (res) {
+                    alert("Tạo bài học mới thành công.");
+                    window.location.reload();
+                }
             }
         } catch (e) {
-            console.log("Error Edit Lesson", e);
+            console.log("Error When Save Lesson", e);
         }
     }
 
@@ -175,7 +129,12 @@ const AdminLesson = () => {
     const {executePost: handleSearch} = usePost(`${API_URL}/admin/search-lessons-name`);
     const [searchName, setSearchName] = useState("");
     useEffect(() => {
-        const handleSearchNameLesson = async () => {
+        const timer = setTimeout(async () => {
+            if (!searchName.trim()) {
+                setLessonsRoadListRes(lessonsRoadRes);
+                return;
+            }
+
             const req = {
                 lessonRoadName: searchName
             }
@@ -187,9 +146,9 @@ const AdminLesson = () => {
             } catch (e) {
                 console.log("Error Search Name Lesson", e);
             }
-        }
-        handleSearchNameLesson();
-    }, [searchName]);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchName, lessonsRoad]);
 
     // Handle Filter Cate, Status
     const [statusFilter, setStatusFilter] = useState(-1);
@@ -362,8 +321,8 @@ const AdminLesson = () => {
                                 <label>Tên bài học</label>
                                 <input
                                     type="text"
-                                    defaultValue={form.name}
-                                    onChange={(e) => setEditInput("name", e.target.value)}
+                                    value={form.name || ""}
+                                    onChange={(e) => handleFieldChange("name", e.target.value)}
                                     placeholder="VD: 10 nguyên âm cơ bản"
                                     required
                                 />
@@ -373,8 +332,8 @@ const AdminLesson = () => {
                                 <div className="field">
                                     <label>Danh mục</label>
                                     <select
-                                        defaultValue={form.cateId}
-                                        onChange={(e) => setEditInput("cateId", e.target.value)}
+                                        value={form.cateRouteId || ""}
+                                        onChange={(e) => handleFieldChange("cateRouteId", e.target.value)}
                                     >
                                         {cateList.map((c) => (
                                             <option key={c.id} value={c.id}>{c.name}</option>
@@ -386,8 +345,8 @@ const AdminLesson = () => {
                                     <label>Vị trí hiện thị trong danh mục</label>
                                     <input
                                         type="text"
-                                        defaultValue={form.orderIndex}
-                                        onChange={(e) => setEditInput("orderIndex", Number(e.target.value))}
+                                        value={form.orderIndex || ""}
+                                        onChange={(e) => handleFieldChange("orderIndex", Number(e.target.value))}
                                         placeholder="VD: 1"
                                         required
                                     />
@@ -398,8 +357,8 @@ const AdminLesson = () => {
                                 <div className="field">
                                     <label>Trạng thái</label>
                                     <select
-                                        defaultValue={String(form.active)}
-                                        onChange={(e) => setEditInput("isActive", e.target.value)}
+                                        value={String(form.active)}
+                                        onChange={(e) => handleFieldChange("isActive", e.target.value)}
                                     >
                                         <option value={String(form.active)}>{form.active ? `Đang hiển thị` : `Đang ẩn`}</option>
                                         <option value={String(!form.active)}>{!form.active ? `Đang hiển thị` : `Đang ẩn`}</option>
@@ -410,8 +369,8 @@ const AdminLesson = () => {
                                     <label>Thời lượng video</label>
                                     <input
                                         type="text"
-                                        defaultValue={form.duration}
-                                        onChange={(e) => setEditInput("duration", e.target.value)}
+                                        value={form.duration || ""}
+                                        onChange={(e) => handleFieldChange("duration", e.target.value)}
                                         placeholder="VD: 5:30"
                                     />
                                 </div>
@@ -423,7 +382,7 @@ const AdminLesson = () => {
                                 <textarea
                                     rows={5}
                                     defaultValue={form.des}
-                                    onChange={(e) => setEditInput("des", e.target.value)}
+                                    onChange={(e) => handleFieldChange("description", e.target.value)}
                                     placeholder="Mô tả ngắn về nội dung bài học..."
                                 />
                             </div>
@@ -440,8 +399,8 @@ const AdminLesson = () => {
                                             type="text"
                                             style={{ border: 'none', outline: 'none', padding: '8px', flex: 1 }}
                                             placeholder="Nhập ID video..."
-                                            defaultValue={form.youtubeId}
-                                            onChange={(e) => setEditInput("youtube", e.target.value)}
+                                            value={form.youtubeId || ""}
+                                            onChange={(e) => handleFieldChange("youtube", e.target.value)}
                                         />
                                     </div>
                                 ) : (
@@ -452,16 +411,16 @@ const AdminLesson = () => {
                                 )}
                             </div>
 
-                            <div className="field toggle-field">
-                                <label>Xuất bản ngay</label>
+                            {/*<div className="field toggle-field">*/}
+                            {/*    <label>Xuất bản ngay</label>*/}
 
-                                <div
-                                    className={`switch ${form.active === 'published' ? 'on' : ''}`}
-                                    onClick={() => setForm({ ...form, status: form.status === 'published' ? 'draft' : 'published' })}
-                                >
-                                    <div className="knob" />
-                                </div>
-                            </div>
+                            {/*    <div*/}
+                            {/*        className={`switch ${form.active === 'published' ? 'on' : ''}`}*/}
+                            {/*        onClick={() => setForm({ ...form, status: form.status === 'published' ? 'draft' : 'published' })}*/}
+                            {/*    >*/}
+                            {/*        <div className="knob" />*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
 
                             <div className="modal-actions">
                                 <button type="button" className="btn btn-ghost" onClick={closeModal}>Hủy</button>
