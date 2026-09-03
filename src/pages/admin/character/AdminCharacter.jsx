@@ -39,12 +39,14 @@ const AdminCharacter = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [form, setForm] = useState(EMPTY_FORM);
-    // Value Edit
-    const [name, setName] = useState('');
-    const [trans, setTrans] = useState('');
-    const [isDouble, setIsDouble] = useState('');
-    const [type, setType] = useState('');
-    const [strokeCount, setStrokeCount] = useState(1);
+
+    // Field Change
+    const handleFieldChange = (field, value) => {
+        setForm(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    }
 
     const openAddModal = () => {
         setEditingId(null);
@@ -67,23 +69,20 @@ const AdminCharacter = () => {
     const handleEditChar = async (e) => {
         e.preventDefault();
 
-        let double = '';
-        if (isDouble !== '') double = JSON.parse(isDouble);
-
         const req = {
-            charId: form.id,
-            name: name,
-            transcription: trans,
-            isDouble: double,
-            type: type,
-            strokeCount: strokeCount
+            charId: editingId,
+            name: form.name,
+            transcription: form.transcription,
+            isDouble: form.double,
+            type: form.type,
+            strokeCount: form.strokeCount
         }
 
         try {
             const data = await handleEdit(req);
             if (data) {
                 alert("Cập nhật thành công.");
-                // window.location.reload();
+                window.location.reload();
             }
         } catch (e) {
             console.log("Error Edit Character", e);
@@ -112,43 +111,35 @@ const AdminCharacter = () => {
         setModalOpen(false);
     }
 
-    // Filter
+    // Filter, Search
     const [search, setSearch] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('all');
     const [strokeFilter, setStrokeFilter] = useState('all'); // all | has | missing
 
     const {executePost: handleSearch} = usePost(`${API_URL}/admin/search-char`);
-    // Filter Search
     useEffect(() => {
         const timer = setTimeout(async () => {
-            if (!search.trim()) {
-                setChars(charsRes || []);
-                return;
+            let baseList = [...charsRes];
+
+            if (search.trim()) {
+                try {
+                    const data = await handleSearch({keyword: search});
+                    baseList = Array.isArray(data) ? data.map(mapChars) : [];
+                    setChars(baseList);
+                } catch (e) {
+                    console.log("Error Search", e);
+                }
             }
 
-            const req = {
-                keyword: search
-            }
+            let list = [...baseList];
 
-            try {
-                const data = await handleSearch(req);
-                setChars(data || []);
-            } catch (e) {
-                console.log("Error Search", e);
-            }
+            if (categoryFilter === 'VOWEL') list = list.filter(char => char.type === 'VOWEL');
+            else if (categoryFilter === 'CONSONANT') list = list.filter(char => char.type === 'CONSONANT');
+
+            setChars(list);
         }, 300);
         return () => clearTimeout(timer);
-    }, [search, getAllChars]);
-
-    // Filter Category Option
-    useEffect(() => {
-        let list = [...charsRes];
-
-        if (categoryFilter === 'VOWEL') list = list.filter(char => char.type === 'VOWEL');
-        if (categoryFilter === 'CONSONANT') list = list.filter(char => char.type === 'CONSONANT');
-
-        setChars(list);
-    }, [getAllChars, categoryFilter]);
+    }, [search, categoryFilter, getAllChars]);
 
     // Category Table
     const categoryLabel = (value) => {
@@ -334,8 +325,8 @@ const AdminCharacter = () => {
                                     <input
                                         type="text"
                                         className="glyph-input"
-                                        defaultValue={form.name}
-                                        onChange={(e) => setName(e.target.value)}
+                                        defaultValue={form.name || ""}
+                                        onChange={(e) => handleFieldChange("name", e.target.value)}
                                         placeholder="ㅏ"
                                         maxLength={2}
                                         required
@@ -346,8 +337,8 @@ const AdminCharacter = () => {
                                     <label>Cách đọc</label>
                                     <input
                                         type="text"
-                                        defaultValue={form.transcription}
-                                        onChange={(e) => setTrans(e.target.value)}
+                                        value={form.transcription || ""}
+                                        onChange={(e) => handleFieldChange("transcription", e.target.value)}
                                         placeholder="VD: a, giyeok, han"
                                         required
                                     />
@@ -356,8 +347,8 @@ const AdminCharacter = () => {
                                 <div className="field">
                                     <label>Âm</label>
                                     <select
-                                        defaultValue={String(form.double)}
-                                        onChange={(e) => setIsDouble(e.target.value)}
+                                        value={String(form.double)}
+                                        onChange={(e) => handleFieldChange("double", e.target.value)}
                                     >
                                         {TYPE_OPTIONS.map((c) => (
                                             <option key={c.value} value={String(c.value)}>{c.label}</option>
@@ -371,7 +362,7 @@ const AdminCharacter = () => {
                                     <label>Danh mục</label>
                                     <select
                                         value={form.type || ""}
-                                        onChange={(e) => setType(e.target.value)}
+                                        onChange={(e) => handleFieldChange("type", e.target.value)}
                                     >
                                         {CATEGORY_OPTIONS.map((c) => (
                                             <option key={c.value} value={c.value}>{c.label}</option>
@@ -385,8 +376,8 @@ const AdminCharacter = () => {
                                         type="number"
                                         min={1}
                                         max={10}
-                                        defaultValue={form.strokeCount}
-                                        onChange={(e) => setStrokeCount(Number(e.target.value))}
+                                        value={form.strokeCount || ""}
+                                        onChange={(e) => handleFieldChange("strokeCount", Number(e.target.value))}
                                     />
                                 </div>
                             </div>

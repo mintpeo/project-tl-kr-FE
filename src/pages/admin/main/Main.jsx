@@ -105,7 +105,7 @@ const Main = () => {
     // Handle Deleted
     const {executeDelete: handleDeleteUser} = useDelete(`${API_URL}/admin/delete`);
     const handleDeleteUserAdmin = async (authId) => {
-        if (!window.confirm("Bạn có chắc chắn muốn xoá bài học này?")) return;
+        if (!window.confirm("Bạn có chắc chắn muốn xoá tài khoản này?")) return;
 
         const req = {
             authId: authId

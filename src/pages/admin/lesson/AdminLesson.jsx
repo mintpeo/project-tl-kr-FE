@@ -27,6 +27,8 @@ const AdminLesson = () => {
     // Delete Lesson
      const {executeDelete: handleDeleteLesson} = useDelete(`${API_URL}/admin/delete-lesson`);
      const handleDeleteLessonAdmin = async (lessonId) => {
+         if (!window.confirm("Bạn có chắc chắn muốn xoá bài học này?")) return;
+
          const req = {
              lessonId: lessonId
          };
@@ -125,10 +127,9 @@ const AdminLesson = () => {
         }
     }
 
-    // Search Name Lesson
+    // Search, Filter
     const {executePost: handleSearch} = usePost(`${API_URL}/admin/search-lessons-name`);
     const [searchName, setSearchName] = useState("");
-    // Handle Filter Cate, Status
     const [statusFilter, setStatusFilter] = useState(-1);
     const [categoryFilter, setCategoryFilter] = useState(0);
     useEffect(() => {
