@@ -128,39 +128,32 @@ const AdminLesson = () => {
     // Search Name Lesson
     const {executePost: handleSearch} = usePost(`${API_URL}/admin/search-lessons-name`);
     const [searchName, setSearchName] = useState("");
-    useEffect(() => {
-        const timer = setTimeout(async () => {
-            if (!searchName.trim()) {
-                setLessonsRoadListRes(lessonsRoadRes);
-                return;
-            }
-
-            const req = {
-                lessonRoadName: searchName
-            }
-
-            try {
-                const data = await handleSearch(req);
-                const res = data.map(mapLessonRoad);
-                setLessonsRoadListRes(res);
-            } catch (e) {
-                console.log("Error Search Name Lesson", e);
-            }
-        }, 300);
-        return () => clearTimeout(timer);
-    }, [searchName, lessonsRoad]);
-
     // Handle Filter Cate, Status
     const [statusFilter, setStatusFilter] = useState(-1);
     const [categoryFilter, setCategoryFilter] = useState(0);
     useEffect(() => {
-        let list = [...lessonsRoadRes];
-        if (categoryFilter !== 0) list = list.filter(l => l.cateId === categoryFilter);
+        const timer = setTimeout(async () => {
+            let baseList = lessonsRoadRes;
 
-        if (statusFilter === 1) list = list.filter(l => l.active);
-        if (statusFilter === 0) list = list.filter(l => !l.active);
+            if (searchName.trim()) {
+                try {
+                    const data = await handleSearch({lessonRoadName: searchName});
+                    baseList = Array.isArray(data) ? data.map(mapLessonRoad) : [];
+                    setLessonsRoadListRes(baseList);
+                } catch (e) {
+                    console.log("Error Search Name Lesson", e);
+                }
+            }
 
-        setLessonsRoadListRes(list);
+            let filtered = [...baseList];
+            if (categoryFilter !== 0) filtered = filtered.filter(l => l.cateId === categoryFilter);
+
+            if (statusFilter === 1) filtered = filtered.filter(l => l.active);
+            else if (statusFilter === 0) filtered = filtered.filter(l => !l.active);
+
+            setLessonsRoadListRes(filtered);
+        }, 300);
+        return () => clearTimeout(timer);
     }, [searchName, categoryFilter, statusFilter, lessonsRoad]);
 
     // Get All Cate Road
@@ -268,7 +261,6 @@ const AdminLesson = () => {
                     <thead>
                         <tr>
                             <th>STT</th>
-                            <th>ID</th>
                             <th>Bài học</th>
                             <th>Danh mục</th>
                             <th>Vị trí hiển thị</th>
@@ -283,7 +275,6 @@ const AdminLesson = () => {
                         {lessonsRoadListRes .map((l, index) => (
                             <tr key={l.id}>
                                 <td>{index + 1}</td>
-                                <td>{l.id}</td>
                                 <td>{truncateText(l.name, 20)}</td>
                                 <td>{l.cateName}</td>
                                 <td>{l.orderIndex}</td>

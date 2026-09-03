@@ -7,6 +7,8 @@ import {usePost} from "../../../components/use/usePost.js";
 import {usePatch} from "../../../components/use/usePatch.js";
 import {useDelete} from "../../../components/use/useDelete.js";
 
+const EMPTY_FORM = {id: null, fullName: '', email: '', password: '', phone: '', role: 'USER', active: true};
+
 const Main = () => {
     const {data: loadAuth, loading: isLoadingAuth} = useFetch(`${API_URL}/admin/all`);
     const mapAuth = (auth) => ({
@@ -23,84 +25,88 @@ const Main = () => {
     const authList = loadAuth.map(mapAuth);
     const [authListCustom, setAuthListCustom] = useState([]);
 
-    const {executePost: handleFindByEmail} = usePost(`${API_URL}/admin/email`);
+    // Modal
+    const [modalOpen, setModalOpen] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+    const [form, setForm] = useState(EMPTY_FORM);
+    const handleFieldChange = (field, value) => {
+        setForm(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+    const openAddModal = () => {
+        setEditingId(null);
+        setForm(EMPTY_FORM);
+        setModalOpen(true);
+    };
+    const openEditModal = (auth) => {
+        setEditingId(auth.id);
+        setForm({
+            id: auth.id,
+            fullName: auth.fullName || '',
+            email: auth.email || '',
+            password: '',
+            phone: auth.phone || '',
+            role: auth.role || 'USER',
+            active: Boolean(auth.enabled)
+        });
+        setModalOpen(true);
+    };
+    const closeModal = () => {
+        setModalOpen(false);
+        setForm(EMPTY_FORM);
+    };
+    // Handle Submit
     const {executePatch: handleChangeProfile} = usePatch(`${API_URL}/admin/change`);
     const {executePost: handleCreateUser} = usePost(`${API_URL}/admin/create`);
-    const {executeDelete: handleDeleteUser} = useDelete(`${API_URL}/admin/delete`);
-
-    // Open Modal
-    const [isOpenEditModal, setIsOpenEditModal] = useState(false);
-    const [isOpenAddModal, setIsOpenAddModal] = useState(false);
-
-    // Create New User
-    const [createFullName, setCreateFullName] = useState("");
-    const [createEmail, setCreateEmail] = useState("");
-    const [createPassword, setCreatePassword] = useState("");
-    const [createPhone, setCreatePhone] = useState("");
-    const [createActive, setCreateActive] = useState("true");
-    const [createRole, setCreateRole] = useState("USER");
-    const setChangeCreateUser = (value, type) => {
-        switch (type) {
-            case "fullName": setCreateFullName(value); return;
-            case "email": setCreateEmail(value); return;
-            case "pass": setCreatePassword(value); return;
-            case "phone": setCreatePhone(value); return;
-        }
-    }
-    const handleCreateNewUser = async (e) => {
+    const handleSubmitForm = async (e) => {
         e.preventDefault();
 
-        const req = {
-            fullName: createFullName,
-            email: createEmail,
-            password: createPassword,
-            numberPhone: createPhone,
-            active: JSON.parse(createActive),
-            role: createRole
-        }
-
         try {
-            const data = await handleCreateUser(req);
-            console.log(data);
-            if (data) {
-                alert("Tạo tài khoản mới thành công.");
-                window.location.reload();
-            } else alert("Email đã tồn tại.");
-        } catch (e) {
-            console.log("Error Create New User", e);
-        }
-    }
+            if (editingId !== null) {
+                const req = {
+                    email: form.email,
+                    fullName: form.fullName.trim(),
+                    phone: form.phone.trim(),
+                    role: form.role,
+                    isActive: form.active
+                };
 
-    // Change Profile
-    const [fullName, setFullName] = useState("");
-    const [phone, setPhone] = useState("");
-    const [role, setRole] = useState("");
-    const [isActive, setIsActive] = useState("");
-    const handleChangeUserProfile = async () => {
-        let active = "";
-        if (isActive.trim() !== "") active = JSON.parse(isActive);
+                const data = await handleChangeProfile(req);
+                if (data) {
+                    alert("Cập nhật thành công.");
+                    window.location.reload();
+                }
+            } else {
+                // Tạo tài khoản mới
+                const req = {
+                    fullName: form.fullName.trim(),
+                    email: form.email.trim(),
+                    password: form.password,
+                    numberPhone: form.phone.trim(),
+                    active: form.active,
+                    role: form.role
+                };
 
-        const req = {
-            email: userDetail?.email,
-            fullName: fullName,
-            phone: phone,
-            role: role,
-            isActive: active
-        }
-
-        try {
-            const data = await handleChangeProfile(req);
-            if (data) {
-                alert("Cập nhật thành công");
-                window.location.reload();
+                const data = await handleCreateUser(req);
+                if (data) {
+                    alert("Tạo tài khoản mới thành công.");
+                    window.location.reload();
+                } else {
+                    alert("Email đã tồn tại.");
+                }
             }
-        } catch (e) {
-            console.log("Error Change User Profile", e);
+        } catch (err) {
+            console.error("Lỗi khi lưu thông tin tài khoản:", err);
         }
-    }
+    };
 
     // Handle Deleted
+    const {executeDelete: handleDeleteUser} = useDelete(`${API_URL}/admin/delete`);
     const handleDeleteUserAdmin = async (authId) => {
+        if (!window.confirm("Bạn có chắc chắn muốn xoá bài học này?")) return;
+
         const req = {
             authId: authId
         }
@@ -116,74 +122,41 @@ const Main = () => {
         }
     }
 
-    // Handle Filter Email
+    // Handle Filter Email Role, Enabled
     const [findByEmail, setFindByEmail] = useState("");
-    useEffect(() => {
-        const timer = setTimeout(async () => {
-            if (!findByEmail.trim()) {
-                setAuthListCustom(authList);
-                return;
-            }
-
-            const body = {
-                email: findByEmail
-            }
-
-            try {
-                const data = await handleFindByEmail(body);
-                const authList = data.map((item) => ({
-                    id: item.authId,
-                    email: item.mail,
-                    role: item.role,
-                    createAt: item.authCreateAt,
-                    enabled: item.active,
-                    isGoogle: item.google,
-                    userId: item.userId,
-                    fullName: item.fullName,
-                    phone: item.phone
-                }));
-                setAuthListCustom(authList);
-            } catch (e) {
-                console.log("Error Find By Email", e);
-            }
-        }, 300);
-
-        return () => clearTimeout(timer);
-    }, [findByEmail, loadAuth]);
-
-    // Handle Filter Role, Enabled
+    const {executePost: handleFindByEmail} = usePost(`${API_URL}/admin/email`);
     const [selectedRole, setSelectedRole] = useState("");
     const [isEnabled, setIsEnabled] = useState("");
     useEffect(() => {
-        let list = [...authList];
+        const timer = setTimeout(async () => {
+            let baseList = [...authList];
 
-        // Role
-        if (selectedRole === "USER") list = list.filter(auth => auth.role === 'USER');
-        if (selectedRole === "ADMIN") list = list.filter(auth => auth.role === 'ADMIN');
+            if (findByEmail.trim()) {
+                try {
+                    const data = await handleFindByEmail({email: findByEmail});
+                    baseList = Array.isArray(data) ? data.map(mapAuth) : [];
+                    setAuthListCustom(baseList);
+                } catch (e) {
+                    console.log("Error Find By Email", e);
+                }
+            }
 
-        // Enabled
-        if (isEnabled === "true") list = list.filter(auth => auth.enabled);
-        if (isEnabled === "false") list = list.filter(auth => !auth.enabled);
+            let list = [...baseList];
 
-        setAuthListCustom(list);
-    }, [loadAuth, selectedRole, isEnabled]);
+            // Role
+            if (selectedRole === "USER") list = list.filter(auth => auth.role === 'USER');
+            if (selectedRole === "ADMIN") list = list.filter(auth => auth.role === 'ADMIN');
 
-    // Handle Selected User
-    const [userDetail, setUserDetail] = useState();
-    const [editUser, setEditUser] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(0);
-    useEffect(() => {
-        const res = authList.find(auth => auth.id === selectedUser);
-        setUserDetail(res);
-        setEditUser(false);
-    }, [selectedUser]);
+            // Enabled
+            if (isEnabled === "true") list = list.filter(auth => auth.enabled);
+            if (isEnabled === "false") list = list.filter(auth => !auth.enabled);
 
-    const dataInput = [
-        {name: "Họ và tên", type: "fullName", typeInput: "text", placeholderInput: "Nhập họ và tên...", valueInput: createFullName},
-        {name: "Số điện thoại", type: "phone", typeInput: "text", placeholderInput: "0987654321", valueInput: createPhone},
-        {name: "Email", type: "email", typeInput: "text", placeholderInput: "example@gmail.com", valueInput: createEmail},
-        {name: "Mật khẩu", type: "pass", typeInput: "password", placeholderInput: "Tối thiểu 6 ký tự...", valueInput: createPassword},
-    ];
+            setAuthListCustom(list);
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [findByEmail, selectedRole, isEnabled, loadAuth]);
+
     const authActive = authList.filter(auth => auth.enabled).length;
     const authNoActive = authList.filter(auth => !auth.enabled).length;
     const dataPagesCate = [
@@ -228,11 +201,10 @@ const Main = () => {
                     <p>Danh sách toàn bộ tài khoản người học và quản trị viên trong hệ thống.</p>
                 </div>
 
-                <button className="btn btn-primary" onClick={() => setIsOpenAddModal(true)}>
+                <button className="btn btn-primary" onClick={() => openAddModal()}>
                     <svg viewBox="0 0 24 24">
                         <path d="M12 5v14M5 12h14"/>
                     </svg>
-
                     Thêm tài khoản
                 </button>
             </div>
@@ -290,12 +262,11 @@ const Main = () => {
                     <thead>
                     <tr>
                         <th>STT</th>
-                        <th>ID</th>
                         <th>Mail</th>
+                        <th>Tên người dùng</th>
                         <th>Vai trò</th>
                         <th>Ngày tham gia</th>
                         <th>Hoạt động</th>
-                        <th>Đăng nhập Google</th>
                         <th>Hành động</th>
                     </tr>
                     </thead>
@@ -303,22 +274,20 @@ const Main = () => {
                     {
                         authListCustom.map((auth, index) => (
                             <tr
-                                className={selectedUser === auth.id ? `activeTR` : ``}
+                                className={editingId === auth.id ? `activeTR` : ``}
                                 key={index}
                             >
                                 <td>{index + 1}</td>
-                                <td>{auth.id}</td>
                                 <td>{auth.email}</td>
+                                <td>{auth.fullName}</td>
                                 <td>{auth.role === 'USER' ? `Người học` : `Quản trị viên`}</td>
                                 <td>{auth.createAt}</td>
                                 <td>{auth.enabled ? `Đang hoạt động` : `Chưa kích hoạt`}</td>
-                                <td>{auth.isGoogle ? `Có` : `Không`}</td>
                                 <td>
                                     <div className="row-actions">
                                         <button className="icon-btn" title="Chỉnh sửa" onClick={(e) => {
                                             e.stopPropagation();
-                                            setSelectedUser(auth.id);
-                                            setIsOpenEditModal(true);
+                                            openEditModal(auth);
                                         }}>
                                             <svg viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" /></svg>
                                         </button>
@@ -354,177 +323,91 @@ const Main = () => {
                 {/*</div>*/}
             </div>
 
-            {isOpenEditModal && (
-                <div className="modal-overlay" onClick={() => setIsOpenEditModal(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header" style={{paddingBottom: '10px'}}>
-                            <h3>Thông tin chi tiết</h3>
-                            <button className="btn btn-ghost" onClick={() => setIsOpenEditModal(false)}>✕</button>
-                        </div>
+            {/* ---------------- MODAL ---------------- */}
+            {modalOpen && (
+                <div className="modal-overlay" onClick={closeModal}>
+                    <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+                        <h3>{editingId === null ? 'Thêm tài khoản mới' : 'Chỉnh sửa tài khoản'}</h3>
 
-                        {userDetail && (
-                            <div className="modal-form">
-                                <div className="detail-item">
-                                    <span className="detail-label">Mã tài khoản (ID):</span>
-                                    <span className="detail-value">{userDetail?.id}</span>
-                                </div>
-
-                                <div className="detail-item">
-                                    <span className="detail-label">Tên:</span>
-                                    {
-                                        !editUser ? (
-                                            <span className="detail-value">{userDetail?.fullName}</span>
-                                        ) : (
-                                            <span className="detail-valute">
-                                    <input
-                                        onChange={(e) => setFullName(e.target.value)}
-                                        type="text" style={{textAlign: "right"}}
-                                        defaultValue={userDetail?.fullName || ''}/>
-                                </span>
-                                        )
-                                    }
-                                </div>
-
-                                <div className="detail-item">
-                                    <span className="detail-label">Số điện thoại:</span>
-                                    {
-                                        !editUser ? (
-                                            <span className="detail-value">{userDetail?.phone}</span>
-                                        ) : (
-                                            <span className="detail-valute">
-                                    <input
-                                        onChange={(e) => setPhone(e.target.value)}
-                                        type="text"
-                                        style={{textAlign: "right"}}
-                                        defaultValue={userDetail?.phone}/>
-                                </span>
-                                        )
-                                    }
-                                </div>
-
-                                <div className="detail-item">
-                                    <span className="detail-label">Email:</span>
-                                    <span className="detail-value">{userDetail?.email}</span>
-                                </div>
-
-                                <div className="detail-item">
-                                    <span className="detail-label">Vai trò:</span>
-                                    {
-                                        !editUser ? (
-                                            <span className={`badge ${userDetail?.role === 'ADMIN' ? 'badge-admin' : 'badge-user'}`}>
-                                                {userDetail?.role === 'USER' ? 'Người học' : 'Quản trị viên'}
-                                            </span>
-                                        ) : (
-                                            <select onChange={(e) => setRole(e.target.value)} className="select filter-select" id="statusFilter">
-                                                <option value={userDetail?.role === 'USER' ? 'USER' : 'ADMIN'}>{userDetail?.role === 'USER' ? 'Người học' : 'Quản trị viên'}</option>
-                                                <option value={userDetail?.role !== 'USER' ? 'USER' : 'ADMIN'}>{userDetail?.role !== 'USER' ? 'Người học' : 'Quản trị viên'}</option>
-                                            </select>
-                                        )
-                                    }
-                                </div>
-
-                                <div className="detail-item">
-                                    <span className="detail-label">Trạng thái:</span>
-                                    {
-                                        !editUser ? (
-                                            <span className={`badge ${userDetail?.enabled ? 'badge-success' : 'badge-danger'}`}>
-                                                {userDetail?.enabled ? 'Đang hoạt động' : 'Chưa kích hoạt'}
-                                            </span>
-                                        ) : (
-                                            <select
-                                                defaultValue={String(userDetail?.enabled)}
-                                                className="select filter-select" id="statusFilter"
-                                                onChange={(e) => setIsActive(e.target.value)}
-                                            >
-                                                <option value={String(userDetail?.enabled)}>{userDetail?.enabled ? 'Đang hoạt động' : 'Chưa kích hoạt'}</option>
-                                                <option value={String(!userDetail?.enabled)}>{!userDetail?.enabled ? 'Đang hoạt động' : 'Chưa kích hoạt'}</option>
-                                            </select>
-                                        )
-                                    }
-                                </div>
-
-                                <div className="detail-item">
-                                    <span className="detail-label">Đăng nhập Google:</span>
-                                    <span className="detail-value">{userDetail?.isGoogle ? 'Có' : 'Không'}</span>
-                                </div>
-
-                                <div className="detail-item">
-                                    <span className="detail-label">Ngày tạo:</span>
-                                    <span className="detail-value">{userDetail?.createAt}</span>
-                                </div>
-
-                                <button className={`btn btn-primary ${editUser ? `disable` : ``}`} style={{justifyContent: "center"}} onClick={() => setEditUser(!editUser)}>Chỉnh sửa</button>
-                                <button className={`btn btn-primary ${editUser ? `` : `disable`}`} style={{justifyContent: "center"}} onClick={() => {
-                                    handleChangeUserProfile();
-                                    setEditUser(!editUser);
-                                }}>Lưu</button>
+                        <form onSubmit={handleSubmitForm}>
+                            <div className="field">
+                                <label>Họ và tên</label>
+                                <input
+                                    type="text"
+                                    value={form.fullName || ""}
+                                    onChange={(e) => handleFieldChange("fullName", e.target.value)}
+                                    placeholder="Nhập họ và tên..."
+                                    required
+                                />
                             </div>
-                        )}
-                    </div>
-                </div>
-            )}
 
-            {isOpenAddModal && (
-                <div className="modal-overlay" onClick={() => setIsOpenAddModal(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h2>Thêm tài khoản mới</h2>
-                            <button className="btn btn-ghost" onClick={() => setIsOpenAddModal(false)}>✕</button>
-                        </div>
+                            <div className="field-row">
+                                <div className="field">
+                                    <label>Email</label>
+                                    <input
+                                        type="email"
+                                        value={form.email || ""}
+                                        onChange={(e) => handleFieldChange("email", e.target.value)}
+                                        placeholder="example@gmail.com"
+                                        disabled={editingId !== null} // Khóa đổi email khi đang ở chế độ sửa
+                                        required
+                                    />
+                                </div>
 
-                        <form
-                            onSubmit={handleCreateNewUser}
-                            className="modal-form"
-                        >
-                            {
-                                dataInput.map((input) => (
-                                    <div className="form-group">
-                                        <label>{input.name}</label>
-                                        <input
-                                            type={input.typeInput}
-                                            name={input.type}
-                                            required
-                                            placeholder={input.placeholderInput}
-                                            value={input.valueInput || ""}
-                                            onChange={(e) => setChangeCreateUser(e.target.value, input.type)}
-                                        />
-                                    </div>
-                                ))
-                            }
+                                <div className="field">
+                                    <label>Số điện thoại</label>
+                                    <input
+                                        type="text"
+                                        value={form.phone || ""}
+                                        onChange={(e) => handleFieldChange("phone", e.target.value)}
+                                        placeholder="0987654321"
+                                    />
+                                </div>
+                            </div>
 
-                            <div className="form-row">
-                                <div className="form-group flex-1">
+                            {/* Chỉ hiển thị trường mật khẩu khi thêm mới */}
+                            {editingId === null && (
+                                <div className="field">
+                                    <label>Mật khẩu</label>
+                                    <input
+                                        type="password"
+                                        value={form.password || ""}
+                                        onChange={(e) => handleFieldChange("password", e.target.value)}
+                                        placeholder="Tối thiểu 6 ký tự..."
+                                        required
+                                    />
+                                </div>
+                            )}
+
+                            <div className="field-row">
+                                <div className="field">
                                     <label>Vai trò</label>
-
                                     <select
-                                        name="role"
-                                        className="select"
-                                        value={createRole}
-                                        onChange={(e) => setCreateRole(e.target.value)}
+                                        value={form.role}
+                                        onChange={(e) => handleFieldChange("role", e.target.value)}
                                     >
                                         <option value="USER">Người học</option>
                                         <option value="ADMIN">Quản trị viên</option>
                                     </select>
                                 </div>
 
-                                <div className="form-group flex-1">
-                                    <label>Trạng thái hoạt động</label>
-
+                                <div className="field">
+                                    <label>Trạng thái</label>
                                     <select
-                                        name="active"
-                                        className="select"
-                                        value={createActive}
-                                        onChange={(e) => setCreateActive(e.target.value)}
+                                        value={String(form.active)}
+                                        onChange={(e) => handleFieldChange("active", e.target.value === 'true')}
                                     >
-                                        <option value="true">Kích hoạt ngay</option>
-                                        <option value="false">Không kích hoạt</option>
+                                        <option value="true">Đang hoạt động</option>
+                                        <option value="false">Chưa kích hoạt</option>
                                     </select>
                                 </div>
                             </div>
 
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={() => setIsOpenAddModal(false)}>Hủy</button>
-                                <button type="submit" className="btn btn-primary">Xác nhận tạo</button>
+                            <div className="modal-actions">
+                                <button type="button" className="btn btn-ghost" onClick={closeModal}>Hủy</button>
+                                <button type="submit" className="btn btn-primary">
+                                    {editingId === null ? 'Xác nhận tạo' : 'Lưu thay đổi'}
+                                </button>
                             </div>
                         </form>
                     </div>
