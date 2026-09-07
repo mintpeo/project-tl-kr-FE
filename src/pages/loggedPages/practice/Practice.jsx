@@ -15,6 +15,8 @@ const Practice = () => {
     const [checked, setChecked] = useState(true);
     const [predict, setPredict] = useState();
     const [feedBack, setFeedBack] = useState([]);
+    const [scoreFB, setScoreFB] = useState(0);
+    const [scoreDisable, setScoreDisable] = useState(false);
 
     useEffect(() => {
         setCharList(vowels);
@@ -39,6 +41,7 @@ const Practice = () => {
 
         const ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        setScoreDisable(false);
     };
 
     const savePNG = () => {
@@ -91,6 +94,8 @@ const Practice = () => {
             console.log("Ket qua du doan:", data);
             setPredict(data.prediction);
             setFeedBack(data.assessment.feedback);
+            setScoreFB(data.assessment.score);
+            setScoreDisable(true);
         } catch (e) {
             console.error("Loi khi goi API predict data url:", e);
         }
@@ -246,25 +251,30 @@ const Practice = () => {
 
                 <div className="feedback-panel">
                     <div className="card score-wrap" id="scoreCard">
-                        <div className="fb-empty" id="fbEmpty">
+                        <div className="fb-empty" style={{display: `${scoreDisable ? `none` : `block`}`}}>
                             Viết chữ mẫu rồi bấm<br /><strong>"Gửi để AI chấm điểm"</strong> để xem kết quả.
-
-                            <p>Chu nhan dien: {predict?.label}, voi do chinh xac: {predict?.confidence}</p>
-                            {
-                                feedBack.map((fb) => (
-                                    <p>{fb.text}</p>
-                                ))
-                            }
                         </div>
 
-                        <div className="scoreResult">
-                            <div className="score-num" id="scoreNum">0%</div>
-                            <div className="score-label">Độ tương đồng với chữ mẫu</div>
-                            <div className="score-track">
-                                <div className="score-fill" id="scoreFill"></div>
+                        <div className="scoreResult" style={{display: `${scoreDisable ? `block` : `none`}`}}>
+                            <div style={{textAlign: "center", whiteSpace: "nowrap", marginBottom: '20px'}}>
+                                <div className="score-label">
+                                    Nhận diện là kí tự: <strong>{predict?.label}</strong> - Với độ chính xác: <strong>{predict?.confidence}%</strong>
+                                </div>
                             </div>
 
-                            <ul className="fb-list" id="fbList"></ul>
+                            <div className="score-num" id="scoreNum">{scoreFB}%</div>
+                            <div className="score-label">Độ tương đồng với chữ mẫu</div>
+                            <div className="score-track">
+                                <div className="score-fill" style={{width: `${scoreFB}%`}} id="scoreFill"></div>
+                            </div>
+
+                            <ul className="fb-list" id="fbList">
+                                {
+                                    feedBack.map((fb) => (
+                                        <li>{fb.text}</li>
+                                    ))
+                                }
+                            </ul>
                         </div>
                     </div>
                 </div>

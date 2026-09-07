@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import './AdminCharacter.css';
-import useFetch from "../../../components/use/useFetch.js";
 import {API_URL} from "../../../components/API_URL.jsx";
+import useFetch from "../../../components/use/useFetch.js";
 import {usePost} from "../../../components/use/usePost.js";
 
 const CATEGORY_OPTIONS = [
@@ -14,7 +14,7 @@ const TYPE_OPTIONS = [
     {value: false, label: 'Đơn'},
 ];
 
-const EMPTY_FORM = { name: '', transcription: '', type: 'VOWEL', strokeCount: '', strokeSvgUrl: '' };
+const EMPTY_FORM = { name: '', transcription: '', type: 'VOWEL', double: false, strokeCount: '', strokeSvgUrl: '' };
 
 const AdminCharacter = () => {
     const {data: getAllChars} = useFetch(`${API_URL}/admin/all-char`);
@@ -39,7 +39,6 @@ const AdminCharacter = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [form, setForm] = useState(EMPTY_FORM);
-
     // Field Change
     const handleFieldChange = (field, value) => {
         setForm(prev => ({
@@ -53,13 +52,11 @@ const AdminCharacter = () => {
         setForm(EMPTY_FORM);
         setModalOpen(true);
     }
-
     const openEditModal = (item) => {
         setEditingId(item.id);
         setForm(mapChars(item));
         setModalOpen(true);
     }
-
     const closeModal = () => {
         setModalOpen(false);
     }
@@ -115,7 +112,6 @@ const AdminCharacter = () => {
     const [search, setSearch] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('all');
     const [strokeFilter, setStrokeFilter] = useState('all'); // all | has | missing
-
     const {executePost: handleSearch} = usePost(`${API_URL}/admin/search-char`);
     useEffect(() => {
         const timer = setTimeout(async () => {
@@ -194,10 +190,10 @@ const AdminCharacter = () => {
                     <p>Danh sách nguyên âm, phụ âm và âm tiết cùng dữ liệu thứ tự nét viết tương ứng.</p>
                 </div>
 
-                <button className="btn btn-primary" onClick={openAddModal}>
-                    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
-                    Thêm ký tự
-                </button>
+                {/*<button className="btn btn-primary" onClick={openAddModal}>*/}
+                {/*    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>*/}
+                {/*    Thêm ký tự*/}
+                {/*</button>*/}
             </div>
 
             {/* ---------------- STATS ---------------- */}
@@ -274,12 +270,10 @@ const AdminCharacter = () => {
                                 {c.strokeSvgUrl ? (
                                     <div style={{display: "flex", gap: '10px'}}>
                                         <span className="stroke-badge has">
-                                            <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg>
                                             <img src={`http://localhost:8080${c.strokeSvgUrl}`} alt={c.name}/>
                                         </span>
 
-                                        <span className="stroke-badge has">
-                                            <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg>
+                                        <span className="stroke-badge">
                                             {splitText(c.strokeSvgUrl)}
                                         </span>
                                     </div>
@@ -297,9 +291,9 @@ const AdminCharacter = () => {
                                         <svg viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" /></svg>
                                     </button>
 
-                                    <button className="icon-btn danger" title="Xóa" onClick={() => deleteChar(c.id)}>
-                                        <svg viewBox="0 0 24 24"><path d="M3 6h18" /><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0l-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6" /></svg>
-                                    </button>
+                                    {/*<button className="icon-btn danger" title="Xóa" onClick={() => deleteChar(c.id)}>*/}
+                                    {/*    <svg viewBox="0 0 24 24"><path d="M3 6h18" /><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0l-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6" /></svg>*/}
+                                    {/*</button>*/}
                                 </div>
                             </td>
                         </tr>
@@ -325,8 +319,8 @@ const AdminCharacter = () => {
                                     <input
                                         type="text"
                                         className="glyph-input"
-                                        defaultValue={form.name || ""}
-                                        onChange={(e) => handleFieldChange("name", e.target.value)}
+                                        value={form.name}
+                                        // onChange={(e) => handleFieldChange("name", e.target.value)}
                                         placeholder="ㅏ"
                                         maxLength={2}
                                         required
@@ -362,7 +356,7 @@ const AdminCharacter = () => {
                                     <label>Danh mục</label>
                                     <select
                                         value={form.type || ""}
-                                        onChange={(e) => handleFieldChange("type", e.target.value)}
+                                        // onChange={(e) => handleFieldChange("type", e.target.value)}
                                     >
                                         {CATEGORY_OPTIONS.map((c) => (
                                             <option key={c.value} value={c.value}>{c.label}</option>
@@ -376,8 +370,8 @@ const AdminCharacter = () => {
                                         type="number"
                                         min={1}
                                         max={10}
-                                        value={form.strokeCount || ""}
-                                        onChange={(e) => handleFieldChange("strokeCount", Number(e.target.value))}
+                                        value={form.strokeCount}
+                                        // onChange={(e) => handleFieldChange("strokeCount", Number(e.target.value))}
                                     />
                                 </div>
                             </div>

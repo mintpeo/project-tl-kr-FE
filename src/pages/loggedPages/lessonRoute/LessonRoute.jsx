@@ -25,6 +25,28 @@ const LessonRoute = () => {
     const [track, setTrack] = useState(0);
     const [countLesson, setCountLesson] = useState(0);
 
+    // Handle Lesson Content
+    const handleLessonContent = (id) => {
+        switch (id) {
+            case 3: return(
+                <div className="demo-card">
+                    <CharHangul isVowels={true}/>
+                    <div className="status-line" id="statusLine"></div>
+                </div>
+            );
+            case 4: return(
+                <div className="demo-card">
+                    <CharHangul isVowels={false}/>
+                    <div className="status-line" id="statusLine"></div>
+                </div>
+            );
+            case 5: return(
+                <Combine singleConsonant={true}/>
+            );
+            default: return(<Combine singleConsonant={false}/>)
+        }
+    }
+
     const fetchCategories = async () => {
         const req = {
             userId: user?.userId
@@ -287,21 +309,7 @@ const LessonRoute = () => {
                                             </div>
 
                                             <div className={`tab-panel ${isLessonContent ? `active` : ``}`} id="panelContent">
-                                                {
-                                                    lessonRoute?.id === 3 ? (
-                                                        <div className="demo-card" style={{marginBottom: '24px'}}>
-                                                            <CharHangul isVowels={true}/>
-                                                            <div className="status-line" id="statusLine"></div>
-                                                        </div>
-                                                    ) : lessonRoute?.id === 4 ? (
-                                                        <div className="demo-card" style={{marginBottom: '24px'}}>
-                                                            <CharHangul isVowels={false}/>
-                                                            <div className="status-line" id="statusLine"></div>
-                                                        </div>
-                                                    ) : lessonRoute?.id === 5 ? (
-                                                        <Combine singleConsonant={true}/>
-                                                    ) : (<Combine singleConsonant={false}/> )
-                                                }
+                                                {handleLessonContent(lessonRoute?.id)}
                                             </div>
 
                                             <div className="tab-panel" id="panelQuiz">
