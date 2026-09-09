@@ -6,6 +6,7 @@ import ReactPlayer from "react-player";
 import CharHangul from "../../../components/hangul/CharHangul.jsx";
 import Combine from "../combine/Combine.jsx";
 import {usePost} from "../../../components/use/usePost.js";
+import Quiz from "../../../components/quiz/Quiz.jsx";
 
 const LessonRoute = () => {
     const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
@@ -24,6 +25,18 @@ const LessonRoute = () => {
     const playerRef = useRef(null);
     const [track, setTrack] = useState(0);
     const [countLesson, setCountLesson] = useState(0);
+
+    const lessons = (lessonByCateId || []).map((item) => ({
+        id: item?.id,
+        name: item?.name,
+        youtubeId: item?.youtubeId || "",
+        cateRouteId: item?.cateRouteId,
+        learned: item?.learned,
+        orderIndex: item?.orderIndex,
+        des: item?.des,
+        learnContent: item?.learnContent,
+        quizId: item?.quizId
+    }));
 
     // Handle Lesson Content
     const handleLessonContent = (id) => {
@@ -47,48 +60,39 @@ const LessonRoute = () => {
         }
     }
 
-    const fetchCategories = async () => {
-        const req = {
-            userId: user?.userId
-        }
-
-        try {
-            const data = await loadCategories(req);
-            const res = data.map((item) => ({
-                id: item.id,
-                name: item.name,
-                des: item.des,
-                orderIndex: item.orderIndex,
-                lessonsSize: item.lessonsSize,
-                learned: item.learned
-            }));
-
-            const count = res.filter(item => item.learned).length;
-            const per = Math.round((count / res.length) * 100);
-            setCountLesson(count);
-            setTrack(per);
-
-            setCategories(res);
-        } catch (e) {
-            console.log("Error Loading Categories User", e);
-        }
-    }
-
+    // Load Cate
     useEffect(() => {
+        const fetchCategories = async () => {
+            const req = {
+                userId: user?.userId
+            }
+
+            try {
+                const data = await loadCategories(req);
+                const res = data.map((item) => ({
+                    id: item.id,
+                    name: item.name,
+                    des: item.des,
+                    orderIndex: item.orderIndex,
+                    lessonsSize: item.lessonsSize,
+                    learned: item.learned
+                }));
+
+                const count = res.filter(item => item.learned).length;
+                const per = Math.round((count / res.length) * 100);
+                setCountLesson(count);
+                setTrack(per);
+
+                setCategories(res);
+            } catch (e) {
+                console.log("Error Loading Categories User", e);
+            }
+        }
+
         fetchCategories();
     }, [user?.userId]);
 
-    const lessons = (lessonByCateId || []).map((item) => ({
-        id: item?.id,
-        name: item?.name,
-        youtubeId: item?.youtubeId || "",
-        cateRouteId: item?.cateRouteId,
-        learned: item?.learned,
-        orderIndex: item?.orderIndex,
-        des: item?.des,
-        learnContent: item?.learnContent
-    }));
-
+    // Handle Progress Video
     const handleProgress = async (event) => {
         const video = event.currentTarget;
         if (!video.duration) return;
@@ -126,11 +130,10 @@ const LessonRoute = () => {
             setLessonRoute(null);
         }
     }, [selectedLessonRoute, lessonByCateId]);
+    console.log(lessonRoute)
 
     // Get lessons by category id
     useEffect(() => {
-        setSelectedLessonRoute(1);
-
         if (selectedCateId === -1) return;
         const getLessonByCateId = async () => {
             const req = {
@@ -162,7 +165,7 @@ const LessonRoute = () => {
         else setSelectedCateId(id)
     }
 
-    // Go to element id
+    // Scroll to Element
     const scrollToElement = (id) => {
         const element = document.getElementById(id);
         if (element) {
@@ -209,7 +212,9 @@ const LessonRoute = () => {
                                                     .sort((a, b) => a.orderIndex - b.orderIndex)
                                                     .map((lesson) => (
                                                         <>
-                                                            <div className={`sub-item ${selectedLessonRoute === lesson.orderIndex ? `active` : ``}`} onClick={() => setSelectedLessonRoute(lesson.orderIndex)}>
+                                                            <div className={`sub-item ${selectedLessonRoute === lesson.orderIndex ? `active` : ``}`}
+                                                                 onClick={() => setSelectedLessonRoute(lesson.orderIndex)}
+                                                            >
                                                                 {
                                                                     lesson.learned ? (
                                                                         <div className="done-tick">
@@ -302,7 +307,10 @@ const LessonRoute = () => {
                                                 <div className={`content-tab ${isLessonContent ? `` : `active`}`} id="tabBtnQuiz"
                                                      onClick={() => setIsLessonContent(false)}
                                                 >
-                                                    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                                                    <svg viewBox="0 0 24 24">
+                                                        <path d="M9 11l3 3L22 4"/>
+                                                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                                                    </svg>
                                                     Bài luyện tập
                                                     <span className="count-badge">5 câu</span>
                                                 </div>
@@ -312,10 +320,14 @@ const LessonRoute = () => {
                                                 {handleLessonContent(lessonRoute?.id)}
                                             </div>
 
-                                            <div className="tab-panel" id="panelQuiz">
-                                                <div className="stroke-detail" id="strokeDetail" />
-                                                <div id="quizArea">
-                                                </div>
+                                            <div className={`tab-panel ${isLessonContent ? `` : `active`}`} id="panelQuiz">
+                                                {lessonRoute?.quizId !== null ? (
+                                                    <div id="quizArea">
+                                                        <Quiz key={lessonRoute.quizId} quizId={lessonRoute?.quizId} />
+                                                    </div>
+                                                ) : (
+                                                    <div className="stroke-detail" id="strokeDetail" />
+                                                )}
                                             </div>
                                         </>
                                     )

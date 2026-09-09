@@ -1,0 +1,57 @@
+.quiz-empty{ text-align:center; padding:30px; color:var(--ink-soft); font-size:13px; }
+
+.quiz-wrap{ font-family:'Be Vietnam Pro',sans-serif; color:var(--ink); }
+
+/* ---- thanh tiến trình ---- */
+.quiz-progress{ display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+.quiz-progress-track{ flex:1; height:6px; border-radius:4px; background:var(--paper-dim); overflow:hidden; }
+.quiz-progress-fill{ height:100%; background:var(--celadon-dark); border-radius:4px; transition:width .3s ease; }
+.quiz-progress-label{ font-size:12px; color:var(--ink-soft); font-family:'JetBrains Mono',monospace; white-space:nowrap; }
+
+/* ---- câu hỏi ---- */
+.quiz-question{ font-size:15.5px; font-weight:600; margin-bottom:18px; }
+
+/* ---- đáp án ---- */
+.quiz-options{ display:grid; gap:12px; margin-bottom:16px; }
+.quiz-options.char-mode{ grid-template-columns:repeat(4,1fr); }
+.quiz-options.text-mode{ grid-template-columns:repeat(2,1fr); }
+
+.quiz-option{
+    border-radius:12px; border:1.5px solid var(--paper-dim); background:var(--paper);
+    cursor:pointer; transition:border-color .15s ease, background .15s ease;
+    font-family:'Be Vietnam Pro',sans-serif;
+}
+.char-mode .quiz-option{
+    aspect-ratio:1; font-family:'Noto Serif KR',serif; font-size:26px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+}
+.text-mode .quiz-option{ padding:16px; font-size:13px; font-weight:600; text-align:left; }
+
+.quiz-option:hover{ border-color:var(--celadon); }
+.quiz-option.correct{ background:var(--celadon-light); border-color:var(--celadon-dark); color:var(--celadon-dark); }
+.quiz-option.wrong{ background:var(--plum-light); border-color:var(--plum); color:var(--plum); }
+.quiz-option.disabled{ pointer-events:none; }
+
+/* ---- phản hồi ---- */
+.quiz-feedback{ min-height:20px; font-size:13px; font-weight:600; margin-bottom:16px; }
+.quiz-feedback.correct{ color:var(--celadon-dark); }
+.quiz-feedback.wrong{ color:var(--plum); }
+
+/* ---- kết quả ---- */
+.quiz-result{ text-align:center; padding:30px 10px; }
+.quiz-result .score-big{ font-family:'Noto Serif KR',serif; font-size:44px; font-weight:700; color:var(--celadon-dark); }
+.quiz-result p{ font-size:13.5px; color:var(--ink-soft); margin:6px 0 22px; }
+.quiz-result .btn-row{ display:flex; gap:10px; justify-content:center; }
+
+/* ---- nút dùng chung ---- */
+.btn{ border:none; border-radius:9px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; font-family:'Be Vietnam Pro',sans-serif; }
+.btn-primary{ background:var(--celadon-dark); color:#fff; }
+.btn-primary:hover{ background:#324c37; }
+.btn-primary:disabled{ background:var(--paper-dim); color:var(--ink-soft); cursor:not-allowed; }
+.btn-ghost{ background:transparent; color:var(--ink-soft); border:1px solid var(--paper-dim); }
+.btn-ghost:hover{ border-color:var(--celadon); color:var(--celadon-dark); }
+
+@media (max-width: 480px){
+    .quiz-options.char-mode{ grid-template-columns:repeat(2,1fr); }
+    .quiz-options.text-mode{ grid-template-columns:1fr; }
+}
