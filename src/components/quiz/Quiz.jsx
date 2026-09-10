@@ -21,12 +21,14 @@ const Quiz = ({quizId, onFinish, onPracticeClick }) => {
     // Get Quiz By Quiz Id
     const {executePost: loadQuiz, loading: loadingQuiz} = usePost(`${API_URL}/quiz/all`);
     const [dataQuestions, setDataQuestions] = useState([]);
+    const [nameQuiz, setNameQuiz] = useState('');
     const getAllQuiz = async () => {
         const req = {
             quizId: quizId
         }
         try {
             const data = await loadQuiz(req);
+            setNameQuiz(data?.title);
             setDataQuestions(data?.questions);
         } catch (e) {
             console.log("Error Get All Quiz", e);
@@ -48,6 +50,7 @@ const Quiz = ({quizId, onFinish, onPracticeClick }) => {
     const [answered, setAnswered] = useState(false);
     const [isCorrect, setIsCorrect] = useState(0);
     const [score, setScore] = useState(0);
+    const [lastScore, setLastScore] = useState(0);
     const [userIsDone, setUserIsDone] = useState(false);
     const [dataComplete, setDataComplete] = useState('');
     const {executePost: handleQuestionCorrect} = usePost(`${API_URL}/quiz/is-correct`);
@@ -88,7 +91,8 @@ const Quiz = ({quizId, onFinish, onPracticeClick }) => {
             if (data?.quizAttempt) {
                 setUserIsDone(true);
                 setScore(data?.score);
-                setDataComplete(data?.date);
+                setDataComplete(data?.lastDate);
+                setLastScore(data?.lastScore);
             }
         } catch (e) {
             console.log("Error User Quiz", e);
@@ -144,14 +148,18 @@ const Quiz = ({quizId, onFinish, onPracticeClick }) => {
         const pct = Math.round((score / questions.length) * 100);
         return (
             <div className="quiz-result">
-                <div className="score-big">{score}/{questions.length}</div>
+                {userIsDone ? (
+                    <p>Điểm cao nhất từng đạt được: <strong>{score}/{questions.length}</strong></p>
+                ) : (
+                    <div className="score-big">{score}/{questions.length}</div>
+                )}
 
-                <p>Bạn đã trả lời đúng {pct}% câu hỏi trong bài luyện tập này.</p>
-                {userIsDone && (<p>Hoàn thành bài luyện tập này vào: {dataComplete}</p>)}
+                {!userIsDone && (<p>Bạn đã trả lời đúng {pct}% câu hỏi trong bài luyện tập này.</p>)}
+                {userIsDone && (<p>Lần cập nhật gần đây nhất: <strong>{dataComplete}</strong> - Với điểm số: <strong>{lastScore}</strong></p>)}
 
                 <div className="btn-row">
                     <button className="btn btn-ghost" onClick={handleRestart}>Làm lại</button>
-                    <button className="btn btn-primary" onClick={onPracticeClick}>Luyện viết ngay</button>
+                    {/*<button className="btn btn-primary" onClick={onPracticeClick}>Luyện viết ngay</button>*/}
                 </div>
             </div>
         );
@@ -164,6 +172,7 @@ const Quiz = ({quizId, onFinish, onPracticeClick }) => {
 
     return (
         <div className="quiz-wrap">
+            <div style={{margin: '5px 0'}}>{nameQuiz}</div>
             <div className="quiz-progress">
                 <div className="quiz-progress-track">
                     <div className="quiz-progress-fill" style={{ width: `${(index / questions.length) * 100}%` }} />
