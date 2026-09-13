@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import useFetch from "../use/useFetch.js";
-import {API_URL} from "../API_URL.jsx";
+import {API_URL, AUDIO_URL} from "../API_URL.jsx";
 
 const CharHangul = ({isVowels}) => {
     const {data: characters} = useFetch(`${API_URL}/character/all`);
@@ -21,6 +21,12 @@ const CharHangul = ({isVowels}) => {
 
     const [selectedPairIndex, setSelectedPairIndex] = useState(0);
     const selectedPair = char_pair[selectedPairIndex] || char_pair[0];
+
+    const audioUrl = "https://res.cloudinary.com/dqzuuzi8z/video/upload/v1788791310/yo_audio_k5rojw.mp3";
+    const handleAudio = (id) => {
+        if (id !== 1) return ".mp3";
+        return ".m4a";
+    }
 
     useEffect(() => {
         setSelectedSingleIndex(0);
@@ -50,6 +56,10 @@ const CharHangul = ({isVowels}) => {
                 <img src={`http://localhost:8080${selectedSingle?.strokeSvgUrl}`} alt={selectedSingle?.name}/>
             </div>
 
+            <div className="audio-stage">
+                <audio controls src={`${AUDIO_URL}/${selectedSingle?.fileAudioName}${handleAudio(selectedSingle?.id)}`} />
+            </div>
+
             <p><strong>{isVowels ? vowelsPair.length : consonantsPair.length}</strong> {isVowels ? 'Nguyên âm đôi' : 'Phụ âm kép'}:</p>
             <div className="char-switch" id="charSwitch">
                 {
@@ -68,6 +78,10 @@ const CharHangul = ({isVowels}) => {
 
             <div className="svg-stage">
                 <img src={`http://localhost:8080${selectedPair?.strokeSvgUrl}`} alt={selectedPair?.name}/>
+            </div>
+
+            <div className="audio-stage">
+                <audio controls src={`${AUDIO_URL}/${selectedPair?.fileAudioName}${handleAudio(selectedPair?.id)}`} />
             </div>
         </>
     );

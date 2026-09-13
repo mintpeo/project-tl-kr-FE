@@ -10,12 +10,12 @@ import Home from "./pages/loggedPages/home/Home.jsx";
 import Lesson from "./pages/loggedPages/lesson/Lesson.jsx";
 import Practice from "./pages/loggedPages/practice/Practice.jsx";
 import Progress from "./pages/loggedPages/progress/Progress.jsx";
-import Admin from "./pages/admin/Admin.jsx";
 import AuthWrapper from "./components/AuthWrapper.jsx";
 import VideoLearningPage from "./pages/loggedPages/lesson/videoLearn/VideoLearningPage.jsx";
 import Stroke from "./pages/loggedPages/stroke/Stroke.jsx";
 import Combine from "./pages/loggedPages/combine/Combine.jsx";
 import LessonRoad from "./pages/loggedPages/lessonRoad/LessonRoad.jsx";
+
 // Admin
 import LayoutAdmin from "./utils/LayoutAdmin.jsx";
 import MainAdmin from "./pages/admin/main/Main.jsx"

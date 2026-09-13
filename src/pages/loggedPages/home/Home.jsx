@@ -1,32 +1,10 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import './Home.css';
-import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
 import {usePost} from "../../../components/use/usePost.js";
+import {API_URL} from "../../../components/API_URL.jsx";
 
 const Home = () => {
-    const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
-    const user = JSON.parse(user_info);
-    const {executePost: getInfoUser} = usePost(`${API_URL}/user/me`);
-
-
-    const handleResetInfoUser = async () => {
-        const userReq = {
-            email: user.email
-        }
-
-        try {
-            const data = await getInfoUser(userReq);
-            if (data) {
-                localStorage.setItem(LOCAL_STORAGE_KEYS.USER_INFO, JSON.stringify(data));
-            }
-        } catch (e) {
-            console.log("Error Reset Info User", e);
-        }
-    }
-
-    useEffect(() => {
-        handleResetInfoUser();
-    }, [])
+    const {executePost: handleCheckIn} = usePost(`${API_URL}/user-streak/check-in`)
 
     return (
         <>
@@ -47,13 +25,17 @@ const Home = () => {
                 </div>
 
                 <div className="card streak-card">
-                    <div className="streak-row">
-                        <div className="ring" style={{background: 'var(--gold)'}}></div>
+                    <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+                        <div className="streak-row">
+                            <div className="ring" style={{background: 'var(--gold)'}}></div>
 
-                        <div>
-                            <div className="streak-num">12 <span style={{fontSize: '15px'}}>ngày</span></div>
-                            <div className="streak-label">Chuỗi ngày học liên tiếp</div>
+                            <div>
+                                <div className="streak-num">12 <span style={{fontSize: '15px'}}>ngày</span></div>
+                                <div className="streak-label">Chuỗi ngày học liên tiếp</div>
+                            </div>
                         </div>
+
+                        <button className="btn btn-primary" style={{height: '50px'}}>Điểm danh</button>
                     </div>
 
                     <div>

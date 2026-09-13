@@ -113,7 +113,7 @@ const Login = ({isTabLogin}) => {
                 Đăng nhập bằng Google
             </button>
 
-            <p className="switch-line">Chưa có tài khoản? <span className="link">Đăng ký ngay</span></p>
+            {/*<p className="switch-line">Chưa có tài khoản? <span className="link">Đăng ký ngay</span></p>*/}
         </form>
     );
 };

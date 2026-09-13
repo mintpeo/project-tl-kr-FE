@@ -1,10 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './Practice.css';
 import useFetch from "../../../components/use/useFetch.js";
-import {API_URL} from "../../../components/API_URL.jsx";
+import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
 import Skeleton from "../../../components/loading/Skeleton.jsx";
+import {usePost} from "../../../components/use/usePost.js";
 
 const Practice = () => {
+    const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
+    const user = JSON.parse(user_info);
+
     const {data: characters, loading: isLoading} = useFetch(`${API_URL}/character/all`);
     const vowels = characters.filter(char => char.type === "VOWEL");
     const consonants = characters.filter(char => char.type === "CONSONANT");
@@ -13,8 +17,11 @@ const Practice = () => {
     const [charList, setCharList] = useState([]);
     const [selectedChar, setSelectedChar] = useState(-1);
     const [checked, setChecked] = useState(true);
+
     const [predict, setPredict] = useState();
     const [feedBack, setFeedBack] = useState([]);
+    const [scoreFB, setScoreFB] = useState(0);
+    const [scoreDisable, setScoreDisable] = useState(false);
 
     useEffect(() => {
         setCharList(vowels);
@@ -26,10 +33,6 @@ const Practice = () => {
         // { name: 'Âm ghép' }
     ];
 
-    const changeChar = (label) => {
-        return charList.filter(item => item.transcription === label);
-    }
-
     const canvasRef = useRef(null);
     const isDrawing = useRef(false);
 
@@ -39,6 +42,7 @@ const Practice = () => {
 
         const ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        setScoreDisable(false);
     };
 
     const savePNG = () => {
@@ -64,6 +68,10 @@ const Practice = () => {
         link.click();
     }
 
+    const [charLabel, setCharLabel] = useState('');
+    const [charId, setCharId] = useState(0);
+    // Submit Canvas
+    const {executePost: handlePredict} = usePost(`${API_URL}/predict/data-url`);
     const submitCanvas = async () => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -80,21 +88,47 @@ const Practice = () => {
         const dataUrl = tempCanvas.toDataURL("image/png");
 
         try {
-            const res = await fetch("http://localhost:8080/api/predict/data-url", {
-                method: "POST",
-                credentials: 'include',
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ dataUrl }),
-            });
+            const data = await handlePredict({dataUrl});
+            // console.log("Ket qua du doan:", data);
 
-            const data = await res.json();
-            console.log("Ket qua du doan:", data);
-            setPredict(data.prediction);
-            setFeedBack(data.assessment.feedback);
+            const char = charList.find(item => item.transcription === data?.prediction.label);
+            setCharLabel(char?.name);
+            setCharId(char?.id);
+
+            setPredict(data?.prediction);
+            setFeedBack(data?.assessment?.feedback);
+            setScoreFB(data?.assessment?.score);
+            setScoreDisable(true);
         } catch (e) {
-            console.error("Loi khi goi API predict data url:", e);
+            console.error("Error Predict AI:", e);
         }
     };
+
+    // Save Practice
+    const {executePost: handleSavePractice} = usePost(`${API_URL}/practice/save`);
+    useEffect(() => {
+        if (!scoreDisable) return;
+
+        const savePractice = async () => {
+            const char = charList.find(item => item.transcription === predict?.label);
+
+            const req = {
+                userId: user.userId,
+                predictedLabel: char?.name,
+                confidence: predict?.confidence,
+                characterId: char?.id,
+                score: scoreFB
+            }
+
+            try {
+                await handleSavePractice(req);
+            } catch (e) {
+                console.log("Error Save Practice", e);
+            }
+        }
+
+        savePractice();
+    }, [predict]);
 
     const startDrawing = (e) => {
         const canvas = canvasRef.current;
@@ -158,17 +192,15 @@ const Practice = () => {
                     <span className="selector-label">Chọn ký tự để luyện</span>
 
                     <div className="cat-pills">
-                        {
-                            cateList.map((item, index) => (
-                                <div
-                                    key={index}
-                                    onClick={() => setSelectedCate(index)}
-                                    className={`cat-pill ${selectedCate === index ? 'active' : ''}`}
-                                >
-                                    {item.name}
-                                </div>
-                            ))
-                        }
+                        {cateList.map((item, index) => (
+                            <div
+                                key={index}
+                                onClick={() => setSelectedCate(index)}
+                                className={`cat-pill ${selectedCate === index ? 'active' : ''}`}
+                            >
+                                {item.name}
+                            </div>
+                        ))}
                     </div>
                 </div>
 
@@ -239,32 +271,37 @@ const Practice = () => {
 
                     <div className="canvas-actions">
                         <button className="btn btn-ghost" onClick={clearCanvas}>Xóa</button>
-                        <button className="btn btn-ghost" onClick={savePNG}>Save PNG</button>
+                        {/*<button className="btn btn-ghost" onClick={savePNG}>Save PNG</button>*/}
                         <button className="btn btn-primary" onClick={submitCanvas}>Gửi để AI chấm điểm</button>
                     </div>
                 </div>
 
                 <div className="feedback-panel">
                     <div className="card score-wrap" id="scoreCard">
-                        <div className="fb-empty" id="fbEmpty">
+                        <div className="fb-empty" style={{display: `${scoreDisable ? `none` : `block`}`}}>
                             Viết chữ mẫu rồi bấm<br /><strong>"Gửi để AI chấm điểm"</strong> để xem kết quả.
-
-                            <p>Chu nhan dien: {predict?.label}, voi do chinh xac: {predict?.confidence}</p>
-                            {
-                                feedBack.map((fb) => (
-                                    <p>{fb.text}</p>
-                                ))
-                            }
                         </div>
 
-                        <div className="scoreResult">
-                            <div className="score-num" id="scoreNum">0%</div>
-                            <div className="score-label">Độ tương đồng với chữ mẫu</div>
-                            <div className="score-track">
-                                <div className="score-fill" id="scoreFill"></div>
+                        <div className="scoreResult" style={{display: `${scoreDisable ? `block` : `none`}`}}>
+                            <div style={{textAlign: "center", whiteSpace: "nowrap", marginBottom: '20px'}}>
+                                <div className="score-label">
+                                    Nhận diện là kí tự: <strong>{charLabel}</strong> - Với độ chính xác: <strong>{predict?.confidence}%</strong>
+                                </div>
                             </div>
 
-                            <ul className="fb-list" id="fbList"></ul>
+                            <div className="score-num" id="scoreNum">{scoreFB}%</div>
+                            <div className="score-label">Độ tương đồng với chữ mẫu</div>
+                            <div className="score-track">
+                                <div className="score-fill" style={{width: `${scoreFB}%`}} id="scoreFill"></div>
+                            </div>
+
+                            <ul className="fb-list" id="fbList">
+                                {
+                                    feedBack.map((fb, index) => (
+                                        <li key={index}>{fb.text}</li>
+                                    ))
+                                }
+                            </ul>
                         </div>
                     </div>
                 </div>
