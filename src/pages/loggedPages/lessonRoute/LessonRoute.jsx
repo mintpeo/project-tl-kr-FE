@@ -35,7 +35,8 @@ const LessonRoute = () => {
         orderIndex: item?.orderIndex,
         des: item?.des,
         learnContent: item?.learnContent,
-        quizId: item?.quizId
+        quizId: item?.quizId,
+        totalQuestions: item?.totalQuestions
     }));
 
     // Handle Lesson Content
@@ -130,11 +131,12 @@ const LessonRoute = () => {
             setLessonRoute(null);
         }
     }, [selectedLessonRoute, lessonByCateId]);
-    console.log(categories)
 
     // Get lessons by category id
     const {executePost: loadLessonByCateId, loading: loadingLessonCate} = usePost(`${API_URL}/lesson-route/lessons`);
     useEffect(() => {
+        setSelectedLessonRoute(1); // Selected Lesson Route 2
+
         if (selectedCateId === -1) return;
         const getLessonByCateId = async () => {
             const req = {
@@ -245,7 +247,7 @@ const LessonRoute = () => {
                                                              setSelectedLessonRoute(lesson.orderIndex)
                                                          }}>
                                                         <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-                                                        Bài luyện tập (5 câu)
+                                                        Bài luyện tập ({lesson?.totalQuestions} câu)
                                                     </div>
                                                 )}
                                             </>
@@ -321,7 +323,7 @@ const LessonRoute = () => {
                                             <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
                                         </svg>
                                         Bài luyện tập
-                                        <span className="count-badge">5 câu</span>
+                                        <span className="count-badge">{lessonRoute?.totalQuestions} câu</span>
                                     </div>
                                 </div>
 

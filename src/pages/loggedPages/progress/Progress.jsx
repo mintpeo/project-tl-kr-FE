@@ -1,36 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import './Progress.css';
+import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
+import {usePost} from "../../../components/use/usePost.js";
+import Skeleton from "../../../components/loading/Skeleton.jsx";
 
 /* ============================================================
    DỮ LIỆU — thay bằng dữ liệu thật từ API khi tích hợp backend.
    ============================================================ */
-const STATS = [
-    { icon: 'check', tone: 'a', num: '86%', label: 'Độ chính xác trung bình' },
-    { icon: 'pen', tone: 'b', num: '142', label: 'Lượt luyện viết' },
-    { icon: 'book', tone: 'c', num: '11/24', label: 'Ký tự đã thành thạo' },
-    { icon: 'flame', tone: 'd', num: '12 ngày', label: 'Chuỗi học liên tiếp' },
-];
-
-const CHART_7D = [
-    ['T2', 62], ['T3', 71], ['T4', 68], ['T5', 80], ['T6', 77], ['T7', 89], ['CN', 86],
-];
-const CHART_14D = [
-    ['25/7', 58], ['26/7', 63], ['27/7', 60], ['28/7', 66], ['29/7', 71], ['30/7', 69], ['31/7', 74],
-    ['1/8', 72], ['2/8', 78], ['3/8', 75], ['4/8', 80], ['5/8', 83], ['6/8', 89], ['7/8', 86],
-];
-
-const CATEGORIES = [
-    { glyph: 'ㅏ', tone: 'celadon', title: 'Nguyên âm cơ bản', sub: '10 nguyên âm đơn', done: 6, total: 10, unit: 'đã học' },
-    { glyph: 'ㄱ', tone: 'gold', title: 'Phụ âm cơ bản', sub: '14 phụ âm đơn', done: 5, total: 14, unit: 'đã học' },
-    { glyph: '가', tone: 'plum', title: 'Âm tiết ghép', sub: 'Ghép phụ âm + nguyên âm', done: 23, total: 82, unit: 'âm tiết đã thử' },
-];
-
-// score = 0 nghĩa là chưa luyện lần nào
-const MASTERY = [
-    ['ㅏ', 92], ['ㅑ', 88], ['ㅓ', 85], ['ㅕ', 79], ['ㅗ', 74], ['ㅛ', 68], ['ㅜ', 55], ['ㅠ', 40], ['ㅡ', 0], ['ㅣ', 0],
-    ['ㄱ', 90], ['ㄴ', 86], ['ㄷ', 77], ['ㄹ', 71], ['ㅁ', 63], ['ㅂ', 0], ['ㅅ', 0], ['ㅇ', 0],
-    ['ㅈ', 0], ['ㅊ', 0], ['ㅋ', 0], ['ㅌ', 0], ['ㅍ', 0], ['ㅎ', 0],
-];
 
 const ACHIEVEMENTS = [
     { title: 'Chuỗi 7 ngày', desc: 'Luyện viết 7 ngày liên tiếp', tone: 'gold', locked: false, icon: 'flame' },
@@ -57,40 +33,196 @@ function Icon({ name }) {
     );
 }
 
-/* ============================================================
-   HELPERS
-   ============================================================ */
-function masteryTone(score) {
-    if (score === 0) return 'none';
-    if (score >= 85) return 'strong';   // thành thạo
-    if (score >= 70) return 'good';     // tốt
-    if (score >= 50) return 'mid';      // đang luyện
-    return 'low';                       // cần cải thiện
-}
-
-function seedHeatmap(days = 45) {
-    return Array.from({ length: days }, () => {
-        const r = Math.random();
-        if (r > 0.85) return 4;
-        if (r > 0.65) return 3;
-        if (r > 0.45) return 2;
-        if (r > 0.25) return 1;
-        return 0;
-    });
-}
-
-/* ============================================================
-   COMPONENT
-   ============================================================ */
 const Progress = () => {
-    const [range, setRange] = useState(7);
-    const chartData = range === 7 ? CHART_7D : CHART_14D;
-    const heatmap = useMemo(() => seedHeatmap(45), []);
+    const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
+    const user = JSON.parse(user_info);
 
-    const completedTotal = MASTERY.filter(([, score]) => score > 0).length;
+    // Handle Cate
+    const {executePost: loadLessonProgress} = usePost(`${API_URL}/progress/lesson-progress`);
+    const [categories, setCategories] = useState([]);
+    const mapCateRes = (cate) => ({
+        glyph: 'ㅏ',
+        tone: 'celadon',
+        title: cate?.nameCate,
+        sub: cate?.desCate,
+        done: cate?.learnLesson,
+        total: cate?.sizeCate,
+        unit: 'đã học'
+    });
+    useEffect(() => {
+        const handleLessonProgress = async () => {
+            const req = {
+                userId: user.userId
+            }
+            try {
+                const data = await loadLessonProgress(req);
+                setCategories(data.map(mapCateRes));
+            } catch (e) {
+                console.log("Error Lesson Progress", e);
+            }
+        }
+        handleLessonProgress();
+    }, []);
+    const glyphCate = (num) => {
+        switch (num) {
+            case 0: return 'ㅏ';
+            case 1: return 'ㄱ';
+            case 2: return '가';
+            default: return '';
+        }
+    }
+    const toneCate = (num) => {
+        switch (num) {
+            case 0: return 'celadon';
+            case 1: return 'gold';
+            case 2: return 'plum';
+            default: return '';
+        }
+    }
+
+    const CATEGORIES = categories;
+
+    // Handle Mastery
+    const [mastery, setMastery] = useState([]);
+    const {executePost: loadMasters, loading: loadingMaster} = usePost(`${API_URL}/progress/master`);
+    useEffect(() => {
+        const handleMasterRes = async () => {
+            const req = {
+                userId: user.userId
+            }
+            try {
+                const data = await loadMasters(req);
+                setMastery(data);
+            } catch (e) {
+                console.log("Error Get Masters", e);
+            }
+        };
+        handleMasterRes();
+    }, []);
+    const masteryTone = (score) => {
+        if (score === 0) return 'none';
+        if (score >= 85) return 'strong';   // thành thạo
+        if (score >= 70) return 'good';     // tốt
+        if (score >= 50) return 'mid';      // đang luyện
+        return 'low';                       // cần cải thiện
+    }
+
+    // Load, Get Progress
+    const {executePost: loadProgress} = usePost(`${API_URL}/progress/get`);
+    const [progress, setProgress] = useState(null);
+    const progressRes = (p) => ({
+        averageScore: p?.averageScore,
+        countIsPass: p?.countIsPass,
+        countPractices: p?.countPractices
+    });
+    useEffect(() => {
+        const getProgressRes = async () => {
+            const req = {
+                userId: user.userId
+            }
+            try {
+                const data = await loadProgress(req);
+                setProgress(progressRes(data));
+            } catch (e) {
+                console.log("Error Get Progress", e);
+            }
+        }
+        getProgressRes();
+    }, [user.userId]);
+
+    // Handle Streak
+    const {executePost: loadUserStreak} = usePost(`${API_URL}/user-streak/get`);
+    const [streak, setStreak] = useState(0);
+    useEffect(() => {
+        const handleUserStreak = async () => {
+            const req = {
+                userId: user.userId
+            }
+            try {
+                const data = await loadUserStreak(req);
+                setStreak(data?.currentStreak);
+            } catch (e) {
+                console.log("Error Load User Streak");
+            }
+        }
+        handleUserStreak();
+    }, []);
+
+    // Handle Stat
+    const STATS = [
+        { icon: 'check', tone: 'a', num: `${progress?.averageScore}%`, label: 'Độ chính xác trung bình' },
+        { icon: 'pen', tone: 'b', num: `${progress?.countPractices}`, label: 'Lượt luyện viết' },
+        { icon: 'book', tone: 'c', num: `${progress?.countIsPass}/24`, label: 'Ký tự đã thành thạo' },
+        { icon: 'flame', tone: 'd', num: `${streak} ngày`, label: 'Chuỗi học liên tiếp' },
+    ];
+
+    // Handle data chart
+    const {executePost: loadDataChart} = usePost(`${API_URL}/progress/get-score-date`);
+    const [chartData, setChartData] = useState([]);
+    const [range, setRange] = useState(7);
+    // Map Chart, Handle Date
+    const mapChart = (c) => {
+        if (!c?.date) return ["--/--", 0, 0];
+
+        const [year, month, day] = c.date.split("-");
+        return [`${day}/${month}`, c.averageScore, c.totalPractice];
+    };
+    // Data Chart
+    useEffect(() => {
+        const handleDataChart = async () => {
+            const req = {
+                userId: user.userId,
+                days: range
+            }
+            try {
+                const data = await loadDataChart(req);
+                setChartData(data.map(mapChart));
+            } catch (e) {
+                console.log("Error Data Chart", e);
+            }
+        }
+
+        handleDataChart();
+    }, [range]);
+
+    // Handle Total Practice
+    const [totalPractice, setTotalPractice] = useState([]);
+    const {executePost: loadTotalPractice} = usePost(`${API_URL}/progress/get-total-practice`);
+    useEffect(() => {
+        const handleTotalPractice = async () => {
+            const req = {
+                userId: user.userId,
+                days: 45
+            }
+            try {
+                const data = await loadTotalPractice(req);
+                setTotalPractice(data);
+            } catch (e) {
+                console.log("Error Total Practice", e);
+            }
+        }
+
+        handleTotalPractice();
+    }, []);
+
+    const seedHeatmap = (days, rList=[]) => {
+        return Array.from({ length: days }, (_,i) => {
+            const num = rList[i] ?? 0;
+            const r = num > 0 ? num / 10 : 0;
+
+            if (r > 0.85) return 4;
+            if (r > 0.65) return 3;
+            if (r > 0.45) return 2;
+            if (r > 0.25) return 1;
+            return 0;
+        });
+    }
+    const heatmap = useMemo(() => seedHeatmap(45, totalPractice), [totalPractice]);
+
+    const completedTotal = mastery.filter((m) => m?.score > 0).length;
 
     return (
-        <div className="progress-page">
+        <div id="progress-page">
             <div className="page-head">
                 <span className="eyebrow">Thống kê học tập</span>
                 <h1>Tiến độ của bạn</h1>
@@ -118,14 +250,16 @@ const Progress = () => {
                             <h3>Độ chính xác theo thời gian</h3>
                             <p>Điểm trung bình do AI đánh giá mỗi ngày</p>
                         </div>
+
                         <div className="range-toggle">
                             <button className={range === 7 ? 'active' : ''} onClick={() => setRange(7)}>7 ngày</button>
                             <button className={range === 14 ? 'active' : ''} onClick={() => setRange(14)}>14 ngày</button>
                         </div>
                     </div>
+
                     <div className="bars">
-                        {chartData.map(([label, val]) => (
-                            <div className="bar-col" key={label}>
+                        {chartData.map(([label, val, total], index) => (
+                            <div className="bar-col" key={index}>
                                 <div className="bar-val">{val}</div>
                                 <div className="bar" style={{ height: `${val * 1.35}px` }} />
                                 <div className="bar-day">{label}</div>
@@ -141,11 +275,13 @@ const Progress = () => {
                             <p>45 ngày gần nhất</p>
                         </div>
                     </div>
+
                     <div className="heatmap-grid">
                         {heatmap.map((level, i) => (
                             <div key={i} className="heat-cell" data-level={level || undefined} />
                         ))}
                     </div>
+
                     <div className="heatmap-foot">
                         <span>Ít hơn</span>
                         <div className="heat-scale">
@@ -160,9 +296,9 @@ const Progress = () => {
 
             {/* ---------------- CATEGORY PROGRESS ---------------- */}
             <div className="category-row">
-                {CATEGORIES.map((c) => (
-                    <div className="card cat-card" key={c.title}>
-                        <div className={`cat-glyph tone-${c.tone}`}>{c.glyph}</div>
+                {CATEGORIES.map((c, index) => (
+                    <div className="card cat-card" key={index}>
+                        <div className={`cat-glyph tone-${toneCate(index)}`}>{glyphCate(index)}</div>
                         <h4>{c.title}</h4>
                         <p className="cat-sub">{c.sub}</p>
                         <div className="cat-progress-num">{c.done}/{c.total} {c.unit}</div>
@@ -178,17 +314,22 @@ const Progress = () => {
                 <div className="panel-head no-margin">
                     <div>
                         <h3>Mức độ thành thạo theo ký tự</h3>
-                        <p>{completedTotal}/{MASTERY.length} ký tự đã luyện · dựa trên điểm số trung bình gần nhất</p>
+                        <p>{completedTotal}/{mastery.length} ký tự đã luyện · dựa trên điểm số trung bình gần nhất</p>
                     </div>
                 </div>
-                <div className="mastery-grid">
-                    {MASTERY.map(([glyph, score]) => (
-                        <div className={`mastery-tile tone-${masteryTone(score)}`} key={glyph}>
-                            <div className="g">{glyph}</div>
-                            <div className="p">{score > 0 ? `${score}%` : '—'}</div>
-                        </div>
-                    ))}
-                </div>
+
+                {loadingMaster && (<Skeleton />)}
+                {!loadingMaster && (
+                    <div className="mastery-grid">
+                        {mastery.map((m, index) => (
+                            <div className={`mastery-tile tone-${masteryTone(m?.score)}`} key={index}>
+                                <div className="g">{m?.nameChar}</div>
+                                <div className="p">{m?.score > 0 ? `${m?.score}%` : '—'}</div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
                 <div className="mastery-legend">
                     <span><i className="dot tone-strong" /> Thành thạo (≥85%)</span>
                     <span><i className="dot tone-good" /> Tốt (70–84%)</span>
@@ -206,6 +347,7 @@ const Progress = () => {
                         <p>Những cột mốc bạn đã đạt được trên hành trình học tiếng Hàn</p>
                     </div>
                 </div>
+
                 <div className="achieve-grid">
                     {ACHIEVEMENTS.map((a) => (
                         <div className={`achieve-item${a.locked ? ' locked' : ''}`} key={a.title}>
