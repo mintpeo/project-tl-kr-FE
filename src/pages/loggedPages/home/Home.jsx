@@ -1,10 +1,86 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import './Home.css';
 import {usePost} from "../../../components/use/usePost.js";
-import {API_URL} from "../../../components/API_URL.jsx";
+import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
+import {useNavigate} from "react-router-dom";
+import Skeleton from "../../../components/loading/Skeleton.jsx";
 
 const Home = () => {
-    const {executePost: handleCheckIn} = usePost(`${API_URL}/user-streak/check-in`)
+    const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
+    const user = JSON.parse(user_info);
+    const navigate = useNavigate();
+
+    // Handle Cate
+    const {executePost: loadLessonProgress, loading:loadingLesson} = usePost(`${API_URL}/progress/lesson-progress`);
+    const [categories, setCategories] = useState([]);
+    const mapCateRes = (cate) => ({
+        title: cate?.nameCate,
+        sub: cate?.desCate,
+        done: cate?.learnLesson,
+        total: cate?.sizeCate,
+        unit: 'đã học'
+    });
+    useEffect(() => {
+        const handleLessonProgress = async () => {
+            const req = {
+                userId: user.userId
+            }
+            try {
+                const data = await loadLessonProgress(req);
+                setCategories(data.map(mapCateRes));
+            } catch (e) {
+                console.log("Error Lesson Progress", e);
+            }
+        }
+        handleLessonProgress();
+    }, []);
+    const glyphCate = (num) => {
+        switch (num) {
+            case 0: return 'ㅏ';
+            case 1: return 'ㄱ';
+            case 2: return '가';
+            default: return 'ㅜ';
+        }
+    }
+
+    // Handle Check In
+    const {executePost: handleCheckIn} = usePost(`${API_URL}/user-streak/check-in`);
+    const [btnCheckIn, setBtnCheckIn] = useState(false);
+    const handleBtnCheckIn = async () => {
+        const req = {
+            userId: user.userId
+        }
+        try {
+            const data = await handleCheckIn(req);
+            if (data) {
+                alert("Điểm danh thành công.");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error User Streak", e);
+        }
+    }
+
+    // Get User Streak
+    const {executePost: loadUserStreak} = usePost(`${API_URL}/user-streak/get`);
+    const [userStreak, setUserStreak] = useState([]);
+    useEffect(() => {
+        const handleUserStreak = async () => {
+            const req = {
+                userId: user.userId
+            }
+            try {
+                const data = await loadUserStreak(req);
+                if (data === null) return;
+                setUserStreak(data);
+                setBtnCheckIn(data?.checked);
+            } catch (e) {
+                console.log("Error User Streak", e);
+            }
+        }
+
+        handleUserStreak();
+    }, []);
 
     return (
         <>
@@ -21,7 +97,7 @@ const Home = () => {
                     <span className="hero-char">한</span>
                     <h2>Luyện viết chữ hôm nay</h2>
                     <p>Viết theo chữ mẫu và để AI chấm điểm độ chính xác từng nét trong vài giây.</p>
-                    <button className="btn btn-light">Bắt đầu luyện viết →</button>
+                    <button onClick={() => navigate("/practice")} className="btn btn-light">Bắt đầu luyện viết →</button>
                 </div>
 
                 <div className="card streak-card">
@@ -30,12 +106,17 @@ const Home = () => {
                             <div className="ring" style={{background: 'var(--gold)'}}></div>
 
                             <div>
-                                <div className="streak-num">12 <span style={{fontSize: '15px'}}>ngày</span></div>
+                                <div className="streak-num">{userStreak?.currentStreak} <span style={{fontSize: '15px'}}>ngày</span></div>
                                 <div className="streak-label">Chuỗi ngày học liên tiếp</div>
                             </div>
                         </div>
 
-                        <button className="btn btn-primary" style={{height: '50px'}}>Điểm danh</button>
+                        <button
+                            className="btn btn-primary"
+                            onClick={() => handleBtnCheckIn()}
+                            disabled={btnCheckIn}
+                            style={{height: '50px'}}
+                        >{btnCheckIn ? `Đã điểm danh`: `Điểm danh`}</button>
                     </div>
 
                     <div>
@@ -53,36 +134,24 @@ const Home = () => {
 
             <div className="section-title">
                 <h3>Tiếp tục bài học</h3>
-                <span className="link-mini">Xem tất cả</span>
+                <span onClick={() => navigate("/road")} className="link-mini">Xem tất cả</span>
             </div>
 
             <div className="lesson-row">
-                <div className="card lesson-card">
-                    <div className="lesson-glyph">ㅏ</div>
-                    <h4>Nguyên âm cơ bản</h4>
-                    <p>10 nguyên âm đơn trong bảng Hangul</p>
-                    <div className="goal-track">
-                        <div className="goal-fill" style={{width: '80%'}}></div>
-                    </div>
-                </div>
-
-                <div className="card lesson-card">
-                    <div className="lesson-glyph">ㄱ</div>
-                    <h4>Phụ âm cơ bản</h4>
-                    <p>14 phụ âm đơn và cách phát âm</p>
-                    <div className="goal-track">
-                        <div className="goal-fill" style={{width: '45%'}}></div>
-                    </div>
-                </div>
-
-                <div className="card lesson-card">
-                    <div className="lesson-glyph">가</div>
-                    <h4>Ghép âm tiết</h4>
-                    <p>Kết hợp phụ âm và nguyên âm thành chữ</p>
-                    <div className="goal-track">
-                        <div className="goal-fill" style={{width: '20%'}}></div>
-                    </div>
-                </div>
+                {loadingLesson && <Skeleton />}
+                {!loadingLesson && (
+                    categories.map((lesson, index) => (
+                        <div onClick={() => navigate("/road")} className="card lesson-card">
+                            <div className="lesson-glyph">{glyphCate(index)}</div>
+                            <h4>{lesson.title}</h4>
+                            <p>{lesson.sub}</p>
+                            <p>{lesson.done}/{lesson.total} {lesson.unit}</p>
+                            <div className="goal-track">
+                                <div className="goal-fill" style={{ width: `${(lesson.done / lesson.total) * 100}%` }}></div>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
         </>
     );

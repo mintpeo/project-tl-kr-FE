@@ -151,7 +151,7 @@
     }
 
     .table-card {
-        overflow: hidden;
+        overflow: auto;
 
         table {
             width: 100%;

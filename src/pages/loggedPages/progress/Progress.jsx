@@ -41,8 +41,6 @@ const Progress = () => {
     const {executePost: loadLessonProgress} = usePost(`${API_URL}/progress/lesson-progress`);
     const [categories, setCategories] = useState([]);
     const mapCateRes = (cate) => ({
-        glyph: 'ㅏ',
-        tone: 'celadon',
         title: cate?.nameCate,
         sub: cate?.desCate,
         done: cate?.learnLesson,
@@ -68,7 +66,7 @@ const Progress = () => {
             case 0: return 'ㅏ';
             case 1: return 'ㄱ';
             case 2: return '가';
-            default: return '';
+            default: return 'ㅜ';
         }
     }
     const toneCate = (num) => {
@@ -76,7 +74,7 @@ const Progress = () => {
             case 0: return 'celadon';
             case 1: return 'gold';
             case 2: return 'plum';
-            default: return '';
+            default: return 'celadon';
         }
     }
 
@@ -303,7 +301,7 @@ const Progress = () => {
                         <p className="cat-sub">{c.sub}</p>
                         <div className="cat-progress-num">{c.done}/{c.total} {c.unit}</div>
                         <div className="cat-track">
-                            <div className={`cat-fill tone-${c.tone}`} style={{ width: `${(c.done / c.total) * 100}%` }} />
+                            <div className={`cat-fill tone-${toneCate(index)}`} style={{ width: `${(c.done / c.total) * 100}%` }} />
                         </div>
                     </div>
                 ))}

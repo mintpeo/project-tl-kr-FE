@@ -13,6 +13,8 @@
     }
 
     .table-card {
+        overflow: auto;
+
         .glyph-cell {
             font-family: 'Noto Serif KR', serif;
             font-size: 22px;

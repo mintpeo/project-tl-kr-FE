@@ -94,13 +94,13 @@ const LoginSuc = () => {
                     </div>
                 </div>
 
-                <div className="streak-teaser">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 2s6 5.5 6 10.5a6 6 0 01-12 0C6 7.5 12 2 12 2z"/>
-                    </svg>
+                {/*<div className="streak-teaser">*/}
+                {/*    <svg viewBox="0 0 24 24">*/}
+                {/*        <path d="M12 2s6 5.5 6 10.5a6 6 0 01-12 0C6 7.5 12 2 12 2z"/>*/}
+                {/*    </svg>*/}
 
-                    <p>Chuỗi <strong>12 ngày</strong> luyện viết của bạn đang chờ được tiếp tục hôm nay.</p>
-                </div>
+                {/*    <p>Chuỗi <strong>12 ngày</strong> luyện viết của bạn đang chờ được tiếp tục hôm nay.</p>*/}
+                {/*</div>*/}
 
                 <div className="progress-track">
                     <div className="progress-fill" id="progressFill" style={{
