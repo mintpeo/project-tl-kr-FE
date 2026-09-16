@@ -32,6 +32,10 @@ const Progress = () => {
     useEffect(() => {
         handleUserLevel();
         loadDataUserLevel();
+        handleMasterRes();
+        handleLessonProgress();
+        handleUserStreak();
+        handleTotalPractice();
     }, []);
 
     // Handle User Level
@@ -84,20 +88,17 @@ const Progress = () => {
         total: cate?.sizeCate,
         unit: 'đã học'
     });
-    useEffect(() => {
-        const handleLessonProgress = async () => {
-            const req = {
-                userId: user.userId
-            }
-            try {
-                const data = await loadLessonProgress(req);
-                setCategories(data.map(mapCateRes));
-            } catch (e) {
-                console.log("Error Lesson Progress", e);
-            }
+    const handleLessonProgress = async () => {
+        const req = {
+            userId: user.userId
         }
-        handleLessonProgress();
-    }, []);
+        try {
+            const data = await loadLessonProgress(req);
+            setCategories(data.map(mapCateRes));
+        } catch (e) {
+            console.log("Error Lesson Progress", e);
+        }
+    }
     const glyphCate = (num) => {
         switch (num) {
             case 0: return 'ㅏ';
@@ -119,20 +120,17 @@ const Progress = () => {
     // Handle Mastery
     const [mastery, setMastery] = useState([]);
     const {executePost: loadMasters, loading: loadingMaster} = usePost(`${API_URL}/progress/master`);
-    useEffect(() => {
-        const handleMasterRes = async () => {
-            const req = {
-                userId: user.userId
-            }
-            try {
-                const data = await loadMasters(req);
-                setMastery(data);
-            } catch (e) {
-                console.log("Error Get Masters", e);
-            }
-        };
-        handleMasterRes();
-    }, []);
+    const handleMasterRes = async () => {
+        const req = {
+            userId: user.userId
+        }
+        try {
+            const data = await loadMasters(req);
+            setMastery(data);
+        } catch (e) {
+            console.log("Error Get Masters", e);
+        }
+    };
     const masteryTone = (score) => {
         if (score === 0) return 'none';
         if (score >= 85) return 'strong';   // thành thạo
@@ -167,20 +165,17 @@ const Progress = () => {
     // Handle Streak
     const {executePost: loadUserStreak} = usePost(`${API_URL}/user-streak/get`);
     const [streak, setStreak] = useState(0);
-    useEffect(() => {
-        const handleUserStreak = async () => {
-            const req = {
-                userId: user.userId
-            }
-            try {
-                const data = await loadUserStreak(req);
-                setStreak(data?.currentStreak);
-            } catch (e) {
-                console.log("Error Load User Streak");
-            }
+    const handleUserStreak = async () => {
+        const req = {
+            userId: user.userId
         }
-        handleUserStreak();
-    }, []);
+        try {
+            const data = await loadUserStreak(req);
+            setStreak(data?.currentStreak);
+        } catch (e) {
+            console.log("Error Load User Streak");
+        }
+    }
 
     // Handle Stat
     const STATS = [
@@ -222,22 +217,18 @@ const Progress = () => {
     // Handle Total Practice
     const [totalPractice, setTotalPractice] = useState([]);
     const {executePost: loadTotalPractice} = usePost(`${API_URL}/progress/get-total-practice`);
-    useEffect(() => {
-        const handleTotalPractice = async () => {
-            const req = {
-                userId: user.userId,
-                days: 45
-            }
-            try {
-                const data = await loadTotalPractice(req);
-                setTotalPractice(data);
-            } catch (e) {
-                console.log("Error Total Practice", e);
-            }
+    const handleTotalPractice = async () => {
+        const req = {
+            userId: user.userId,
+            days: 45
         }
-
-        handleTotalPractice();
-    }, []);
+        try {
+            const data = await loadTotalPractice(req);
+            setTotalPractice(data);
+        } catch (e) {
+            console.log("Error Total Practice", e);
+        }
+    }
 
     const seedHeatmap = (days, rList=[]) => {
         return Array.from({ length: days }, (_,i) => {
