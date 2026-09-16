@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import useFetch from "../use/useFetch.js";
 import {API_URL, AUDIO_URL} from "../API_URL.jsx";
+import {usePost} from "../use/usePost.js";
 
 const CharHangul = ({isVowels}) => {
     const {data: characters} = useFetch(`${API_URL}/character/all`);
@@ -22,7 +23,6 @@ const CharHangul = ({isVowels}) => {
     const [selectedPairIndex, setSelectedPairIndex] = useState(0);
     const selectedPair = char_pair[selectedPairIndex] || char_pair[0];
 
-    const audioUrl = "https://res.cloudinary.com/dqzuuzi8z/video/upload/v1788791310/yo_audio_k5rojw.mp3";
     const handleAudio = (id) => {
         if (id !== 1) return ".mp3";
         return ".m4a";
@@ -57,7 +57,11 @@ const CharHangul = ({isVowels}) => {
             </div>
 
             <div className="audio-stage">
-                <audio controls src={`${AUDIO_URL}/${selectedSingle?.fileAudioName}${handleAudio(selectedSingle?.id)}`} />
+                <audio
+                    key={selectedSingle?.id}
+                    controls
+                    src={`${API_URL}/audio/speak?text=${encodeURIComponent(selectedSingle?.name)}`}
+                />
             </div>
 
             <p><strong>{isVowels ? vowelsPair.length : consonantsPair.length}</strong> {isVowels ? 'Nguyên âm đôi' : 'Phụ âm kép'}:</p>
@@ -81,7 +85,11 @@ const CharHangul = ({isVowels}) => {
             </div>
 
             <div className="audio-stage">
-                <audio controls src={`${AUDIO_URL}/${selectedPair?.fileAudioName}${handleAudio(selectedPair?.id)}`} />
+                <audio
+                    key={selectedPair?.id}
+                    controls
+                    src={`${API_URL}/audio/speak?text=${encodeURIComponent(selectedPair?.name)}`}
+                />
             </div>
         </>
     );
