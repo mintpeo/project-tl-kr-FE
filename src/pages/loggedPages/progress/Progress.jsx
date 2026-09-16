@@ -4,20 +4,12 @@ import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
 import {usePost} from "../../../components/use/usePost.js";
 import Skeleton from "../../../components/loading/Skeleton.jsx";
 
-/* ============================================================
-   DỮ LIỆU — thay bằng dữ liệu thật từ API khi tích hợp backend.
-   ============================================================ */
-
 const ACHIEVEMENTS = [
     { title: 'Chuỗi 7 ngày', desc: 'Luyện viết 7 ngày liên tiếp', tone: 'gold', locked: false, icon: 'flame' },
     { title: 'Điểm số hoàn hảo', desc: 'Đạt 100% độ tương đồng', tone: 'celadon', locked: false, icon: 'check' },
     { title: 'Hoàn thành nguyên âm', desc: 'Học đủ 10 nguyên âm cơ bản', tone: 'plum', locked: false, icon: 'book' },
     { title: 'Bậc thầy Hangul', desc: 'Thành thạo cả 24 ký tự cơ bản', tone: 'locked', locked: true, icon: 'lock' },
 ];
-
-/* ============================================================
-   ICON — bộ icon inline tối giản, tránh phụ thuộc thư viện ngoài
-   ============================================================ */
 const ICONS = {
     check: <path d="M20 6L9 17l-5-5" />,
     pen: <><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" /></>,
@@ -36,6 +28,51 @@ function Icon({ name }) {
 const Progress = () => {
     const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
     const user = JSON.parse(user_info);
+
+    useEffect(() => {
+        handleUserLevel();
+        loadDataUserLevel();
+    }, []);
+
+    // Handle User Level
+    // Set User Level
+    const {executePost: updateUserLevel} = usePost(`${API_URL}/progress/user-level`);
+    const handleUserLevel = async () => {
+        const req = {
+            userId: user.userId
+        }
+        try {
+            await updateUserLevel(req);
+        } catch (e) {
+            console.log("Error Handle User Level", e);
+        }
+    }
+    // Get User Level
+    const {executePost: loadUserLevel, loading: loadingUserLevel} = usePost(`${API_URL}/progress/get-user-level`);
+    const [userLevel, setUserLevel] = useState([]);
+    const mapUserLevel = (level) => ({
+        accuracyRate: level?.accuracyRate,
+        levelNumber: level?.levelNumber,
+        nextLevelTitle: level?.nextLevelTitle,
+        progressPercent: level?.progressPercent,
+        remainingAccuracy: level?.remainingAccuracy,
+        remainingQuestions: level?.remainingQuestions,
+        totalQuestions: level?.totalQuestions,
+        totalScore: level?.totalScore,
+        userLevel: level?.userLevel
+    })
+    const loadDataUserLevel = async () => {
+        const req = {
+            userId: user.userId
+        }
+        try {
+            const data = await loadUserLevel(req);
+            setUserLevel(data);
+        } catch (e) {
+            console.log("Error User Level", e);
+        }
+    }
+    const userLevelRes = mapUserLevel(userLevel);
 
     // Handle Cate
     const {executePost: loadLessonProgress} = usePost(`${API_URL}/progress/lesson-progress`);
@@ -77,7 +114,6 @@ const Progress = () => {
             default: return 'celadon';
         }
     }
-
     const CATEGORIES = categories;
 
     // Handle Mastery
@@ -231,13 +267,56 @@ const Progress = () => {
             <div className="stat-row">
                 {STATS.map((s) => (
                     <div className="card stat-card" key={s.label}>
-                        <div className={`stat-icon tone-${s.tone}`}><Icon name={s.icon} /></div>
+                        <div className={`stat-icon tone-${s.tone}`}><Icon name={s.icon}/></div>
                         <div>
                             <div className="stat-num">{s.num}</div>
                             <div className="stat-label">{s.label}</div>
                         </div>
                     </div>
                 ))}
+            </div>
+
+            <div className="level-card">
+                {loadingUserLevel && (<Skeleton />)}
+                {!loadingUserLevel && (
+                    <>
+                        <div className="level-header">
+                            <div className="level-badge">
+                                <span className="badge-icon">🌿</span>
+                                <span className="badge-title">{userLevelRes?.userLevel}</span>
+                            </div>
+                            <span className="level-tag">Level {userLevel?.levelNumber}</span>
+                        </div>
+
+                        <div className="level-stats">
+                            <div className="stat-item">
+                                <span className="stat-label">Độ chính xác</span>
+                                <span className="stat-val">{`${userLevelRes?.accuracyRate}%`}</span>
+                            </div>
+
+                            <div className="stat-divider"></div>
+                            <div className="stat-item">
+                                <span className="stat-label">Số câu đúng</span>
+                                <span className="stat-val">{userLevelRes?.totalScore}<small>/{userLevelRes?.totalQuestions}</small></span>
+                            </div>
+                        </div>
+
+                        <div className="progress-section">
+                            <div className="progress-label">
+                                <span>{userLevelRes?.nextLevelTitle}</span>
+                                {userLevelRes?.remainingQuestions === 0 ? (
+                                    <span>Cần cải thiện độ chính xác</span>
+                                ) : (
+                                    <span>{userLevelRes?.remainingQuestions} câu nữa</span>
+                                )}
+                            </div>
+
+                            <div className="progress-bar">
+                                <div className="progress-fill" style={{width: `${userLevelRes?.progressPercent}%`}}></div>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* ---------------- CHART + HEATMAP ---------------- */}
@@ -251,7 +330,8 @@ const Progress = () => {
 
                         <div className="range-toggle">
                             <button className={range === 7 ? 'active' : ''} onClick={() => setRange(7)}>7 ngày</button>
-                            <button className={range === 14 ? 'active' : ''} onClick={() => setRange(14)}>14 ngày</button>
+                            <button className={range === 14 ? 'active' : ''} onClick={() => setRange(14)}>14 ngày
+                            </button>
                         </div>
                     </div>
 
@@ -259,7 +339,7 @@ const Progress = () => {
                         {chartData.map(([label, val, total], index) => (
                             <div className="bar-col" key={index}>
                                 <div className="bar-val">{val}</div>
-                                <div className="bar" style={{ height: `${val * 1.35}px` }} />
+                                <div className="bar" style={{height: `${val * 1.35}px`}}/>
                                 <div className="bar-day">{label}</div>
                             </div>
                         ))}
@@ -276,7 +356,7 @@ const Progress = () => {
 
                     <div className="heatmap-grid">
                         {heatmap.map((level, i) => (
-                            <div key={i} className="heat-cell" data-level={level || undefined} />
+                            <div key={i} className="heat-cell" data-level={level || undefined}/>
                         ))}
                     </div>
 
@@ -284,7 +364,7 @@ const Progress = () => {
                         <span>Ít hơn</span>
                         <div className="heat-scale">
                             {[0, 1, 2, 3, 4].map((lvl) => (
-                                <div key={lvl} className="heat-cell" data-level={lvl || undefined} />
+                                <div key={lvl} className="heat-cell" data-level={lvl || undefined}/>
                             ))}
                         </div>
                         <span>Nhiều hơn</span>
@@ -301,7 +381,8 @@ const Progress = () => {
                         <p className="cat-sub">{c.sub}</p>
                         <div className="cat-progress-num">{c.done}/{c.total} {c.unit}</div>
                         <div className="cat-track">
-                            <div className={`cat-fill tone-${toneCate(index)}`} style={{ width: `${(c.done / c.total) * 100}%` }} />
+                            <div className={`cat-fill tone-${toneCate(index)}`}
+                                 style={{width: `${(c.done / c.total) * 100}%`}}/>
                         </div>
                     </div>
                 ))}
@@ -316,7 +397,7 @@ const Progress = () => {
                     </div>
                 </div>
 
-                {loadingMaster && (<Skeleton />)}
+                {loadingMaster && (<Skeleton/>)}
                 {!loadingMaster && (
                     <div className="mastery-grid">
                         {mastery.map((m, index) => (
@@ -329,11 +410,11 @@ const Progress = () => {
                 )}
 
                 <div className="mastery-legend">
-                    <span><i className="dot tone-strong" /> Thành thạo (≥85%)</span>
-                    <span><i className="dot tone-good" /> Tốt (70–84%)</span>
-                    <span><i className="dot tone-mid" /> Đang luyện (50–69%)</span>
-                    <span><i className="dot tone-low" /> Cần cải thiện (&lt;50%)</span>
-                    <span><i className="dot tone-none" /> Chưa luyện</span>
+                    <span><i className="dot tone-strong"/> Thành thạo (≥85%)</span>
+                    <span><i className="dot tone-good"/> Tốt (70–84%)</span>
+                    <span><i className="dot tone-mid"/> Đang luyện (50–69%)</span>
+                    <span><i className="dot tone-low"/> Cần cải thiện (&lt;50%)</span>
+                    <span><i className="dot tone-none"/> Chưa luyện</span>
                 </div>
             </div>
 
@@ -349,7 +430,7 @@ const Progress = () => {
                 <div className="achieve-grid">
                     {ACHIEVEMENTS.map((a) => (
                         <div className={`achieve-item${a.locked ? ' locked' : ''}`} key={a.title}>
-                            <div className={`achieve-icon tone-${a.tone}`}><Icon name={a.icon} /></div>
+                            <div className={`achieve-icon tone-${a.tone}`}><Icon name={a.icon}/></div>
                             <h5>{a.title}</h5>
                             <p>{a.desc}</p>
                         </div>
