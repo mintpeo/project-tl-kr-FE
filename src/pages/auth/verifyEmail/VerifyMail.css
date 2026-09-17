@@ -164,3 +164,82 @@
         }
     }
 }
+
+@media (max-width: 768px) {
+    .container {
+        margin-top: 24px;
+        padding: 16px;
+
+        .auth-card {
+            padding: 28px 18px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(63, 94, 69, 0.06);
+
+            .mail-icon {
+                width: 52px;
+                height: 52px;
+                margin-bottom: 16px;
+
+                svg {
+                    width: 24px;
+                    height: 24px;
+                }
+            }
+
+            h1 {
+                font-size: 20px;
+                margin-bottom: 8px;
+            }
+
+            .desc {
+                font-size: 13px;
+
+                .email {
+                    word-break: break-all;
+                }
+            }
+
+            .change-email {
+                margin-bottom: 22px;
+                padding: 4px 0;
+            }
+
+            .otp-row {
+                gap: 8px;
+                margin-bottom: 18px;
+
+                .otp-box {
+                    width: 46px;
+                    height: 54px;
+                    font-size: 22px;
+                    border-radius: 10px;
+                }
+            }
+
+            .status-line {
+                font-size: 12.5px;
+                margin-bottom: 16px;
+            }
+
+            .btn {
+                padding: 13px 16px;
+                font-size: 15px;
+            }
+
+            .resend-row {
+                margin-top: 18px;
+                font-size: 12.5px;
+
+                .resend-link {
+                    display: inline-block;
+                    padding: 4px 0;
+                }
+            }
+
+            .back-link {
+                margin-top: 22px;
+                padding: 6px 0;
+            }
+        }
+    }
+}

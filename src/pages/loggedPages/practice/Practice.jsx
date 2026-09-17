@@ -222,8 +222,6 @@ const Practice = () => {
                         }
                     </div>
                 </div>
-
-                <div className="char-chip-row" id="charChipRow"></div>
             </div>
 
             <div className="practice-layout">
@@ -232,7 +230,7 @@ const Practice = () => {
                         <div style={{display: "flex", alignItems: "center"}}>
                             <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--ink-soft)' }}>Chữ đang luyện:</p>
                             <p className={`${selectedChar >= 0 ? `selected-char` : ``}`}>
-                                {selectedChar >= 0 ? charList[selectedChar]?.name + `-` + charList[selectedChar]?.transcription : 'Chưa chọn'}
+                                {selectedChar >= 0 ? charList[selectedChar]?.name : 'Chưa chọn'}
                             </p>
                         </div>
 

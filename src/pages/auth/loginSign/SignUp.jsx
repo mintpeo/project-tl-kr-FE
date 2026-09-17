@@ -125,7 +125,7 @@ const SignUp = ({isTabLogin}) => {
             </div>
 
             <BtnSpinner text={`Đăng ký`} isLoading={isLoading} />
-            <p className="switch-line">Đã có tài khoản? <span className="link">Đăng nhập</span></p>
+            {/*<p className="switch-line">Đã có tài khoản? <span className="link">Đăng nhập</span></p>*/}
         </form>
     );
 };

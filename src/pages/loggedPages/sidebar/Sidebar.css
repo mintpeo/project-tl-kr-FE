@@ -1,168 +1,221 @@
-.sidebar {
+#sidebar {
     position: sticky;
     top: 0;
     left: 0;
     height: 100vh;
-    justify-content: space-between;
     z-index: 1000;
-    overflow-y: auto;
+    padding: 32px 0 0 40px;
 
-    .nav {
+    .mobile-toggle-btn {
+        /*position: relative;*/
+        display: none;
+    }
+
+    .menu-content {
+        /*position: absolute;*/
         display: flex;
         flex-direction: column;
-        gap: 3px;
+        justify-content: space-between;
+        padding-bottom: 32px;
+        height: 100%;
 
-        .nav-item {
+        .header-sidebar {
             display: flex;
-            align-items: center;
-            gap: 11px;
-            padding: 10px 12px;
-            border-radius: 10px;
-            font-size: 15px;
-            color: var(--ink-soft);
-            cursor: pointer;
-            border: none;
-            background: transparent;
-            text-align: left;
-            width: 100%;
-            font-family: 'Be Vietnam Pro', sans-serif;
-            transition: background .15s ease, color .15s ease;
+            flex-direction: column;
+            gap: 1rem;
 
-            svg {
-                width: 18px;
-                height: 18px;
-                flex-shrink: 0;
-            }
+            .brand-sidebar {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px 6px;
+                border-bottom: 1px solid var(--paper-dim);
 
-            &:hover {
-                background: var(--paper-dim);
-                color: var(--ink);
-            }
-        }
-
-        .active {
-            background: var(--celadon-light);
-            color: var(--celadon-dark);
-            font-weight: 600;
-        }
-    }
-
-    .sidebar-foot-wrapper {
-        margin-top: auto;
-        position: relative;
-    }
-
-    .sidebar-foot-logged {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 12px;
-        border-radius: 10px;
-        background: var(--paper-card);
-        border: 1px solid var(--paper-dim);
-        cursor: pointer;
-        transition: background 0.15s ease;
-
-        &:hover {
-            background: var(--paper-dim);
-        }
-
-        .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--plum);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            font-weight: 600;
-            font-family: 'Noto Serif KR', serif;
-            flex-shrink: 0;
-        }
-
-        .user-info {
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .name {
-            font-size: 13px;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .role {
-            font-size: 11px;
-            color: var(--ink-soft);
-        }
-
-        .more-icon {
-            color: var(--ink-soft);
-            flex-shrink: 0;
-        }
-    }
-
-    .user-dropdown-menu {
-        position: absolute;
-        bottom: 100%;
-        left: 0;
-        width: 100%;
-        background: var(--paper-card);
-        border: 1px solid var(--paper-dim);
-        border-radius: 12px;
-        padding: 6px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        z-index: 100;
-        animation: fadeIn 0.15s ease-in-out;
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 10px;
-            border: none;
-            background: transparent;
-            border-radius: 8px;
-            font-size: 13px;
-            color: var(--ink);
-            font-family: 'Be Vietnam Pro', sans-serif;
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-            transition: background 0.15s ease;
-
-            svg {
-                color: var(--ink-soft);
-            }
-
-            &:hover {
-                background: var(--paper-dim);
-            }
-
-            &.logout {
-                color: var(--plum);
-
-                svg {
-                    color: var(--plum);
+                .brand-mark {
+                    width: 38px;
+                    height: 38px;
+                    border-radius: 10px;
+                    background: var(--celadon);
+                    color: var(--paper-card);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-family: 'Noto Serif KR', serif;
+                    font-size: 19px;
+                    font-weight: 700;
                 }
+
+                .brand-name {
+                    font-family: 'Noto Serif KR', serif;
+                    font-size: 19px;
+                    font-weight: 700;
+                }
+
+                .brand-sub {
+                    font-size: 11px;
+                    color: var(--ink-soft);
+                    margin-top: 1px;
+                }
+            }
+
+            .nav {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+
+                .nav-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 11px;
+                    padding: 10px 12px;
+                    border-radius: 10px;
+                    font-size: 15px;
+                    color: var(--ink-soft);
+                    cursor: pointer;
+                    border: none;
+                    background: transparent;
+                    text-align: left;
+                    width: 100%;
+                    font-family: 'Be Vietnam Pro', sans-serif;
+                    transition: background .15s ease, color .15s ease;
+
+                    svg {
+                        width: 18px;
+                        height: 18px;
+                        flex-shrink: 0;
+                    }
+
+                    &:hover {
+                        background: var(--paper-dim);
+                        color: var(--ink);
+                    }
+                }
+
+                .active {
+                    background: var(--celadon-light);
+                    color: var(--celadon-dark);
+                    font-weight: 600;
+                }
+            }
+        }
+
+        .sidebar-foot-wrapper {
+            margin-top: auto;
+            position: relative;
+
+            .user-dropdown-menu {
+                position: absolute;
+                bottom: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--paper-card);
+                border: 1px solid var(--paper-dim);
+                border-radius: 12px;
+                padding: 6px;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                z-index: 100;
+                animation: fadeIn 0.15s ease-in-out;
+
+                .menu-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 8px 10px;
+                    border: none;
+                    background: transparent;
+                    border-radius: 8px;
+                    font-size: 13px;
+                    color: var(--ink);
+                    font-family: 'Be Vietnam Pro', sans-serif;
+                    cursor: pointer;
+                    width: 100%;
+                    text-align: left;
+                    transition: background 0.15s ease;
+
+                    svg {
+                        color: var(--ink-soft);
+                    }
+
+                    &:hover {
+                        background: var(--paper-dim);
+                    }
+
+                    &.logout {
+                        color: var(--plum);
+
+                        svg {
+                            color: var(--plum);
+                        }
+
+                        &:hover {
+                            background: var(--plum-light);
+                        }
+                    }
+                }
+
+                .menu-divider {
+                    height: 1px;
+                    background: var(--paper-dim);
+                    margin: 4px 0;
+                }
+            }
+
+            .sidebar-foot-logged {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px 12px;
+                border-radius: 10px;
+                background: var(--paper-card);
+                border: 1px solid var(--paper-dim);
+                cursor: pointer;
+                transition: background 0.15s ease;
 
                 &:hover {
-                    background: var(--plum-light);
+                    background: var(--paper-dim);
+                }
+
+                .avatar {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    background: var(--plum);
+                    color: #fff;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 13px;
+                    font-weight: 600;
+                    font-family: 'Noto Serif KR', serif;
+                    flex-shrink: 0;
+                }
+
+                .user-info {
+                    flex: 1;
+                    overflow: hidden;
+                }
+
+                .name {
+                    font-size: 13px;
+                    font-weight: 600;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .role {
+                    font-size: 11px;
+                    color: var(--ink-soft);
+                }
+
+                .more-icon {
+                    color: var(--ink-soft);
+                    flex-shrink: 0;
                 }
             }
-        }
-
-        .menu-divider {
-            height: 1px;
-            background: var(--paper-dim);
-            margin: 4px 0;
         }
     }
 }
@@ -175,5 +228,135 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    #sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: auto;
+        min-height: 60px;
+        border-top: 1px solid var(--paper-dim);
+        display: flex;
+        align-items: center;
+        padding: 6px 12px calc(6px + env(safe-area-inset-bottom));
+        /*overflow: visible;*/
+        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
+        overflow: auto;
+
+        .mobile-toggle-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 1001;
+            background: var(--paper-card, #fff);
+            border: 1px solid var(--paper-dim, #ddd);
+            border-radius: 8px;
+            padding: 6px;
+            cursor: pointer;
+            color: var(--ink);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(3px);
+            z-index: 1002;
+        }
+
+        .menu-content {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            /*width: 270px;*/
+            /*height: 100vh;*/
+            max-height: 93vh;
+            background: var(--paper-card, #fff);
+            z-index: 1003;
+            transform: translateX(-100%);
+            transition: transform 0.28s ease-in-out;
+            box-shadow: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 16px;
+            overflow-y: auto;
+
+            &.open {
+                transform: translateX(0);
+                box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+            }
+
+            .nav {
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                flex: 1;
+                gap: 4px;
+
+                .nav-item {
+                    align-items: center;
+                    gap: 4px;
+                    padding: 6px 4px;
+                    font-size: 11px;
+                    text-align: center;
+                    border-radius: 8px;
+
+                    svg {
+                        width: 20px;
+                        height: 20px;
+                    }
+                }
+
+                .active {
+                    background: transparent;
+                    color: var(--celadon-dark);
+                }
+            }
+
+            .sidebar-foot-wrapper {
+                margin-top: 0;
+                margin-left: 6px;
+
+                .user-dropdown-menu {
+                    bottom: calc(100% + 12px);
+                    left: auto;
+                    right: 0;
+                    width: 190px;
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+                }
+
+                .sidebar-foot-logged {
+                    padding: 4px;
+                    border: none;
+                    background: transparent;
+
+                    .user-info, .more-icon {
+                        /*display: none;*/
+                    }
+
+                    .avatar {
+                        width: 30px;
+                        height: 30px;
+                        font-size: 12px;
+                    }
+
+                    &:hover {
+                        background: transparent;
+                    }
+                }
+
+            }
+        }
     }
 }

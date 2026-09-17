@@ -99,15 +99,6 @@ const ForgetPass = () => {
                         <p>Đã gửi đường link để đặt lại mật khẩu đến</p>
                         <p className="email" id="emailDisplay">{email}</p>
                     </div>
-
-                    {/*<div className="back-link" style={{marginTop: 0}} onClick={() => setCurrentStep(0)}>*/}
-                    {/*    <svg viewBox="0 0 24 24">*/}
-                    {/*        <path d="M19 12H5"/>*/}
-                    {/*        <path d="M12 19l-7-7 7-7"/>*/}
-                    {/*    </svg>*/}
-
-                    {/*    Quay lại*/}
-                    {/*</div>*/}
                 </div>
             </div>
         </div>

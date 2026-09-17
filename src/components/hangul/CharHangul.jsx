@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import useFetch from "../use/useFetch.js";
-import {API_URL, AUDIO_URL} from "../API_URL.jsx";
-import {usePost} from "../use/usePost.js";
+import {API_URL} from "../API_URL.jsx";
 
 const CharHangul = ({isVowels}) => {
     const {data: characters} = useFetch(`${API_URL}/character/all`);
