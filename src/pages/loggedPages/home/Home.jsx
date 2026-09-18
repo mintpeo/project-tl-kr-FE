@@ -119,16 +119,16 @@ const Home = () => {
                         >{btnCheckIn ? `Đã điểm danh`: `Điểm danh`}</button>
                     </div>
 
-                    <div>
-                        <div
-                            className="streak-target">
-                            <span>Mục tiêu hôm nay</span><span className="mono">7/10 chữ</span>
-                        </div>
+                    {/*<div>*/}
+                    {/*    <div*/}
+                    {/*        className="streak-target">*/}
+                    {/*        <span>Mục tiêu hôm nay</span><span className="mono">7/10 chữ</span>*/}
+                    {/*    </div>*/}
 
-                        <div className="goal-track">
-                            <div className="goal-fill" style={{width: '70%'}}></div>
-                        </div>
-                    </div>
+                    {/*    <div className="goal-track">*/}
+                    {/*        <div className="goal-fill" style={{width: '70%'}}></div>*/}
+                    {/*    </div>*/}
+                    {/*</div>*/}
                 </div>
             </div>
 

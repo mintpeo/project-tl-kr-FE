@@ -173,10 +173,12 @@ const Quiz = ({quizId, onFinish, onPracticeClick }) => {
     return (
         <div className="quiz-wrap">
             <div style={{margin: '5px 0'}}>{nameQuiz}</div>
+
             <div className="quiz-progress">
                 <div className="quiz-progress-track">
                     <div className="quiz-progress-fill" style={{ width: `${(index / questions.length) * 100}%` }} />
                 </div>
+
                 <div className="quiz-progress-label">Câu {index + 1}/{questions.length}</div>
             </div>
 

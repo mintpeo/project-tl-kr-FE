@@ -610,24 +610,316 @@
     }
 }
 
-@media (max-width: 900px) {
-    .stat-row {
-        grid-template-columns:repeat(2, 1fr);
-    }
+@media (max-width: 1024px) {
+    #progress-page {
+        .page-head {
+            margin-bottom: 20px;
 
-    .row-2col {
-        grid-template-columns:1fr;
-    }
+            h1 {
+                font-size: 24px;
+            }
 
-    .category-row {
-        grid-template-columns:1fr;
-    }
+            p {
+                font-size: 13px;
+            }
+        }
 
-    .mastery-grid {
-        grid-template-columns:repeat(6, 1fr);
-    }
+        .stat-row {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+            white-space: normal;
 
-    .achieve-grid {
-        grid-template-columns:repeat(2, 1fr);
+            .stat-card {
+                padding: 16px 18px;
+                gap: 12px;
+
+                .stat-num {
+                    font-size: 20px;
+                }
+
+                .stat-label {
+                    font-size: 11px;
+                }
+            }
+        }
+
+        .level-card {
+            max-width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .row-2col {
+            grid-template-columns: 1fr;
+            gap: 18px;
+            margin-bottom: 20px;
+
+            .panel {
+                padding: 20px;
+                max-width: 100%;
+
+                .bars {
+                    height: 140px;
+                    gap: 8px;
+                }
+
+                .heatmap-grid {
+                    grid-template-columns: repeat(12, 1fr);
+                    gap: 4px;
+                }
+            }
+        }
+
+        .category-row {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+
+            .cat-card {
+                padding: 16px;
+
+                h4 {
+                    font-size: 13px;
+                }
+
+                .cat-progress-num {
+                    font-size: 12px;
+                }
+            }
+        }
+
+        .mastery-card {
+            margin-bottom: 20px;
+
+            .mastery-grid {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 8px;
+            }
+        }
+
+        .achieve-card {
+            .achieve-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+
+                .achieve-item {
+                    padding: 14px;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    #progress-page {
+        .page-head {
+            margin-bottom: 16px;
+
+            h1 {
+                font-size: 21px;
+            }
+
+            p {
+                font-size: 13px;
+            }
+        }
+
+        .stat-row {
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+            white-space: normal;
+
+            .stat-card {
+                padding: 14px 16px;
+                gap: 12px;
+
+                .stat-icon {
+                    width: 36px;
+                    height: 36px;
+
+                    svg {
+                        width: 16px;
+                        height: 16px;
+                    }
+                }
+
+                .stat-num {
+                    font-size: 20px;
+                }
+
+                .stat-label {
+                    font-size: 11px;
+                }
+            }
+        }
+
+        .level-card {
+            max-width: 100%;
+            padding: 16px;
+            margin-bottom: 18px;
+
+            .level-header {
+                margin-bottom: 14px;
+
+                .level-badge {
+                    font-size: 13px;
+                    padding: 5px 10px;
+                }
+
+                .level-tag {
+                    font-size: 12px;
+                    padding: 3px 8px;
+                }
+            }
+
+            .level-stats {
+                padding: 10px 6px;
+                margin-bottom: 14px;
+
+                .stat-item {
+                    .stat-val {
+                        font-size: 16px;
+                    }
+                }
+            }
+        }
+
+        .row-2col {
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 18px;
+
+            .panel {
+                padding: 16px;
+                width: 100%;
+                overflow: hidden;
+
+                .panel-head {
+                    flex-direction: column;
+                    gap: 10px;
+                    align-items: flex-start;
+                    margin-bottom: 14px;
+
+                    .range-toggle {
+                        width: 100%;
+                        display: flex;
+
+                        button {
+                            flex: 1;
+                            padding: 6px 0;
+                            text-align: center;
+                        }
+                    }
+                }
+
+                .bars {
+                    overflow-x: auto;
+                    height: 130px;
+                    gap: 6px;
+
+                    .bar-col {
+                        .bar-val,
+                        .bar-day {
+                            font-size: 9px;
+                        }
+                    }
+                }
+
+                .heatmap-grid {
+                    grid-template-columns: repeat(8, 1fr);
+                    gap: 3px;
+                }
+
+                .heatmap-foot {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 8px;
+                    margin-top: 12px;
+                }
+            }
+        }
+
+        .category-row {
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 18px;
+
+            .cat-card {
+                padding: 16px;
+
+                .cat-glyph {
+                    width: 34px;
+                    height: 34px;
+                    font-size: 15px;
+                    margin-bottom: 10px;
+                }
+            }
+        }
+
+        .mastery-card {
+            margin-bottom: 18px;
+            padding: 16px;
+
+            .mastery-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+                margin-top: 12px;
+
+                .mastery-tile {
+                    .g {
+                        font-size: 15px;
+                    }
+
+                    .p {
+                        font-size: 8px;
+                    }
+                }
+            }
+
+            .mastery-legend {
+                gap: 10px 14px;
+                margin-top: 14px;
+                font-size: 10.5px;
+            }
+        }
+
+        .achieve-card {
+            padding: 16px;
+
+            .achieve-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-top: 12px;
+
+                .achieve-item {
+                    display: flex;
+                    align-items: center;
+                    text-align: left;
+                    gap: 12px;
+                    padding: 12px;
+
+                    .achieve-icon {
+                        width: 40px;
+                        height: 40px;
+                        margin: 0;
+                        flex-shrink: 0;
+
+                        svg {
+                            width: 18px;
+                            height: 18px;
+                        }
+                    }
+
+                    h5 {
+                        font-size: 12px;
+                    }
+
+                    p {
+                        font-size: 10px;
+                    }
+                }
+            }
+        }
     }
 }

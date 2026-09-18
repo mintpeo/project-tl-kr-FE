@@ -69,7 +69,6 @@ const Practice = () => {
     }
 
     const [charLabel, setCharLabel] = useState('');
-    const [charId, setCharId] = useState(0);
     // Submit Canvas
     const {executePost: handlePredict} = usePost(`${API_URL}/predict/data-url`);
     const submitCanvas = async () => {
@@ -93,7 +92,6 @@ const Practice = () => {
 
             const char = charList.find(item => item.transcription === data?.prediction.label);
             setCharLabel(char?.name);
-            setCharId(char?.id);
 
             setPredict(data?.prediction);
             setFeedBack(data?.assessment?.feedback);
@@ -130,6 +128,24 @@ const Practice = () => {
         savePractice();
     }, [predict]);
 
+    // Tinh toa do theo do phan giai
+    const getCoordinates = (e, canvas) => {
+        const rect = canvas.getBoundingClientRect();
+
+        // Lấy tọa độ từ touch (mobile) hoặc mouse (desktop)
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        // Tính tỷ lệ giữa kích thước thật của canvas và kích thước hiển thị CSS
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        return {
+            x: (clientX - rect.left) * scaleX,
+            y: (clientY - rect.top) * scaleY
+        };
+    };
+
     const startDrawing = (e) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -137,8 +153,9 @@ const Practice = () => {
         const ctx = canvas.getContext("2d");
         isDrawing.current = true;
 
+        const { x, y } = getCoordinates(e, canvas);
         ctx.beginPath();
-        ctx.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+        ctx.moveTo(x, y);
     };
 
     const draw = (e) => {
@@ -154,11 +171,8 @@ const Practice = () => {
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
 
-        ctx.lineTo(
-            e.nativeEvent.offsetX,
-            e.nativeEvent.offsetY
-        );
-
+        const { x, y } = getCoordinates(e, canvas);
+        ctx.lineTo(x, y);
         ctx.stroke();
     };
 
@@ -227,15 +241,15 @@ const Practice = () => {
             <div className="practice-layout">
                 <div className="card canvas-card">
                     <div className="canvas-top-row">
-                        <div style={{display: "flex", alignItems: "center"}}>
-                            <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--ink-soft)' }}>Chữ đang luyện:</p>
+                        <div className="selected-char-content">
+                            <p>Chữ đang luyện:</p>
                             <p className={`${selectedChar >= 0 ? `selected-char` : ``}`}>
                                 {selectedChar >= 0 ? charList[selectedChar]?.name : 'Chưa chọn'}
                             </p>
                         </div>
 
                         <div className="char-switch">
-                            <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--ink-soft)' }}>Hiện thứ tự nét</p>
+                            <p style={{ margin: 0, fontSize: '12px', color: 'var(--ink-soft)' }}>Hiện thứ tự nét</p>
 
                             <button
                                 type="button"
