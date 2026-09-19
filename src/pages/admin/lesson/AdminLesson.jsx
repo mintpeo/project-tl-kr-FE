@@ -24,6 +24,12 @@ const AdminLesson = () => {
     const lessonsRoadRes = lessonsRoad.map(mapLessonRoad);
     const [lessonsRoadListRes, setLessonsRoadListRes] = useState([]);
 
+    // Btn toggle
+    const [checked, setChecked] = useState(false);
+    const toggle = () => {
+        setChecked(!checked);
+    };
+
     // Delete Lesson
      const {executeDelete: handleDeleteLesson} = useDelete(`${API_URL}/admin/delete-lesson`);
      const handleDeleteLessonAdmin = async (lessonId) => {
@@ -250,11 +256,23 @@ const AdminLesson = () => {
                     ))}
                 </select>
 
-                <select value={statusFilter} onChange={(e) => setStatusFilter(Number(e.target.value))}>
+                <select value={statusFilter} disabled={checked} onChange={(e) => setStatusFilter(Number(e.target.value))}>
                     <option value={-1}>Tất cả trạng thái</option>
                     <option value={1}>Đang hiển thị</option>
                     <option value={0}>Đang ẩn</option>
                 </select>
+
+                <div className="char-switch">
+                    <p style={{ margin: 0, fontSize: '12px', color: 'var(--ink-soft)' }}>Sắp xếp vị trí</p>
+
+                    <button
+                        type="button"
+                        className={`toggle-btn ${checked ? 'active' : ''}`}
+                        onClick={toggle}
+                    >
+                        <span className="toggle-thumb" />
+                    </button>
+                </div>
             </div>
 
             <div className="card table-card">
@@ -264,7 +282,6 @@ const AdminLesson = () => {
                             <th>STT</th>
                             <th>Bài học</th>
                             <th>Danh mục</th>
-                            <th>Vị trí hiển thị</th>
                             <th>Trạng thái</th>
                             <th>Ngày tạo</th>
                             <th>Cập nhật</th>
@@ -278,7 +295,6 @@ const AdminLesson = () => {
                                 <td>{index + 1}</td>
                                 <td>{truncateText(l.name, 20)}</td>
                                 <td>{l.cateName}</td>
-                                <td>{l.orderIndex}</td>
                                 <td>{l.active ? 'Đang hiển thị' : 'Đang ẩn'}</td>
                                 <td>{l.createdAt}</td>
                                 <td>{l.updateAt}</td>
@@ -402,17 +418,6 @@ const AdminLesson = () => {
                                     </div>
                                 )}
                             </div>
-
-                            {/*<div className="field toggle-field">*/}
-                            {/*    <label>Xuất bản ngay</label>*/}
-
-                            {/*    <div*/}
-                            {/*        className={`switch ${form.active === 'published' ? 'on' : ''}`}*/}
-                            {/*        onClick={() => setForm({ ...form, status: form.status === 'published' ? 'draft' : 'published' })}*/}
-                            {/*    >*/}
-                            {/*        <div className="knob" />*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
 
                             <div className="modal-actions">
                                 <button type="button" className="btn btn-ghost" onClick={closeModal}>Hủy</button>
