@@ -87,7 +87,7 @@ const Home = () => {
             <div className="page-head">
                 <div>
                     <span className="eyebrow">Chào mừng trở lại</span>
-                    <h1>안녕하세요, Minh 👋</h1>
+                    <h1>안녕하세요, {user.fullName} 👋</h1>
                     <p>Hôm nay là ngày tốt để luyện thêm vài nét chữ.</p>
                 </div>
             </div>

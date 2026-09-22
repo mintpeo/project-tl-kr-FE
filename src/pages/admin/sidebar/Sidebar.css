@@ -3,6 +3,11 @@
     flex-shrink: 0;
     padding: 28px 18px;
     display: flex;
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    max-height: 100vh;
     flex-direction: column;
     gap: 28px;
     border-right: 1px solid var(--paper-dim);

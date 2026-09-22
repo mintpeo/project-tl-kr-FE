@@ -53,7 +53,7 @@
 }
 
 .streak-card {
-    max-height: 10vh;
+    max-height: 15vh;
 
     .streak-row {
         display: flex;

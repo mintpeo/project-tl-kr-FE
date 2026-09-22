@@ -306,7 +306,7 @@ const AdminCharacter = () => {
                 </table>
             </div>
 
-            {/* ---------------- MODAL THÊM/SỬA ---------------- */}
+            {/* ---------------- MODAL SỬA ---------------- */}
             {modalOpen && (
                 <div className="modal-overlay" onClick={closeModal}>
                     <div className="modal-card" onClick={(e) => e.stopPropagation()}>
@@ -319,9 +319,8 @@ const AdminCharacter = () => {
                                     <input
                                         type="text"
                                         className="glyph-input"
+                                        disabled={true}
                                         value={form.name}
-                                        // onChange={(e) => handleFieldChange("name", e.target.value)}
-                                        placeholder="ㅏ"
                                         maxLength={2}
                                         required
                                     />
@@ -331,9 +330,8 @@ const AdminCharacter = () => {
                                     <label>Cách đọc</label>
                                     <input
                                         type="text"
-                                        value={form.transcription || ""}
-                                        onChange={(e) => handleFieldChange("transcription", e.target.value)}
-                                        placeholder="VD: a, giyeok, han"
+                                        disabled={true}
+                                        value={form.transcription}
                                         required
                                     />
                                 </div>
@@ -342,7 +340,7 @@ const AdminCharacter = () => {
                                     <label>Âm</label>
                                     <select
                                         value={String(form.double)}
-                                        onChange={(e) => handleFieldChange("double", e.target.value)}
+                                        disabled={true}
                                     >
                                         {TYPE_OPTIONS.map((c) => (
                                             <option key={c.value} value={String(c.value)}>{c.label}</option>
@@ -355,8 +353,8 @@ const AdminCharacter = () => {
                                 <div className="field">
                                     <label>Danh mục</label>
                                     <select
-                                        value={form.type || ""}
-                                        // onChange={(e) => handleFieldChange("type", e.target.value)}
+                                        value={form.type}
+                                        disabled={true}
                                     >
                                         {CATEGORY_OPTIONS.map((c) => (
                                             <option key={c.value} value={c.value}>{c.label}</option>
@@ -371,7 +369,7 @@ const AdminCharacter = () => {
                                         min={1}
                                         max={10}
                                         value={form.strokeCount}
-                                        // onChange={(e) => handleFieldChange("strokeCount", Number(e.target.value))}
+                                        disabled={true}
                                     />
                                 </div>
                             </div>

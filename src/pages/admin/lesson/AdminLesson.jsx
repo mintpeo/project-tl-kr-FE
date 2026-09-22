@@ -4,6 +4,9 @@ import useFetch from "../../../components/use/useFetch.js";
 import {API_URL} from "../../../components/API_URL.jsx";
 import {usePost} from "../../../components/use/usePost.js";
 import {useDelete} from "../../../components/use/useDelete.js";
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { SortableLessonRow } from "./DraggableRow.jsx";
 
 const AdminLesson = () => {
     const {data: lessonsRoad} = useFetch(`${API_URL}/admin/all-lessons-road`);
@@ -24,10 +27,70 @@ const AdminLesson = () => {
     const lessonsRoadRes = lessonsRoad.map(mapLessonRoad);
     const [lessonsRoadListRes, setLessonsRoadListRes] = useState([]);
 
+    // Create Array ao
+    const [reorderList, setReorderList] = useState([]);
+    // Cam bien chuot: di chuyen 5px moi tinh
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {distance: 5}
+        })
+    );
+
     // Btn toggle
     const [checked, setChecked] = useState(false);
     const toggle = () => {
-        setChecked(!checked);
+        if (!checked) {
+            if (categoryFilter === 0) {
+                alert("Vui lòng chọn 1 danh mục cụ thể trước khi sắp xếp vị trí!");
+                return;
+            }
+
+            const listToReorder = lessonsRoadRes.filter(l => l.cateId === categoryFilter)
+                .sort((a, b) => a.orderIndex - b.orderIndex);
+
+            if (listToReorder.length === 0) {
+                alert("Danh mục này chưa có bài học nào để sắp xếp.");
+                return;
+            }
+
+            setReorderList(listToReorder);
+            setChecked(true);
+        } else {
+            setChecked(false);
+            setReorderList([]);
+        }
+    };
+
+    // Handle Drag
+    const handleDragEnd = (e) => {
+        const {active, over} = e;
+        if (!over || active.id === over.id) return;
+        setReorderList((items) => {
+            const oldIndex = items.findIndex(item => item.id === active.id);
+            const newIndex = items.findIndex(item => item.id === over.id);
+            return arrayMove(items, oldIndex, newIndex);
+        });
+    };
+
+    // Save New Order
+    const {executePost: handleSaveReorder} = usePost(`${API_URL}/admin/update-order-index`);
+    const saveNewOrder = async () => {
+        const orderedIds = reorderList.map(item => item.id);
+        const req = {
+            lessonsId: orderedIds,
+            cateRouteId: categoryFilter
+        }
+
+        try {
+            const data = await handleSaveReorder(req);
+            if (data) {
+                alert("Cập nhật vị trí hiển thị thành công!");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.error("Lỗi cập nhật thứ tự:", e);
+            alert("Lỗi khi lưu vị trí hiển thị.");
+        }
     };
 
     // Delete Lesson
@@ -58,7 +121,7 @@ const AdminLesson = () => {
         }));
     }
     // Modal
-    const EMPTY_FORM = { name: '', cateRouteId: 1, orderIndex: 1, active: true, duration: '', description: '', youtubeId: '' };
+    const EMPTY_FORM = { name: '', cateRouteId: 1, active: true, duration: '', description: '', youtubeId: '' };
     const [modalOpen, setModalOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [form, setForm] = useState(EMPTY_FORM);
@@ -95,22 +158,15 @@ const AdminLesson = () => {
     const handleSubmitForm = async (e) => {
         e.preventDefault();
 
-        if (form.orderIndex <= 0) {
-            alert("Vị trí hiển thị trong danh mục phải > 0");
-            return;
-        }
-
         const req = {
             id: editingId,
             name: form.name,
             cateRouteId: form.cateRouteId,
-            orderIndex: form.orderIndex,
             isActive: form.active,
             duration: form.duration,
             description: form.description,
             youtubeId: form.youtubeId
         }
-        console.log(req);
 
         try {
             if (editingId !== null) {
@@ -241,6 +297,7 @@ const AdminLesson = () => {
                 <div className="search-wrap">
                     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
                     <input
+                        disabled={checked}
                         type="text"
                         placeholder="Tìm theo tên bài học..."
                         value={searchName || ""}
@@ -275,9 +332,48 @@ const AdminLesson = () => {
                 </div>
             </div>
 
+            {checked && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 16px', background: '#eff6ff', borderRadius: '8px', marginBottom: '12px' }}>
+                    <span style={{ fontSize: '14px', color: '#1e40af' }}>
+                        Đang ở chế độ sắp xếp. Kéo thả các dòng để đổi vị trí, sau đó bấm <b>Lưu thứ tự</b>.
+                    </span>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        <button className="btn btn-ghost" onClick={toggle}>Hủy</button>
+                        <button className="btn btn-primary" onClick={saveNewOrder}>Lưu thứ tự</button>
+                    </div>
+                </div>
+            )}
+
             <div className="card table-card">
-                <table>
-                    <thead>
+                {checked ? (
+                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                        <table>
+                            <thead>
+                            <tr>
+                                <th style={{ width: '50px' }}></th>
+                                <th>Vị trí mới</th>
+                                <th>Bài học</th>
+                                <th>Danh mục</th>
+                                <th colSpan={2}>Thao tác</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <SortableContext items={reorderList.map(l => l.id)} strategy={verticalListSortingStrategy}>
+                                {reorderList.map((l, index) => (
+                                    <SortableLessonRow
+                                        key={l.id}
+                                        lesson={l}
+                                        index={index}
+                                        truncateText={truncateText}
+                                    />
+                                ))}
+                            </SortableContext>
+                            </tbody>
+                        </table>
+                    </DndContext>
+                ) : (
+                    <table>
+                        <thead>
                         <tr>
                             <th>STT</th>
                             <th>Bài học</th>
@@ -287,9 +383,9 @@ const AdminLesson = () => {
                             <th>Cập nhật</th>
                             <th style={{ textAlign: 'right' }}>Hành động</th>
                         </tr>
-                    </thead>
+                        </thead>
 
-                    <tbody>
+                        <tbody>
                         {lessonsRoadListRes .map((l, index) => (
                             <tr key={l.id}>
                                 <td>{index + 1}</td>
@@ -313,10 +409,11 @@ const AdminLesson = () => {
                         ))}
 
                         {lessonsRoadListRes.length === 0 && (
-                            <tr><td colSpan={6} className="empty-row">Không tìm thấy bài học phù hợp.</td></tr>
+                            <tr><td colSpan={7} className="empty-row">Không tìm thấy bài học phù hợp.</td></tr>
                         )}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                )}
             </div>
 
             {modalOpen && (
@@ -347,17 +444,6 @@ const AdminLesson = () => {
                                             <option key={c.id} value={c.id}>{c.name}</option>
                                         ))}
                                     </select>
-                                </div>
-
-                                <div className="field">
-                                    <label>Vị trí hiện thị trong danh mục</label>
-                                    <input
-                                        type="text"
-                                        value={form.orderIndex || ""}
-                                        onChange={(e) => handleFieldChange("orderIndex", Number(e.target.value))}
-                                        placeholder="VD: 1"
-                                        required
-                                    />
                                 </div>
                             </div>
 
