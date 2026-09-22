@@ -47,11 +47,6 @@ const AdminCharacter = () => {
         }));
     }
 
-    const openAddModal = () => {
-        setEditingId(null);
-        setForm(EMPTY_FORM);
-        setModalOpen(true);
-    }
     const openEditModal = (item) => {
         setEditingId(item.id);
         setForm(mapChars(item));
@@ -84,28 +79,6 @@ const AdminCharacter = () => {
         } catch (e) {
             console.log("Error Edit Character", e);
         }
-    }
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!form.glyph.trim() || !form.romanization.trim()) return;
-
-        if (editingId === null) {
-            const newItem = {
-                id: Math.max(0, ...chars.map((c) => c.id)) + 1,
-                glyph: form.glyph.trim(),
-                romanization: form.romanization.trim(),
-                category: form.category,
-                strokeCount: Number(form.strokeCount) || 1,
-                strokeFile: form.strokeFile,
-            };
-            setChars((prev) => [newItem, ...prev]);
-        } else {
-            setChars((prev) =>
-                prev.map((c) => (c.id === editingId ? { ...c, ...form, strokeCount: Number(form.strokeCount) || 1 } : c))
-            );
-        }
-        setModalOpen(false);
     }
 
     // Filter, Search
@@ -172,11 +145,6 @@ const AdminCharacter = () => {
     function handleFileChange(e) {
         const file = e.target.files?.[0];
         if (file) setForm((f) => ({ ...f, strokeFile: file.name }));
-    }
-
-    function deleteChar(id) {
-        if (!window.confirm('Xóa ký tự này khỏi hệ thống?')) return;
-        setChars((prev) => prev.filter((c) => c.id !== id));
     }
 
     console.log(form);
@@ -310,7 +278,7 @@ const AdminCharacter = () => {
             {modalOpen && (
                 <div className="modal-overlay" onClick={closeModal}>
                     <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-                        <h3>{editingId === null ? 'Thêm ký tự mới' : 'Chỉnh sửa ký tự'}</h3>
+                        <h3>Chỉnh sửa ký tự</h3>
 
                         <form onSubmit={handleEditChar}>
                             <div className="field-row">
@@ -387,7 +355,7 @@ const AdminCharacter = () => {
                             <div className="modal-actions">
                                 <button type="button" className="btn btn-ghost" onClick={closeModal}>Hủy</button>
                                 <button type="submit" className="btn btn-primary">
-                                    {editingId === null ? 'Thêm ký tự' : 'Lưu thay đổi'}
+                                    Lưu thay đổi
                                 </button>
                             </div>
                         </form>

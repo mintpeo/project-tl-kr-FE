@@ -22,10 +22,8 @@ const CharHangul = ({isVowels}) => {
     const [selectedPairIndex, setSelectedPairIndex] = useState(0);
     const selectedPair = char_pair[selectedPairIndex] || char_pair[0];
 
-    const handleAudio = (id) => {
-        if (id !== 1) return ".mp3";
-        return ".m4a";
-    }
+    const urlImageCloud = "https://res.cloudinary.com/dqzuuzi8z/image/upload/v1790074911/";
+    const lastPath = ".svg";
 
     useEffect(() => {
         setSelectedSingleIndex(0);
@@ -52,7 +50,7 @@ const CharHangul = ({isVowels}) => {
             </div>
 
             <div className="svg-stage">
-                <img src={`http://localhost:8080${selectedSingle?.strokeSvgUrl}`} alt={selectedSingle?.name}/>
+                <img src={`${urlImageCloud}${selectedSingle?.strokeSvgUrl}${lastPath}`} alt={selectedSingle?.name}/>
             </div>
 
             <div className="audio-stage">
@@ -80,7 +78,7 @@ const CharHangul = ({isVowels}) => {
             </div>
 
             <div className="svg-stage">
-                <img src={`http://localhost:8080${selectedPair?.strokeSvgUrl}`} alt={selectedPair?.name}/>
+                <img src={`${urlImageCloud}${selectedPair?.strokeSvgUrl}${lastPath}`} alt={selectedPair?.name}/>
             </div>
 
             <div className="audio-stage">
