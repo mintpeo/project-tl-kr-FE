@@ -3,6 +3,8 @@ import './AdminCharacter.css';
 import {API_URL} from "../../../components/API_URL.jsx";
 import useFetch from "../../../components/use/useFetch.js";
 import {usePost} from "../../../components/use/usePost.js";
+import {usePutUploadFile} from "../../../components/use/usePut.js";
+import BtnSpinner from "../../../components/loading/BtnSpinner.jsx";
 
 const CATEGORY_OPTIONS = [
     { value: 'VOWEL', label: 'Nguyên âm' },
@@ -14,7 +16,7 @@ const TYPE_OPTIONS = [
     {value: false, label: 'Đơn'},
 ];
 
-const EMPTY_FORM = { name: '', transcription: '', type: 'VOWEL', double: false, strokeCount: '', strokeSvgUrl: '' };
+const EMPTY_FORM = { name: '', transcription: '', type: 'VOWEL', double: false, strokeCount: '', strokeSvgUrl: '', versionUrl: '' };
 
 const AdminCharacter = () => {
     const {data: getAllChars} = useFetch(`${API_URL}/admin/all-char`);
@@ -25,20 +27,56 @@ const AdminCharacter = () => {
         strokeCount: char?.strokeCount,
         strokeSvgUrl: char?.strokeSvgUrl,
         transcription: char?.transcription,
-        type: char?.type
+        type: char?.type,
+        imageVersion: char?.imageVersion
     });
     const charsRes = getAllChars.map(mapChars);
     const [chars, setChars] = useState([]);
-
-    // Split Text
-    const splitText = (name) => {
-        return name.split("/").pop();
-    }
 
     // Modal
     const [modalOpen, setModalOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [form, setForm] = useState(EMPTY_FORM);
+
+    const buildCloudinaryUrl = (version, fileName) => {
+        return `https://res.cloudinary.com/dqzuuzi8z/image/upload/v${version}/${fileName}.svg`;
+    };
+
+    // Upload File Character
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState(null);
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+            setPreviewUrl(file.name);
+        }
+    }
+    // Handle Upload File
+    const {executePutUploadFile: uploadFileChar, loading: loadingUploadFileChar} = usePutUploadFile(`${API_URL}/admin/upload-char`);
+    const handleUploadFile = async (e) => {
+        e.preventDefault();
+
+        if (!selectedFile) {
+            alert('Vui lòng chọn file ảnh trước.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        formData.append("targetFileName", form.strokeSvgUrl);
+        formData.append("charId", editingId);
+        try {
+            const data = await uploadFileChar(formData);
+            if (data !== null) {
+                alert("Tải ảnh mới lên thành công.");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error Upload Character", e);
+        }
+    }
+
     // Field Change
     const handleFieldChange = (field, value) => {
         setForm(prev => ({
@@ -46,6 +84,7 @@ const AdminCharacter = () => {
             [field]: value
         }));
     }
+    console.log(form);
 
     const openEditModal = (item) => {
         setEditingId(item.id);
@@ -142,13 +181,6 @@ const AdminCharacter = () => {
         )
     };
 
-    function handleFileChange(e) {
-        const file = e.target.files?.[0];
-        if (file) setForm((f) => ({ ...f, strokeFile: file.name }));
-    }
-
-    console.log(form);
-
     return (
         <div className="admin-chars">
             <div className="page-head">
@@ -157,11 +189,6 @@ const AdminCharacter = () => {
                     <h1>Quản lý ký tự tiếng Hàn</h1>
                     <p>Danh sách nguyên âm, phụ âm và âm tiết cùng dữ liệu thứ tự nét viết tương ứng.</p>
                 </div>
-
-                {/*<button className="btn btn-primary" onClick={openAddModal}>*/}
-                {/*    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>*/}
-                {/*    Thêm ký tự*/}
-                {/*</button>*/}
             </div>
 
             {/* ---------------- STATS ---------------- */}
@@ -219,8 +246,8 @@ const AdminCharacter = () => {
                         <th>STT</th>
                         <th>Ký tự</th>
                         <th>Cách đọc</th>
-                        <th>Danh mục</th>
-                        <th>Số nét</th>
+                        <th style={{whiteSpace: "nowrap"}}>Danh mục</th>
+                        <th style={{whiteSpace: "nowrap"}}>Số nét</th>
                         <th>Dữ liệu nét</th>
                         <th>Âm</th>
                         <th style={{ textAlign: 'right' }}>Hành động</th>
@@ -232,18 +259,16 @@ const AdminCharacter = () => {
                             <td>{index + 1}</td>
                             <td><div className="glyph-cell">{c.name}</div></td>
                             <td className="mono">|{c.transcription}|</td>
-                            <td><span className={`category-badge ${c.type}`}>{categoryLabel(c.type)}</span></td>
+                            <td style={{whiteSpace: "nowrap"}}><span className={`category-badge ${c.type}`}>{categoryLabel(c.type)}</span></td>
                             <td className="mono">{c.strokeCount > 0 ? `${c.strokeCount} nét` : ``}</td>
                             <td>
                                 {c.strokeSvgUrl ? (
                                     <div style={{display: "flex", gap: '10px'}}>
                                         <span className="stroke-badge has">
-                                            <img src={`http://localhost:8080${c.strokeSvgUrl}`} alt={c.name}/>
+                                            <img src={buildCloudinaryUrl(c?.imageVersion, c?.strokeSvgUrl)} alt={c?.name}/>
                                         </span>
 
-                                        <span className="stroke-badge">
-                                            {splitText(c.strokeSvgUrl)}
-                                        </span>
+                                        <span className="stroke-badge">{c.strokeSvgUrl}</span>
                                     </div>
                                 ) : (
                                     <span className="stroke-badge missing">
@@ -280,7 +305,7 @@ const AdminCharacter = () => {
                     <div className="modal-card" onClick={(e) => e.stopPropagation()}>
                         <h3>Chỉnh sửa ký tự</h3>
 
-                        <form onSubmit={handleEditChar}>
+                        <form onSubmit={handleUploadFile}>
                             <div className="field-row">
                                 <div className="field" style={{ maxWidth: 100 }}>
                                     <label>Ký tự</label>
@@ -348,15 +373,15 @@ const AdminCharacter = () => {
                                 <label className="upload-box">
                                     <input type="file" accept=".svg" hidden onChange={handleFileChange} />
                                     <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4" /><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" /></svg>
-                                    <span>{splitText(form.strokeSvgUrl) || 'Kéo thả file .svg hoặc bấm để chọn'}</span>
+                                    {previewUrl ? (<span>{`${form.strokeSvgUrl}  -> ${previewUrl}`}</span>) : (
+                                        <span>{form.strokeSvgUrl || 'Kéo thả file .svg hoặc bấm để chọn'}</span>
+                                    )}
                                 </label>
                             </div>
 
                             <div className="modal-actions">
                                 <button type="button" className="btn btn-ghost" onClick={closeModal}>Hủy</button>
-                                <button type="submit" className="btn btn-primary">
-                                    Lưu thay đổi
-                                </button>
+                                <BtnSpinner text={"Lưu thay đổi"} isLoading={loadingUploadFileChar} />
                             </div>
                         </form>
                     </div>
