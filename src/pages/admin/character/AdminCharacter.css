@@ -1,15 +1,8 @@
 .admin-chars {
-    font-family: 'Be Vietnam Pro', sans-serif;
-    color: var(--ink);
-
     h1, h3 {
         font-family: 'Noto Serif KR', serif;
         font-weight: 600;
         letter-spacing: -0.01em;
-    }
-
-    .mono {
-        font-family: 'JetBrains Mono', monospace;
     }
 
     .table-card {

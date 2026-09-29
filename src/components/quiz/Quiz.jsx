@@ -10,16 +10,15 @@ import {API_URL, LOCAL_STORAGE_KEYS} from "../API_URL.jsx";
  *  - questions: [{ id, question, options: string[], correct: number }]
  *    (đúng cấu trúc dữ liệu từ AdminExercises.jsx / API /api/admin/exercises)
  *  - onFinish?: (score: number, total: number) => void
- *  - onPracticeClick?: () => void  // bấm "Luyện viết ngay" ở màn kết quả
  */
 
-const Quiz = ({quizId, onFinish, onPracticeClick }) => {
+const Quiz = ({quizId, onFinish}) => {
     // User
     const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
     const user = JSON.parse(user_info);
 
     // Get Quiz By Quiz Id
-    const {executePost: loadQuiz, loading: loadingQuiz} = usePost(`${API_URL}/quiz/all`);
+    const {executePost: loadQuiz, loading: loadingQuiz} = usePost(`${API_URL}/quiz/get-quiz-id`);
     const [dataQuestions, setDataQuestions] = useState([]);
     const [nameQuiz, setNameQuiz] = useState('');
     const getAllQuiz = async () => {

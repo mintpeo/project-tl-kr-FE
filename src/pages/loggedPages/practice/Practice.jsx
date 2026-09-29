@@ -27,6 +27,10 @@ const Practice = () => {
         setCharList(vowels);
     }, [characters]);
 
+    const buildCloudinaryUrl = (version, fileName) => {
+        return `https://res.cloudinary.com/dqzuuzi8z/image/upload/v${version}/${fileName}.svg`;
+    };
+
     const cateList = [
         { name: 'Nguyên âm' },
         { name: 'Phụ âm' },
@@ -88,14 +92,14 @@ const Practice = () => {
 
         try {
             const data = await handlePredict({dataUrl});
-            // console.log("Ket qua du doan:", data);
+            console.log("Ket qua du doan:", data);
 
             const char = charList.find(item => item.transcription === data?.prediction.label);
             setCharLabel(char?.name);
 
             setPredict(data?.prediction);
-            setFeedBack(data?.assessment?.feedback);
-            setScoreFB(data?.assessment?.score);
+            // setFeedBack(data?.assessment?.feedback);
+            // setScoreFB(data?.assessment?.score);
             setScoreDisable(true);
         } catch (e) {
             console.error("Error Predict AI:", e);
@@ -265,7 +269,7 @@ const Practice = () => {
                         {
                             selectedChar >= 0 && (
                                 <div className={`char-guide ${checked ? '' : 'hide-stroke-order'}`}>
-                                    <img className="hide-stroke-order" src={`http://localhost:8080${charList[selectedChar]?.strokeSvgUrl}`} alt={charList[selectedChar]?.name}/>
+                                    <img className="hide-stroke-order" src={buildCloudinaryUrl(charList[selectedChar]?.imageVersion, charList[selectedChar]?.strokeSvgUrl)} alt={charList[selectedChar]?.name}/>
                                 </div>
                             )
                         }
@@ -297,7 +301,7 @@ const Practice = () => {
                         <div className="scoreResult" style={{display: `${scoreDisable ? `block` : `none`}`}}>
                             <div style={{textAlign: "center", whiteSpace: "nowrap", marginBottom: '20px'}}>
                                 <div className="score-label">
-                                    Nhận diện là kí tự: <strong>{charLabel}</strong> - Với độ chính xác: <strong>{predict?.confidence}%</strong>
+                                    Nhận diện là kí tự: <strong>{predict?.char}</strong> - Với độ chính xác: <strong>{predict?.confidence}%</strong>
                                 </div>
                             </div>
 
