@@ -8,7 +8,6 @@ const Hero = () => {
         <>
             <div className="hero" id="hero">
                 <div className="hero-grid">
-
                     <div>
                         <span className="eyebrow-pill">
                             <i className="icon"><BsLightningCharge /></i>

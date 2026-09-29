@@ -59,3 +59,44 @@
         }
     }
 }
+
+@media (max-width: 768px) {
+    .steps-section {
+        .steps-grid {
+            grid-template-columns: 1fr;
+            gap: 32px;
+
+            .step {
+                padding: 0;
+
+                h4 {
+                    font-size: 15px;
+                }
+
+                p {
+                    max-width: 100%;
+                }
+
+                .step-num {
+                    position: relative;
+                    z-index: 1;
+                    margin-bottom: 12px;
+                }
+
+            .step-connector {
+                top: 38px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 1px;
+                height: 32px;
+            }
+
+                &:last-child {
+                    .step-connector {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+}

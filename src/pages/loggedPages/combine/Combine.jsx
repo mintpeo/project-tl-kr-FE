@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import './Combine.css';
 import {
     CONSONANT,
@@ -8,6 +8,7 @@ import {
     composeHangul,
     DOUBLE_FINAL_CONSONANTS
 } from "../../../components/hangul/hangulHelper.js";
+import {API_URL} from "../../../components/API_URL.jsx";
 
 const Combine = ({singleConsonant}) => {
     const [selectedVowels, setSelectedVowels] = useState(-1);
@@ -87,6 +88,14 @@ const Combine = ({singleConsonant}) => {
                             </p>
                         )
                     }
+
+                    <div className="audio-stage">
+                        <audio
+                            key={1}
+                            controls
+                            src={`${API_URL}/audio/speak?text=${encodeURIComponent(combinedChar)}`}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

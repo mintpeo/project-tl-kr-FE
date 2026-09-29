@@ -27,6 +27,10 @@ const Practice = () => {
         setCharList(vowels);
     }, [characters]);
 
+    const buildCloudinaryUrl = (version, fileName) => {
+        return `https://res.cloudinary.com/dqzuuzi8z/image/upload/v${version}/${fileName}.svg`;
+    };
+
     const cateList = [
         { name: 'Nguyên âm' },
         { name: 'Phụ âm' },
@@ -69,7 +73,6 @@ const Practice = () => {
     }
 
     const [charLabel, setCharLabel] = useState('');
-    const [charId, setCharId] = useState(0);
     // Submit Canvas
     const {executePost: handlePredict} = usePost(`${API_URL}/predict/data-url`);
     const submitCanvas = async () => {
@@ -89,15 +92,14 @@ const Practice = () => {
 
         try {
             const data = await handlePredict({dataUrl});
-            // console.log("Ket qua du doan:", data);
+            console.log("Ket qua du doan:", data);
 
             const char = charList.find(item => item.transcription === data?.prediction.label);
             setCharLabel(char?.name);
-            setCharId(char?.id);
 
             setPredict(data?.prediction);
-            setFeedBack(data?.assessment?.feedback);
-            setScoreFB(data?.assessment?.score);
+            // setFeedBack(data?.assessment?.feedback);
+            // setScoreFB(data?.assessment?.score);
             setScoreDisable(true);
         } catch (e) {
             console.error("Error Predict AI:", e);
@@ -130,6 +132,24 @@ const Practice = () => {
         savePractice();
     }, [predict]);
 
+    // Tinh toa do theo do phan giai
+    const getCoordinates = (e, canvas) => {
+        const rect = canvas.getBoundingClientRect();
+
+        // Lấy tọa độ từ touch (mobile) hoặc mouse (desktop)
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        // Tính tỷ lệ giữa kích thước thật của canvas và kích thước hiển thị CSS
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        return {
+            x: (clientX - rect.left) * scaleX,
+            y: (clientY - rect.top) * scaleY
+        };
+    };
+
     const startDrawing = (e) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -137,8 +157,9 @@ const Practice = () => {
         const ctx = canvas.getContext("2d");
         isDrawing.current = true;
 
+        const { x, y } = getCoordinates(e, canvas);
         ctx.beginPath();
-        ctx.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+        ctx.moveTo(x, y);
     };
 
     const draw = (e) => {
@@ -154,11 +175,8 @@ const Practice = () => {
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
 
-        ctx.lineTo(
-            e.nativeEvent.offsetX,
-            e.nativeEvent.offsetY
-        );
-
+        const { x, y } = getCoordinates(e, canvas);
+        ctx.lineTo(x, y);
         ctx.stroke();
     };
 
@@ -222,22 +240,20 @@ const Practice = () => {
                         }
                     </div>
                 </div>
-
-                <div className="char-chip-row" id="charChipRow"></div>
             </div>
 
             <div className="practice-layout">
                 <div className="card canvas-card">
                     <div className="canvas-top-row">
-                        <div style={{display: "flex", alignItems: "center"}}>
-                            <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--ink-soft)' }}>Chữ đang luyện:</p>
+                        <div className="selected-char-content">
+                            <p>Chữ đang luyện:</p>
                             <p className={`${selectedChar >= 0 ? `selected-char` : ``}`}>
-                                {selectedChar >= 0 ? charList[selectedChar]?.name + `-` + charList[selectedChar]?.transcription : 'Chưa chọn'}
+                                {selectedChar >= 0 ? charList[selectedChar]?.name : 'Chưa chọn'}
                             </p>
                         </div>
 
                         <div className="char-switch">
-                            <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--ink-soft)' }}>Hiện thứ tự nét</p>
+                            <p style={{ margin: 0, fontSize: '12px', color: 'var(--ink-soft)' }}>Hiện thứ tự nét</p>
 
                             <button
                                 type="button"
@@ -253,7 +269,7 @@ const Practice = () => {
                         {
                             selectedChar >= 0 && (
                                 <div className={`char-guide ${checked ? '' : 'hide-stroke-order'}`}>
-                                    <img className="hide-stroke-order" src={`http://localhost:8080${charList[selectedChar]?.strokeSvgUrl}`} alt={charList[selectedChar]?.name}/>
+                                    <img className="hide-stroke-order" src={buildCloudinaryUrl(charList[selectedChar]?.imageVersion, charList[selectedChar]?.strokeSvgUrl)} alt={charList[selectedChar]?.name}/>
                                 </div>
                             )
                         }
@@ -285,7 +301,7 @@ const Practice = () => {
                         <div className="scoreResult" style={{display: `${scoreDisable ? `block` : `none`}`}}>
                             <div style={{textAlign: "center", whiteSpace: "nowrap", marginBottom: '20px'}}>
                                 <div className="score-label">
-                                    Nhận diện là kí tự: <strong>{charLabel}</strong> - Với độ chính xác: <strong>{predict?.confidence}%</strong>
+                                    Nhận diện là kí tự: <strong>{predict?.char}</strong> - Với độ chính xác: <strong>{predict?.confidence}%</strong>
                                 </div>
                             </div>
 

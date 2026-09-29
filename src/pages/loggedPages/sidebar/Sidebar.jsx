@@ -16,6 +16,7 @@ import {
 } from "react-icons/ri";
 import { TbAlphabetKorean } from "react-icons/tb";
 import { PiRoadHorizonBold } from "react-icons/pi";
+import { IoMenu } from "react-icons/io5";
 
 const Sidebar = () => {
     const USER_INFO = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
@@ -24,13 +25,15 @@ const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const [isMenuContent, setIsMenuContent] = useState(false);
+
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const {executePost: getInfoUser} = usePost(`${API_URL}/user/me`);
 
     const dataPages = [
         {name: "Trang chủ", navi: "/home", icon: "RiHome2Line"},
         {name: "Lộ trình học", navi: "/road", icon: "PiRoadHorizonBold"},
-        {name: "Bài học khác", navi: "/lessons/1", icon: "RiBook2Line"},
+        // {name: "Bài học khác", navi: "/lessons/1", icon: "RiBook2Line"},
         // {name: "Thứ tự các nét", navi: "/strokes", icon: "TbAlphabetKorean"},
         // {name: 'Cách ghép chữ', navi: "/combine", icon: "TbAlphabetKorean"},
         {name: "Luyện viết AI", navi: "/practice", icon: "RiPencilAi2Line"},
@@ -72,68 +75,95 @@ const Sidebar = () => {
     }, [])
 
     return (
-        <div className="sidebar">
-            <div className="brand">
-                <div className="brand-mark">글</div>
+        <div id="sidebar">
+            <button
+                className="btn btn-ghost mobile-toggle-btn"
+                onClick={() => setIsMenuContent(prev => !prev)}
+            >
+                <IoMenu />
+            </button>
 
-                <div>
-                    <div className="brand-name">글씨</div>
-                    <div className="brand-sub">Học chữ Hàn cùng AI</div>
-                </div>
-            </div>
+            {isMenuContent && (
+                <div
+                    className="sidebar-backdrop"
+                    onClick={() => setIsMenuContent(false)}
+                />
+            )}
 
-            <div className="nav">
-                {dataPages.map((item, index) => {
-                    const IconComponent = ICON_MAP[item.icon];
+            <div className={`menu-content ${isMenuContent ? 'open' : ''}`}>
+                <div className="header-sidebar">
+                    <div className="brand-sidebar">
+                        <div className="brand-mark">글</div>
 
-                    return (
-                        <button key={index}
-                                className={`nav-item ${location.pathname === item.navi ? `active` : ``}`}
-                                onClick={() => navigate(`/${item.navi}`)}>
-                            {IconComponent && <IconComponent size={24} />}
-                            {item.name}
-                        </button>
-                    );
-                })}
-            </div>
-
-            <div className="sidebar-foot-wrapper" onMouseLeave={() => setIsMenuOpen(false)}>
-                {isMenuOpen && (
-                    <div className="user-dropdown-menu">
-                        <button
-                            className="menu-item"
-                            onClick={() => navigate("/profile")}
-                        >
-                            <RiUser3Line size={18} />
-                            <span>Thông tin cá nhân</span>
-                        </button>
-
-                        <button
-                            className="menu-item"
-                            onClick={() => navigate("/setting")}
-                        >
-                            <RiSettings3Line size={18} />
-                            <span>Cài đặt</span>
-                        </button>
-
-                        <div className="menu-divider"></div>
-
-                        <button
-                            className="menu-item logout"
-                            onClick={handleLogout}
-                        >
-                            <RiLogoutCircleRLine size={18} />
-                            <span>Đăng xuất</span>
-                        </button>
+                        <div>
+                            <div className="brand-name">글씨</div>
+                            <div className="brand-sub">Học chữ Hàn cùng AI</div>
+                        </div>
                     </div>
-                )}
 
-                <div className="sidebar-foot-logged" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                    <div className="avatar">{user_info.fullName.charAt(0)}</div>
+                    <div className="nav">
+                        {dataPages.map((item, index) => {
+                            const IconComponent = ICON_MAP[item.icon];
 
-                    <div>
-                        <div className="name">{user_info.fullName}</div>
-                        <div className="role">Người học</div>
+                            return (
+                                <button key={index}
+                                        className={`nav-item ${location.pathname === item.navi ? `active` : ``}`}
+                                        onClick={() => navigate(`/${item.navi}`)}>
+                                    {IconComponent && <IconComponent size={24} />}
+                                    {item.name}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <div className="sidebar-foot-wrapper" onMouseLeave={() => setIsMenuOpen(false)}>
+                    {isMenuOpen && (
+                        <div className="user-dropdown-menu">
+                            <button
+                                className="menu-item"
+                                onClick={() => {
+                                    setIsMenuOpen(false);
+                                    navigate("/profile");
+                                }}
+                            >
+                                <RiUser3Line size={18} />
+                                <span>Thông tin cá nhân</span>
+                            </button>
+
+                            <button
+                                className="menu-item"
+                                onClick={() => {
+                                    setIsMenuOpen(false);
+                                    navigate("/setting");
+                                }}
+                            >
+                                <RiSettings3Line size={18} />
+                                <span>Cài đặt</span>
+                            </button>
+
+                            <div className="menu-divider"></div>
+
+                            <button
+                                className="menu-item logout"
+                                onClick={() => {
+                                    setIsMenuOpen(false);
+                                    handleLogout();
+                                }}
+                            >
+                                <RiLogoutCircleRLine size={18} />
+                                <span>Đăng xuất</span>
+                            </button>
+                        </div>
+                    )}
+
+                    <div className="sidebar-foot-logged" onClick={() => setIsMenuOpen(prev => !prev)}>
+                        <div className="avatar">{user_info?.fullName?.charAt(0).toUpperCase()}</div>
+
+                        <div>
+                            <div className="name">{user_info?.fullName}</div>
+                            <div className="role">Người học</div>
+                        </div>
                     </div>
                 </div>
             </div>

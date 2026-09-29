@@ -99,7 +99,7 @@ const AdminSample = () => {
     }
 
     return (
-        <div className="admin-samples">
+        <div id="admin-samples">
             <div className="page-head">
                 <div>
                     <span className="eyebrow">Quản trị hệ thống</span>
@@ -114,10 +114,15 @@ const AdminSample = () => {
                     <div className="stat-icon tone-a"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></svg></div>
                     <div><div className="stat-num">{stats.totalSamples}</div><div className="stat-label">Tổng số chữ mẫu</div></div>
                 </div>
+
                 <div className="card stat-card">
                     <div className="stat-icon tone-b"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg></div>
-                    <div><div className="stat-num">{stats.withSamples}/{stats.totalChars}</div><div className="stat-label">Ký tự đã có mẫu</div></div>
+                    <div>
+                        <div className="stat-num">{stats.withSamples}/{stats.totalChars}</div>
+                        <div className="stat-label">Ký tự đã có mẫu</div>
+                    </div>
                 </div>
+
                 <div className="card stat-card">
                     <div className="stat-icon tone-c"><svg viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01" /><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg></div>
                     <div><div className="stat-num">{stats.missing}</div><div className="stat-label">Ký tự chưa có mẫu</div></div>
@@ -135,12 +140,14 @@ const AdminSample = () => {
                         onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
+
                 <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
                     <option value="all">Tất cả danh mục</option>
                     {CATEGORY_OPTIONS.map((c) => (
                         <option key={c.value} value={c.value}>{c.label}</option>
                     ))}
                 </select>
+
                 <select value={sampleFilter} onChange={(e) => setSampleFilter(e.target.value)}>
                     <option value="all">Tất cả trạng thái</option>
                     <option value="has">Đã có chữ mẫu</option>
@@ -159,15 +166,20 @@ const AdminSample = () => {
                                 <span className="thumb-glyph placeholder">{c.glyph}</span>
                             )}
                         </div>
+
                         <div className="char-card-info">
                             <p>{c.glyph} <span className="mono">· {c.romanization}</span></p>
-                            <span className={`category-badge ${c.category}`}>{categoryLabel(c.category)}</span>
+                            <span className={`category-badge ${c.category}`}>
+                                {categoryLabel(c.category)}
+                            </span>
                         </div>
+
                         <div className={`sample-count ${c.samples.length === 0 ? 'zero' : ''}`}>
                             {c.samples.length} mẫu
                         </div>
                     </div>
                 ))}
+
                 {filtered.length === 0 && (
                     <div className="empty-state">Không tìm thấy ký tự phù hợp.</div>
                 )}
@@ -179,12 +191,17 @@ const AdminSample = () => {
                     <div className="modal-card wide" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-head">
                             <div className="modal-head-glyph">{activeChar.glyph}</div>
+
                             <div>
                                 <h3>{activeChar.glyph} · {activeChar.romanization}</h3>
                                 <span className={`category-badge ${activeChar.category}`}>{categoryLabel(activeChar.category)}</span>
                             </div>
+
                             <button className="close-btn" onClick={() => setActiveCharId(null)}>
-                                <svg viewBox="0 0 24 24"><path d="M18 6L6 18" /><path d="M6 6l12 12" /></svg>
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M18 6L6 18" />
+                                    <path d="M6 6l12 12" />
+                                </svg>
                             </button>
                         </div>
 
@@ -194,10 +211,12 @@ const AdminSample = () => {
                                     <div className="sample-thumb">
                                         <span>{activeChar.glyph}</span>
                                     </div>
+
                                     <div className="sample-info">
                                         <p>{s.label}</p>
                                         <span>{s.uploadedAt}</span>
                                     </div>
+
                                     <button className="sample-remove" onClick={() => removeSample(activeChar.id, s.id)} title="Xóa mẫu này">
                                         <svg viewBox="0 0 24 24"><path d="M18 6L6 18" /><path d="M6 6l12 12" /></svg>
                                     </button>

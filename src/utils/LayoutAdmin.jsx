@@ -1,5 +1,6 @@
 import React from 'react';
 import {Outlet} from 'react-router-dom';
+import './LayoutAdmin.css';
 
 // import Pages
 import Sidebar from "../pages/admin/sidebar/Sidebar.jsx";

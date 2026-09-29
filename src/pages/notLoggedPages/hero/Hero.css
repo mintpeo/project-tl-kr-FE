@@ -13,14 +13,12 @@
         }
     }
 
-    p {
-        .lead {
-            font-size: 16px;
-            color: var(--ink-soft);
-            line-height: 1.7;
-            max-width: 460px;
-            margin: 0 0 28px;
-        }
+    .lead {
+        font-size: 16px;
+        color: var(--ink-soft);
+        line-height: 1.7;
+        max-width: 460px;
+        margin: 0 0 28px;
     }
 
     .hero-grid {
@@ -230,6 +228,98 @@
                 font-size: 12px;
                 color: var(--ink-soft);
                 margin-top: 3px;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .hero {
+        padding: 40px 20px 24px;
+
+        h1 {
+            font-size: 30px;
+            line-height: 1.25;
+            margin-bottom: 14px;
+        }
+
+        p.lead,
+        .lead {
+            font-size: 15px;
+            margin-bottom: 22px;
+        }
+
+        .hero-grid {
+            grid-template-columns: 1fr;
+            gap: 36px;
+
+            .hero-actions {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+
+                > * {
+                    width: 100%;
+                    text-align: center;
+                    justify-content: center;
+                }
+            }
+
+            .trust-row {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .hero-visual {
+                max-width: 340px;
+                margin: 10px auto 0;
+                width: 100%;
+
+                .floating-streak {
+                    top: -10px;
+                    left: -8px;
+                    padding: 8px 12px;
+                }
+
+                .floating-score {
+                    bottom: -10px;
+                    right: -8px;
+                    padding: 10px 14px;
+                    min-width: 90px;
+
+                    .num {
+                        font-size: 20px;
+                    }
+                }
+
+                .hero-card {
+                    padding: 16px;
+
+                    .hero-canvas .ghost {
+                        font-size: 110px;
+                    }
+                }
+            }
+        }
+    }
+
+    .stats-strip {
+        margin-top: 36px;
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px 16px;
+            padding: 20px;
+
+            .stat-block {
+                .num {
+                    font-size: 22px;
+                }
+
+                &:last-child:nth-child(odd) {
+                    grid-column: span 2;
+                }
             }
         }
     }

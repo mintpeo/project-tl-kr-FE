@@ -160,9 +160,9 @@ const Main = () => {
     const authActive = authList.filter(auth => auth.enabled).length;
     const authNoActive = authList.filter(auth => !auth.enabled).length;
     const dataPagesCate = [
-        { name: "Tổng số tài khoản", number: authList.length, iconKey: "user" },
-        { name: "Đang hoạt động", number: authActive, iconKey: "active" },
-        { name: "Chưa kích hoạt", number: authNoActive, iconKey: "lock" },
+        { name: "Tổng số tài khoản", number: authList.length, iconKey: "user", tone: 'tone-a' },
+        { name: "Đang hoạt động", number: authActive, iconKey: "active", tone: 'tone-b' },
+        { name: "Chưa kích hoạt", number: authNoActive, iconKey: "lock", tone: 'tone-c' },
         // { name: "Mới trong tuần", number: "-", iconKey: "new" },
     ]
     const ICONS = {
@@ -213,7 +213,7 @@ const Main = () => {
                 {
                     dataPagesCate.map((item, index) => (
                         <div key={index} className="card stat-card">
-                            <div className="stat-icon total">
+                            <div className={`stat-icon ${item.tone}`}>
                                 {ICONS[item.iconKey]}
                             </div>
 
@@ -270,7 +270,7 @@ const Main = () => {
                         <th>Hành động</th>
                     </tr>
                     </thead>
-                    <tbody id="userTableBody">
+                    <tbody>
                     {
                         authListCustom.map((auth, index) => (
                             <tr

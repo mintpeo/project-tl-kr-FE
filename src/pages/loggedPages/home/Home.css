@@ -25,6 +25,7 @@
             max-width: 320px;
             margin: 0 0 18px;
             line-height: 1.55;
+            display: inline;
         }
 
         .hero-char {
@@ -41,6 +42,8 @@
         .btn-light {
             background: #fff;
             color: var(--celadon-dark);
+            display: block;
+            margin-top: 1rem;
 
             &:hover {
                 background: #EFF5EE;
@@ -50,10 +53,7 @@
 }
 
 .streak-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 12px;
+    max-height: 15vh;
 
     .streak-row {
         display: flex;
@@ -147,6 +147,110 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 12px;
+        }
+    }
+}
+
+@media (max-width: 1024px) {
+    .streak-card {
+        max-height: 15vh;
+    }
+}
+
+@media (max-width: 768px) {
+    .home-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-bottom: 16px;
+
+        .hero-card {
+            padding: 20px;
+            border-radius: 16px;
+            font-size: 84px;
+
+            h2 {
+                font-size: 19px;
+            }
+
+            p {
+                display: block;
+            }
+        }
+
+        p {
+            font-size: 13px;
+            max-width: 240px;
+        }
+
+        .btn-light {
+            width: 100%;
+            justify-content: center;
+            padding: 11px 16px;
+        }
+    }
+
+    .streak-card {
+        padding: 18px;
+        gap: 10px;
+        max-height: 20vh;
+
+        .streak-row {
+            gap: 10px;
+
+            .ring {
+                width: 12px;
+                height: 12px;
+            }
+
+            .streak-num {
+                font-size: 18px;
+            }
+
+            .streak-label {
+                font-size: 12px;
+            }
+        }
+
+        .btn {
+            font-size: 12px;
+        }
+    }
+
+    .section-title {
+        margin: 20px 0 10px;
+
+        h3 {
+            font-size: 15px;
+        }
+
+        .link-mini {
+            font-size: 13px;
+            padding: 4px 0;
+        }
+    }
+
+    .lesson-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+
+        .lesson-card {
+            padding: 16px;
+
+            .lesson-glyph {
+                width: 40px;
+                height: 40px;
+                font-size: 22px;
+                margin-bottom: 10px;
+            }
+
+            h4 {
+                font-size: 14px;
+            }
+
+            p {
+                font-size: 12px;
+                margin-bottom: 10px;
+            }
         }
     }
 }

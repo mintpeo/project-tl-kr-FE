@@ -1,15 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import './AdminExercise.css';
-
-/* ============================================================
-   DỮ LIỆU MẪU — thay bằng dữ liệu thật từ API /api/admin/exercises
-   "lessonId" nên khớp với id bài học trong AdminLessons.jsx thật.
-   ============================================================ */
-const LESSON_OPTIONS = [
-    { value: 'vowel-basic', label: 'Nguyên âm cơ bản' },
-    { value: 'consonant-basic', label: 'Phụ âm cơ bản' },
-    { value: 'syllable-combine', label: 'Âm tiết ghép' },
-];
+import useFetch from "../../../components/use/useFetch.js";
+import {API_URL} from "../../../components/API_URL.jsx";
+import {usePatch} from "../../../components/use/usePatch.js";
+import {usePost} from "../../../components/use/usePost.js";
+import {useDelete} from "../../../components/use/useDelete.js";
 
 const EMPTY_OPTIONS = ['', '', '', ''];
 
@@ -23,126 +18,221 @@ const INITIAL_QUESTIONS = [
     { id: 7, lesson: 'syllable-combine', question: "ㄱ + ㅏ ghép thành chữ nào?", options: ['가', '나', '다', '사'], correct: 0 },
 ];
 
-function lessonLabel(value) {
-    return LESSON_OPTIONS.find((l) => l.value === value)?.label ?? value;
-}
+const EMPTY_FORM = { quizId: '', question: '', questionMediaUrl: '', options: [...EMPTY_OPTIONS], correct: 0 };
 
-const EMPTY_FORM = { lesson: 'vowel-basic', question: '', options: [...EMPTY_OPTIONS], correct: 0 };
-
-/* ============================================================
-   COMPONENT
-   ============================================================ */
 const AdminExercise = () => {
-    const [questions, setQuestions] = useState(INITIAL_QUESTIONS);
-    const [search, setSearch] = useState('');
-    const [lessonFilter, setLessonFilter] = useState('all');
+    const {data: loadAdminQuiz} = useFetch(`${API_URL}/admin/get-quizzes`);
+    const {data: loadAdminQuestions} = useFetch(`${API_URL}/admin/get-questions`);
+    const mapQuizRes = (quiz) => ({
+        id: quiz?.id,
+        name: quiz?.name,
+    });
+    const mapQuesRes = (q) => ({
+        id: q?.id,
+        quizId: q?.quizId,
+        question: q?.question,
+        options: q?.options,
+        correct: q?.options.find((opt) => opt?.correct === true)?.id,
+    });
+    const quizRes = loadAdminQuiz.map(mapQuizRes);
 
-    const [modalOpen, setModalOpen] = useState(false);
-    const [editingId, setEditingId] = useState(null);
-    const [form, setForm] = useState(EMPTY_FORM);
+    const [questions, setQuestions] = useState([]);
+    useEffect(() => {
+        setQuestions(loadAdminQuestions.map(mapQuesRes));
+    }, [loadAdminQuestions]);
 
+    // Handle Stat
+    const stats = [
+        {name: "Tổng số câu hỏi", amount: questions.length, icon: "total", tone: "tone-a"},
+        {name: "Bài học có luyện tập", amount: quizRes.length, icon: "lesson", tone: "tone-b"},
+        {name: "TB câu hỏi / bài học", amount: Math.round(questions.length / quizRes.length), icon: "avg", tone: "tone-c"},
+    ];
+    const iconStatRows = {
+        total: (
+            <svg viewBox="0 0 24 24">
+                <path d="M9 11l3 3L22 4" />
+                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+            </svg>
+        ),
+        lesson: (
+            <svg viewBox="0 0 24 24">
+                <path d="M4 5a2 2 0 012-2h11v16H6a2 2 0 00-2 2V5z" />
+                <path d="M17 3v16" />
+            </svg>
+        ),
+        avg: (
+            <svg viewBox="0 0 24 24">
+                <path d="M4 20V10" />
+                <path d="M12 20V4" />
+                <path d="M20 20v-7" />
+            </svg>
+        ),
+        cate: (
+            <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" /></svg>
+        )
+    };
+
+    // Handle Quiz Name
+    const handleQuizName = (quizId) => {
+        return quizRes.find(q => q?.id === quizId)?.name;
+    }
+
+    // Handle Filter
+    const [search, setSearch] = useState("");
+    const [lessonFilter, setLessonFilter] = useState(0);
     const filtered = useMemo(() => {
         return questions.filter((q) => {
             const matchesSearch = q.question.toLowerCase().includes(search.toLowerCase());
-            const matchesLesson = lessonFilter === 'all' || q.lesson === lessonFilter;
+            const matchesLesson = lessonFilter === 0 || q.quizId === lessonFilter;
             return matchesSearch && matchesLesson;
         });
     }, [questions, search, lessonFilter]);
 
-    const stats = useMemo(() => {
-        const byLesson = {};
-        questions.forEach((q) => { byLesson[q.lesson] = (byLesson[q.lesson] || 0) + 1; });
-        return {
-            total: questions.length,
-            lessonCount: Object.keys(byLesson).length,
-            avgPerLesson: Object.keys(byLesson).length
-                ? Math.round(questions.length / Object.keys(byLesson).length)
-                : 0,
-        };
-    }, [questions]);
+    // Open Modal
+    const [modalOpen, setModalOpen] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+    const [form, setForm] = useState(EMPTY_FORM);
+    console.log(form);
 
-    function openAddModal() {
+    const openAddModal = () => {
         setEditingId(null);
         setForm(EMPTY_FORM);
         setModalOpen(true);
     }
 
-    function openEditModal(q) {
+    const openEditModal = (q) => {
         setEditingId(q.id);
-        setForm({ lesson: q.lesson, question: q.question, options: [...q.options], correct: q.correct });
+        setForm(mapQuesRes(q));
         setModalOpen(true);
     }
 
-    function closeModal() {
+    const closeModal = () => {
         setModalOpen(false);
     }
 
-    function updateOption(index, value) {
+    const updateCorrect = (index, optId) => {
+        if (editingId !== null) setForm({ ...form, correct: optId });
+        else setForm({...form, correct: index});
+    }
+
+    const updateOption = (index, value) => {
         const next = [...form.options];
-        next[index] = value;
+        next[index] = {...next[index], optionText: value};
         setForm({ ...form, options: next });
     }
 
-    function handleSubmit(e) {
+    // Handle Update Question
+    const {executePatch: handleUpdateQuestion} = usePatch(`${API_URL}/admin/update-question`);
+    const {executePost: handleCreateQuestion} = usePost(`${API_URL}/admin/create-question`);
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!form.question.trim() || form.options.some((o) => !o.trim())) return;
+        // if (form.question.trim() || form.options.some((o) => !o.trim())) return;
+
+        if (editingId !== null) {
+            const req = {
+                id: editingId,
+                quizId: form?.quizId,
+                question: form?.question,
+                questionMediaUrl: form?.questionMediaUrl,
+                correct: form?.correct,
+                options: form?.options
+            }
+            try {
+                const data = await handleUpdateQuestion(req);
+                if (data) {
+                    alert("Cập nhật câu hỏi thành công.");
+                    window.location.reload();
+                }
+            } catch (e) {
+                console.log("Error Update Question", e);
+            }
+        }
 
         if (editingId === null) {
-            const newQ = {
-                id: Math.max(0, ...questions.map((q) => q.id)) + 1,
-                lesson: form.lesson,
+            const req = {
+                quizId: form.quizId,
                 question: form.question.trim(),
-                options: form.options.map((o) => o.trim()),
+                questionMediaUrl: '',
                 correct: form.correct,
-            };
-            setQuestions((prev) => [newQ, ...prev]);
-        } else {
-            setQuestions((prev) =>
-                prev.map((q) => (q.id === editingId ? { ...q, ...form } : q))
-            );
+                options: form.options,
+            }
+            try {
+                const data = await handleCreateQuestion(req);
+                if (data) {
+                    alert("Tạo câu hỏi thành công.");
+                    window.location.reload();
+                }
+            } catch (e) {
+                console.log("Error Create Question", e);
+            }
         }
-        setModalOpen(false);
     }
 
-    function deleteQuestion(id) {
+    // Delete Question
+    const {executeDelete: handleDeleteQuestion} = useDelete(`${API_URL}/admin/delete-question`);
+    const deleteQuestion = async (id) => {
         if (!window.confirm('Xóa câu hỏi này khỏi bài luyện tập?')) return;
-        setQuestions((prev) => prev.filter((q) => q.id !== id));
+        const req = {
+            questionId: id
+        }
+        try {
+            const data = await handleDeleteQuestion(req);
+            if (data) {
+                alert("Xoá câu hỏi thành công.");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error Delete Question", e);
+        }
     }
+
+    // Spilt Text
+    const truncateText = (text, maxLength = 20) => {
+        if (!text || text.length <= maxLength) return text;
+        return text.slice(0, maxLength) + '...';
+    };
 
     return (
-        <div className="admin-exercises">
+        <div id="admin-exercises">
             <div className="page-head">
                 <div>
                     <span className="eyebrow">Quản trị hệ thống</span>
                     <h1>Quản lý bài luyện tập</h1>
                     <p>Câu hỏi trắc nghiệm dùng để kiểm tra kiến thức sau mỗi bài học.</p>
                 </div>
+
                 <button className="btn btn-primary" onClick={openAddModal}>
-                    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 5v14M5 12h14" />
+                    </svg>
                     Thêm câu hỏi
                 </button>
             </div>
 
             {/* ---------------- STATS ---------------- */}
             <div className="stat-row">
-                <div className="card stat-card">
-                    <div className="stat-icon tone-a"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg></div>
-                    <div><div className="stat-num">{stats.total}</div><div className="stat-label">Tổng số câu hỏi</div></div>
-                </div>
-                <div className="card stat-card">
-                    <div className="stat-icon tone-b"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 012-2h11v16H6a2 2 0 00-2 2V5z" /><path d="M17 3v16" /></svg></div>
-                    <div><div className="stat-num">{stats.lessonCount}</div><div className="stat-label">Bài học có luyện tập</div></div>
-                </div>
-                <div className="card stat-card">
-                    <div className="stat-icon tone-c"><svg viewBox="0 0 24 24"><path d="M4 20V10" /><path d="M12 20V4" /><path d="M20 20v-7" /></svg></div>
-                    <div><div className="stat-num">{stats.avgPerLesson}</div><div className="stat-label">TB câu hỏi / bài học</div></div>
-                </div>
+                {stats.map((s, index) => (
+                    <div key={index} className="card stat-card">
+                        <div className={`stat-icon ${s.tone}`}>
+                            {iconStatRows[s.icon]}
+                        </div>
+
+                        <div>
+                            <div className="stat-num">{s.amount}</div>
+                            <div className="stat-label">{s.name}</div>
+                        </div>
+                    </div>
+                ))}
             </div>
 
             {/* ---------------- TOOLBAR ---------------- */}
             <div className="toolbar">
                 <div className="search-wrap">
-                    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="7" />
+                        <path d="M21 21l-4.3-4.3" />
+                    </svg>
+
                     <input
                         type="text"
                         placeholder="Tìm theo nội dung câu hỏi..."
@@ -150,10 +240,11 @@ const AdminExercise = () => {
                         onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
-                <select value={lessonFilter} onChange={(e) => setLessonFilter(e.target.value)}>
-                    <option value="all">Tất cả bài học</option>
-                    {LESSON_OPTIONS.map((l) => (
-                        <option key={l.value} value={l.value}>{l.label}</option>
+
+                <select value={lessonFilter} onChange={(e) => setLessonFilter(Number(e.target.value))}>
+                    <option value={0}>Tất cả bộ câu hỏi</option>
+                    {loadAdminQuiz.map((l) => (
+                        <option key={l?.id} value={l?.id}>{l?.name}</option>
                     ))}
                 </select>
             </div>
@@ -163,31 +254,34 @@ const AdminExercise = () => {
                 <table>
                     <thead>
                     <tr>
+                        <th>STT</th>
                         <th>Câu hỏi</th>
-                        <th>Thuộc bài học</th>
                         <th>Đáp án</th>
+                        <th>Thuộc bộ câu hỏi</th>
                         <th style={{ textAlign: 'right' }}>Hành động</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {filtered.map((q) => (
-                        <tr key={q.id}>
-                            <td className="question-cell">{q.question}</td>
-                            <td><span className="lesson-badge">{lessonLabel(q.lesson)}</span></td>
+                    {filtered.map((q, index) => (
+                        <tr key={q?.id}>
+                            <td>{index + 1}</td>
+                            <td className="question-cell">{truncateText(q?.question)}</td>
                             <td>
                                 <div className="options-preview">
-                                    {q.options.map((opt, i) => (
-                                        <span key={i} className={`option-chip ${i === q.correct ? 'correct' : ''}`}>
-                        {opt}
-                      </span>
+                                    {q.options.map((opt) => (
+                                        <span key={opt?.id} className={`option-chip ${opt?.id === q.correct ? 'correct' : ''}`}>
+                                        {opt?.optionText}
+                                      </span>
                                     ))}
                                 </div>
                             </td>
+                            <td><span className="lesson-badge">{truncateText(handleQuizName(q?.quizId))}</span></td>
                             <td>
                                 <div className="row-actions">
                                     <button className="icon-btn" title="Chỉnh sửa" onClick={() => openEditModal(q)}>
                                         <svg viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" /></svg>
                                     </button>
+
                                     <button className="icon-btn danger" title="Xóa" onClick={() => deleteQuestion(q.id)}>
                                         <svg viewBox="0 0 24 24"><path d="M3 6h18" /><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0l-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6" /></svg>
                                     </button>
@@ -210,10 +304,14 @@ const AdminExercise = () => {
 
                         <form onSubmit={handleSubmit}>
                             <div className="field">
-                                <label>Thuộc bài học</label>
-                                <select value={form.lesson} onChange={(e) => setForm({ ...form, lesson: e.target.value })}>
-                                    {LESSON_OPTIONS.map((l) => (
-                                        <option key={l.value} value={l.value}>{l.label}</option>
+                                <label>Thuộc bộ câu hỏi</label>
+                                <select value={form.quizId}
+                                        onChange={(e) => setForm({...form, quizId: Number(e.target.value)})}
+                                        required
+                                >
+                                    <option value=''>Chọn bộ câu hỏi</option>
+                                    {loadAdminQuiz.map((l) => (
+                                        <option key={l?.id} value={l?.id}>{l?.name}</option>
                                     ))}
                                 </select>
                             </div>
@@ -236,14 +334,16 @@ const AdminExercise = () => {
                                         <div className="option-row" key={i}>
                                             <button
                                                 type="button"
-                                                className={`radio-btn ${form.correct === i ? 'checked' : ''}`}
-                                                onClick={() => setForm({ ...form, correct: i })}
+                                                className={`radio-btn ${form.correct === opt?.id && editingId !== null ? 'checked' : 
+                                                form.correct === i && editingId === null ? 'checked' : ''}`}
+                                                onClick={() => updateCorrect(i, opt?.id)}
                                             >
-                                                {form.correct === i && <span className="radio-dot" />}
+                                                {(form.correct === i && editingId === null) && <span className="radio-dot" />}
+                                                {(form.correct === opt?.id && editingId !== null) && <span className="radio-dot" />}
                                             </button>
                                             <input
                                                 type="text"
-                                                value={opt}
+                                                value={opt?.optionText}
                                                 onChange={(e) => updateOption(i, e.target.value)}
                                                 placeholder={`Đáp án ${i + 1}`}
                                                 required
