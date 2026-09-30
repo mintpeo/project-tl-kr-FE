@@ -24,8 +24,8 @@ const Sidebar = () => {
         {name: "Ký tự tiếng Hàn", navi: "/character", icon: "TbAlphabetKorean"},
         {name: 'Chữ mẫu', navi: "/sample", icon: "RiBattery2Line"},
         {name: "Bài luyện tập", navi: "/exercise", icon: "RiBriefcase2Line"},
-        {name: "Thứ tự nét", navi: "/progress", icon: "RiDatabase2Line"},
-        {name: "Theo dõi hoạt động học tập", navi: "/progress", icon: "RiBarChart2Line"},
+        {name: "Thứ tự nét", navi: "/activity", icon: "RiDatabase2Line"},
+        {name: "Theo dõi hoạt động học tập", navi: "/activity", icon: "RiBarChart2Line"},
     ];
 
     const changeNavi = (navi) => {

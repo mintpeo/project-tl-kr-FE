@@ -8,6 +8,11 @@
         letter-spacing: -0.01em;
     }
 
+    .stat-row {
+        display: grid;
+        grid-template-columns:repeat(3, 1fr);
+    }
+
     .btn {
         border: none;
         border-radius: 9px;

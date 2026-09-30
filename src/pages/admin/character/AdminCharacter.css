@@ -5,6 +5,11 @@
         letter-spacing: -0.01em;
     }
 
+    .stat-row {
+        display: grid;
+        grid-template-columns:repeat(3, 1fr);
+    }
+
     .table-card {
         overflow: auto;
 
@@ -132,8 +137,13 @@
             .field-row {
                 display: flex;
                 gap: 12px;
+            }
 
-                .modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }
+            .modal-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+                margin-top: 20px;
             }
 
             .field {

@@ -4,6 +4,11 @@
         gap: 10px;
     }
 
+    .stat-row {
+        display: grid;
+        grid-template-columns:repeat(3, 1fr);
+    }
+
     .table-card {
         overflow: auto;
 
@@ -95,137 +100,116 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(35, 40, 35, 0.45);
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 1000;
         backdrop-filter: blur(2px);
 
-        .detail-body {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-
-            .detail-item {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                font-size: 0.9rem;
-
-                .detail-label {
-                    color: var(--ink);
-                }
-
-                .detail-value {
-                    font-weight: 500;
-                    color: var(--ink-soft);
-                }
-            }
-        }
-
-        .detail-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9rem;
-
-            .detail-label {
-                color: var(--ink);
-            }
-
-            .detail-value {
-                font-weight: 500;
-                color: var(--ink-soft);
-            }
-        }
-
-        .disable {
-            display: none;
-        }
-
-        .modal-content {
-            background: #ffffff;
+        .modal-card {
             width: 100%;
-            max-width: 520px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            animation: fadeIn 0.2s ease-in-out;
+            max-width: 460px;
+            background: var(--paper-card);
+            border-radius: 16px;
+            padding: 26px;
+            max-height: 90vh;
+            overflow-y: auto;
 
-            .modal-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 18px 24px;
-                border-bottom: 1px solid #e5e7eb;
-
-                h2 {
-                    font-size: 1.25rem;
-                    font-weight: 600;
-                    margin: 0;
-                }
+            h3 {
+                font-size: 17px;
+                margin: 0 0 18px;
             }
 
-            .modal-form {
-                padding: 20px 24px;
+            .field-row {
                 display: flex;
-                flex-direction: column;
-                gap: 16px;
+                gap: 12px;
+            }
 
-                .form-group {
+            .modal-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+                margin-top: 20px;
+            }
+
+            .field {
+                flex: 1;
+                margin-bottom: 14px;
+
+                label {
+                    display: block;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: var(--ink);
+                    margin-bottom: 6px;
+                }
+
+                input, select, textarea {
+                    width: 100%;
+                    padding: 9px 12px;
+                    border-radius: 9px;
+                    border: 1px solid var(--paper-dim);
+                    background: var(--paper);
+                    font-size: 13px;
+                    color: var(--ink);
+                    outline: none;
+                    font-family: 'Be Vietnam Pro', sans-serif;
+
+                    &:focus {
+                        border-color: var(--celadon);
+                    }
+                }
+
+                .glyph-input {
+                    text-align: center;
+                    font-family: 'Noto Serif KR', serif;
+                    font-size: 20px;
+                    font-weight: 700;
+                }
+
+                .upload-box {
+                    border: 1px dashed var(--paper-dim);
+                    border-radius: 10px;
+                    padding: 18px;
+                    text-align: center;
+                    color: var(--ink-soft);
+                    font-size: 12px;
+                    cursor: pointer;
                     display: flex;
                     flex-direction: column;
-                    gap: 6px;
+                    align-items: center;
+                    gap: 8px;
 
-                    label {
-                        font-size: 0.875rem;
-                        font-weight: 500;
-                        color: #374151;
+                    svg {
+                        width: 20px;
+                        height: 20px;
+                        stroke: var(--ink-soft);
+                        fill: none;
+                        stroke-width: 1.6;
                     }
 
-                    input, select {
-                        padding: 10px 12px;
-                        border: 1px solid #d1d5db;
-                        border-radius: 6px;
-                        font-size: 0.95rem;
-                        outline: none;
-                        transition: border-color 0.2s;
-
-                        &:focus {
-                            border-color: #2563eb;
-                        }
+                    &:hover {
+                        border-color: var(--celadon);
+                        color: var(--celadon-dark);
                     }
                 }
 
-                .form-row {
-                    display: flex;
-                    gap: 12px;
+                .upload-box.disabled {
+                    display: none;
                 }
 
-                .flex-1 {
-                    flex: 1;
-                }
+                .field-hint {
+                    font-size: 11px;
+                    color: var(--ink-soft);
+                    margin: 6px 0 0;
+                    line-height: 1.5;
 
-                .modal-footer {
-                    display: flex;
-                    justify-content: flex-end;
-                    gap: 12px;
-                    margin-top: 10px;
-                    padding-top: 16px;
-                    border-top: 1px solid #e5e7eb;
-
-                    .btn-secondary {
-                        background: #f3f4f6;
-                        color: #374151;
-                        border: 1px solid #d1d5db;
-                        padding: 8px 16px;
-                        border-radius: 6px;
-                        cursor: pointer;
-
-                        &:hover {
-                            background: #e5e7eb;
-                        }
+                    code {
+                        background: var(--paper-dim);
+                        padding: 1px 5px;
+                        border-radius: 4px;
+                        font-family: 'JetBrains Mono', monospace;
                     }
                 }
             }
