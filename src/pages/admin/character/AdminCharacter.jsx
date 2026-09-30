@@ -16,7 +16,7 @@ const TYPE_OPTIONS = [
     {value: false, label: 'Đơn'},
 ];
 
-const EMPTY_FORM = { name: '', transcription: '', type: 'VOWEL', double: false, strokeCount: '', strokeSvgUrl: '', versionUrl: '' };
+const EMPTY_FORM = { name: '', transcription: '', type: 'VOWEL', double: false, strokeCount: '', imgUrl: '', fileName: '' };
 
 const AdminCharacter = () => {
     const {data: getAllChars} = useFetch(`${API_URL}/admin/all-char`);
@@ -25,10 +25,13 @@ const AdminCharacter = () => {
         double: char?.double,
         name: char?.name,
         strokeCount: char?.strokeCount,
-        strokeSvgUrl: char?.strokeSvgUrl,
+        imgUrl: char?.imgUrl,
         transcription: char?.transcription,
         type: char?.type,
-        imageVersion: char?.imageVersion
+        fileName: char?.fileName,
+        status: char?.status,
+        pendingUrl: char?.pendingUrl,
+        pendingPublicId: char?.pendingPublicId,
     });
     const charsRes = getAllChars.map(mapChars);
     const [chars, setChars] = useState([]);
@@ -37,10 +40,6 @@ const AdminCharacter = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [form, setForm] = useState(EMPTY_FORM);
-
-    const buildCloudinaryUrl = (version, fileName) => {
-        return `https://res.cloudinary.com/dqzuuzi8z/image/upload/v${version}/${fileName}.svg`;
-    };
 
     // Upload File Character
     const [selectedFile, setSelectedFile] = useState(null);
@@ -53,7 +52,7 @@ const AdminCharacter = () => {
         }
     }
     // Handle Upload File
-    const {executePutUploadFile: uploadFileChar, loading: loadingUploadFileChar} = usePutUploadFile(`${API_URL}/admin/upload-char`);
+    const {executePutUploadFile: uploadFileChar, loading: loadingUploadFileChar} = usePutUploadFile(`${API_URL}/admin/upload-pending`);
     const handleUploadFile = async (e) => {
         e.preventDefault();
 
@@ -64,7 +63,6 @@ const AdminCharacter = () => {
 
         const formData = new FormData();
         formData.append("file", selectedFile);
-        formData.append("targetFileName", form.strokeSvgUrl);
         formData.append("charId", editingId);
         try {
             const data = await uploadFileChar(formData);
@@ -84,7 +82,7 @@ const AdminCharacter = () => {
             [field]: value
         }));
     }
-    console.log(form);
+    // console.log(form);
 
     const openEditModal = (item) => {
         setEditingId(item.id);
@@ -141,13 +139,16 @@ const AdminCharacter = () => {
 
             let list = [...baseList];
 
+            if (strokeFilter === 'has') list = list.filter(char => char.imgUrl !== null);
+            else if (strokeFilter === 'missing') list = list.filter(char => char.imgUrl === null);
+
             if (categoryFilter === 'VOWEL') list = list.filter(char => char.type === 'VOWEL');
             else if (categoryFilter === 'CONSONANT') list = list.filter(char => char.type === 'CONSONANT');
 
             setChars(list);
         }, 300);
         return () => clearTimeout(timer);
-    }, [search, categoryFilter, getAllChars]);
+    }, [search, categoryFilter, strokeFilter, getAllChars]);
 
     // Category Table
     const categoryLabel = (value) => {
@@ -180,6 +181,12 @@ const AdminCharacter = () => {
             <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" /></svg>
         )
     };
+
+    // Spite
+    const formatStrokeId = (path) => {
+        if (!path) return "";
+        return path.split("/").pop();
+    }
 
     return (
         <div className="admin-chars">
@@ -248,7 +255,9 @@ const AdminCharacter = () => {
                         <th>Cách đọc</th>
                         <th style={{whiteSpace: "nowrap"}}>Danh mục</th>
                         <th style={{whiteSpace: "nowrap"}}>Số nét</th>
+                        <th>Hình ảnh</th>
                         <th>Dữ liệu nét</th>
+                        <th>Trạng thái</th>
                         <th>Âm</th>
                         <th style={{ textAlign: 'right' }}>Hành động</th>
                     </tr>
@@ -262,21 +271,52 @@ const AdminCharacter = () => {
                             <td style={{whiteSpace: "nowrap"}}><span className={`category-badge ${c.type}`}>{categoryLabel(c.type)}</span></td>
                             <td className="mono">{c.strokeCount > 0 ? `${c.strokeCount} nét` : ``}</td>
                             <td>
-                                {c.strokeSvgUrl ? (
-                                    <div style={{display: "flex", gap: '10px'}}>
-                                        <span className="stroke-badge has">
-                                            <img src={buildCloudinaryUrl(c?.imageVersion, c?.strokeSvgUrl)} alt={c?.name}/>
-                                        </span>
-
-                                        <span className="stroke-badge">{c.strokeSvgUrl}</span>
+                                {c?.imgUrl ? (
+                                    <div style={{display: "flex", alignItems: "center", gap: '10px'}}>
+                                        <span className="stroke-badge has"><img src={c?.imgUrl} alt={c?.name}/></span>
+                                        {c?.status === 'PENDING' && (
+                                            <>
+                                                <p>&rarr;</p>
+                                                <span className="stroke-badge has">
+                                                    <img src={c?.pendingUrl} alt={c?.name}/>
+                                                </span>
+                                            </>
+                                        )}
                                     </div>
                                 ) : (
-                                    <span className="stroke-badge missing">
-                                        <svg viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01" /><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
-                                        Chưa có
-                                    </span>
+                                    <div style={{display: "flex", alignItems: "center", gap: '10px'}}>
+                                        <span className="stroke-badge missing">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M12 9v4m0 4h.01" />
+                                                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                                            </svg>
+                                            Chưa có
+                                        </span>
+                                        {c?.status === 'PENDING' && (
+                                            <>
+                                                <p>&rarr;</p>
+                                                <span className="stroke-badge has">
+                                                    <img src={c?.pendingUrl} alt={c?.name}/>
+                                                </span>
+                                            </>
+                                        )}
+                                    </div>
                                 )}
                             </td>
+                            <td>
+                                <div style={{display: "flex", alignItems: "center", gap: '10px'}}>
+                                    <span className="stroke-badge has">{formatStrokeId(c?.fileName)}</span>
+                                    {c?.status === 'PENDING' && (
+                                        <>
+                                            <p>&rarr;</p>
+                                            <span className="stroke-badge has">
+                                                {formatStrokeId(c?.pendingPublicId)}
+                                            </span>
+                                        </>
+                                    )}
+                                </div>
+                            </td>
+                            <td><span className="stroke-badge">{c?.status}</span></td>
                             <td className="mono">{c.double ? `Đôi` : `Đơn`}</td>
                             <td>
                                 <div className="row-actions">
@@ -291,7 +331,6 @@ const AdminCharacter = () => {
                             </td>
                         </tr>
                     ))}
-
                     {chars.length === 0 && (
                         <tr><td colSpan={6} className="empty-row">Không tìm thấy ký tự phù hợp.</td></tr>
                     )}
@@ -373,8 +412,8 @@ const AdminCharacter = () => {
                                 <label className="upload-box">
                                     <input type="file" accept=".svg" hidden onChange={handleFileChange} />
                                     <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4" /><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" /></svg>
-                                    {previewUrl ? (<span>{`${form.strokeSvgUrl}  -> ${previewUrl}`}</span>) : (
-                                        <span>{form.strokeSvgUrl || 'Kéo thả file .svg hoặc bấm để chọn'}</span>
+                                    {previewUrl ? (<span>{`${formatStrokeId(form?.fileName)} -> ${previewUrl}`}</span>) : (
+                                        <span>{formatStrokeId(form?.fileName) || 'Kéo thả file .svg hoặc bấm để chọn'}</span>
                                     )}
                                 </label>
                             </div>
