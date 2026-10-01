@@ -152,11 +152,13 @@ const AdminActivity = () => {
                             <h3>Lượt luyện viết toàn hệ thống</h3>
                             <p>Tổng số lượt luyện viết được ghi nhận mỗi ngày</p>
                         </div>
+
                         <div className="range-toggle">
                             <button className={range === 7 ? 'active' : ''} onClick={() => setRange(7)}>7 ngày</button>
                             <button className={range === 14 ? 'active' : ''} onClick={() => setRange(14)}>14 ngày</button>
                         </div>
                     </div>
+
                     <div className="bars">
                         {chartData.map(([label, val]) => (
                             <div className="bar-col" key={label}>
@@ -175,17 +177,21 @@ const AdminActivity = () => {
                             <p>Điểm trung bình thấp nhất trên toàn bộ người học</p>
                         </div>
                     </div>
+
                     <div className="hardest-list">
                         {loadingAllChar && <Skeleton />}
                         {!loadingAllChar && HARDEST_CHARS.map((c) => (
                             <div className="hardest-row" key={c.glyph}>
                                 <div className="hardest-glyph">{c.glyph}</div>
+
                                 <div className="hardest-info">
                                     <p>{handleRoma(c.charId)} <span className="mono">· {c.attempts} lượt luyện</span></p>
+
                                     <div className="hardest-track">
                                         <div className={`hardest-fill tone-${scoreTone(c.avgScore)}`} style={{ width: `${c.avgScore}%` }} />
                                     </div>
                                 </div>
+
                                 <div className={`hardest-score tone-${scoreTone(c.avgScore)}`}>{c.avgScore}%</div>
                             </div>
                         ))}
@@ -237,6 +243,7 @@ const AdminActivity = () => {
                             <td>
                                 <div className="user-cell">
                                     <div className="user-avatar">{u.name.split(' ').slice(-2).map((w) => w[0]).join('')}</div>
+
                                     <div>
                                         <div className="user-name">{u.name}</div>
                                         <div className="user-email">{u.email}</div>

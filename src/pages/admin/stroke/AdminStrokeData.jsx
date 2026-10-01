@@ -2,19 +2,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 import './AdminStrokeData.css';
 import useFetch from "../../../components/use/useFetch.js";
 import {API_URL} from "../../../components/API_URL.jsx";
-
-const STATUS_LABEL = {
-    verified: 'Đã duyệt',
-    pending: 'Chờ duyệt',
-    flagged: 'Cần chỉnh sửa',
-    missing: 'Thiếu dữ liệu',
-};
-
-// Bỏ dòng <?xml ...?> ở đầu file — không hợp lệ khi nhúng trực tiếp vào DOM
-// (đúng lỗi InvalidCharacterError đã gặp ở Stroke.jsx trước đây).
-function stripXmlDeclaration(raw) {
-    return raw ? raw.replace(/<\?xml[^>]*\?>/, '') : raw;
-}
+import {usePost} from "../../../components/use/usePost.js";
 
 // Kiểm tra cấu trúc file bằng cách tìm class name trong chuỗi SVG thô —
 // đơn giản nhưng đủ dùng để phát hiện file thiếu thành phần trước khi duyệt.
@@ -44,6 +32,8 @@ export default function AdminStrokeData() {
         glyph: s?.glyph,
         romanization: s?.romanization,
         declaredStrokes: s?.declaredStrokes,
+        charId: s?.charId,
+        options: s?.options,
     });
     const [items, setItems] = useState([]);
     useEffect(() => {
@@ -52,11 +42,31 @@ export default function AdminStrokeData() {
 
     // Get Option Stroke Data
     const {data: loadOptionStrokeData} = useFetch(`${API_URL}/admin/all-option-stroke`);
+    // Handle Check Change
+    const {executePost: postCheckChange} = usePost(`${API_URL}/admin/handle-option-stroke`);
+    const [strokeOptionData, setStrokeOptionData] = useState([]);
+    const [noteDraft, setNoteDraft] = useState('');
+    const handleCheckChange = async (option, value, itemId) => {
+        const data = {
+            id: option?.id,
+            strokeId: itemId,
+            content: option?.content,
+            accepted: value
+        };
+        setStrokeOptionData((prev) => {
+            const exists = prev.some((s) => s?.id === data?.id);
+            if (exists) return prev.map((s) => (s?.id === data?.id ? {...s, accepted: value} : s));
+            return [...prev, data];
+        })
+    }
+    const currentSelected = (optionId) => {
+        const cur = strokeOptionData.find((d) => d.id === optionId);
+        return cur?.accepted;
+    };
 
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [activeId, setActiveId] = useState(null);
-    const [noteDraft, setNoteDraft] = useState('');
 
     const filtered = useMemo(() => {
         return items.filter((it) => {
@@ -75,127 +85,81 @@ export default function AdminStrokeData() {
 
     const activeItem = items.find((i) => i.id === activeId) ?? null;
 
-    function openDetail(item) {
-        setActiveId(item.id);
-        setNoteDraft(item.flagReason ?? '');
+    const [selectedItem, setSelectedItem] = useState();
+    const openDetail = (item) => {
+        setActiveId(item?.id);
+        setSelectedItem(item);
+        setNoteDraft(item?.flagReason ?? '');
     }
-    function closeDetail() {
+    const closeDetail = () => {
         setActiveId(null);
+        setStrokeOptionData([]);
     }
 
-    function setStatus(id, status, reason) {
+    const setStatus = (id, status, reason) => {
         setItems((prev) =>
             prev.map((it) => (it.id === id ? { ...it, status, flagReason: reason ?? it.flagReason, updatedAt: 'Vừa xong' } : it))
         );
     }
 
-    function approve() {
-        setStatus(activeItem.id, 'verified', undefined);
+    const {executePost: handleActive, loading: loadingHandleActive} = usePost(`${API_URL}/admin/upload-active`);
+    const approve = async () => {
+        if (strokeOptionData.length <= 0) return;
+
+        const req = {
+            charId: selectedItem?.charId
+        }
+
+        try {
+            const check = await postCheckChange(strokeOptionData);
+            if (!check) return;
+            const data = await handleActive(req);
+            if (data) {
+                alert("Duyệt thành công.");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error Check Change", e);
+        }
         closeDetail();
     }
-    function flag() {
+
+    // Handle flag
+    const {executePost: handleFlag} = usePost(`${API_URL}/admin/flag-stroke`);
+    const flag = async () => {
         if (!noteDraft.trim()) {
             alert('Nhập lý do trước khi yêu cầu chỉnh sửa.');
             return;
         }
-        setStatus(activeItem.id, 'flagged', noteDraft.trim());
+
+        const req = {
+            id: activeId,
+            note: noteDraft
+        }
+        try {
+            const data = await handleFlag(req);
+            if (data) {
+                alert("Yêu cầu chỉnh sửa thành công.");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error Handle Flag", e);
+        }
+
         closeDetail();
     }
+
+    const STATUS_LABEL = {
+        verified: 'Đã duyệt',
+        pending: 'Chờ duyệt',
+        flagged: 'Cần chỉnh sửa',
+        missing: 'Thiếu dữ liệu',
+    };
 
     // Spite
     const formatStrokeId = (path) => {
         if (!path) return "—";
         return path.split("/").pop();
-    }
-
-    // Modal
-    const StrokeDetailModal = ({ item, noteDraft, onNoteChange, onApprove, onFlag, onClose }) => {
-        const hasFile = Boolean(item.svgRaw);
-        const hasFilePending = Boolean(item.pendingPublicId);
-        const check = validateSvgStructure(item.svgRaw);
-        const allValid = check.hasJamo && check.hasNumber && check.hasArrow;
-
-        return (
-            <div className="modal-overlay" onClick={onClose}>
-                <div className="modal-card wide" onClick={(e) => e.stopPropagation()}>
-                    <div className="modal-head">
-                        <div className="modal-head-glyph">{item.glyph}</div>
-                        <div>
-                            <h3>{item.glyph} · {item.romanization}</h3>
-                            <span className={`status-badge ${item.status}`}>{STATUS_LABEL[item.status]}</span>
-                        </div>
-                        <button className="close-btn" onClick={onClose}>
-                            <svg viewBox="0 0 24 24"><path d="M18 6L6 18" /><path d="M6 6l12 12" /></svg>
-                        </button>
-                    </div>
-
-                    <div className="detail-body">
-                        {/* ---- preview tĩnh ---- */}
-                        <div className="preview-col">
-                            {hasFile ? (
-                                <div className="svg-preview">
-                                    <img src={item?.sourceFile} alt={item?.glyph}/>
-                                </div>
-                            ) : (
-                                <div className="no-preview">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M12 9v4m0 4h.01" />
-                                        <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-                                    </svg>
-                                    Chưa có file SVG để xem trước
-                                </div>
-                            )}
-
-                            {hasFilePending && (
-                                <div style={{justifyItems: "center"}}>
-                                    <p>↓</p>
-                                    <div className="svg-preview">
-                                        <img src={item?.pendingUrl} alt={item?.glyph}/>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* ---- checklist + metadata ---- */}
-                        <div className="info-col">
-                            <div className="meta-row"><span>Số nét khai báo</span><strong>{item.declaredStrokes} nét</strong></div>
-                            <div className="meta-row"><span>File nguồn</span><strong className="mono">{formatStrokeId(item?.svgRaw)}</strong></div>
-                            <div className="meta-row"><span>Cập nhật lần cuối</span><strong>{item.updatedAt ?? '—'}</strong></div>
-
-                            <div className="checklist">
-                                <div className={`check-item ${check.hasJamo ? 'ok' : 'bad'}`}>
-                                    <CheckIcon ok={check.hasJamo} />
-                                    Có group <code>.jamo</code> (hình chữ)
-                                </div>
-                                <div className={`check-item ${check.hasNumber ? 'ok' : 'bad'}`}>
-                                    <CheckIcon ok={check.hasNumber} />
-                                    Có group <code>.stroke-number</code> (số thứ tự)
-                                </div>
-                                <div className={`check-item ${check.hasArrow ? 'ok' : 'bad'}`}>
-                                    <CheckIcon ok={check.hasArrow} />
-                                    Có <code>.order-arrow</code> (mũi tên hướng nét)
-                                </div>
-                            </div>
-
-                            <div className="field">
-                                <label>Ghi chú (bắt buộc nếu yêu cầu chỉnh sửa)</label>
-                                <textarea
-                                    rows={3}
-                                    value={noteDraft}
-                                    onChange={(e) => onNoteChange(e.target.value)}
-                                    placeholder="VD: Thiếu mũi tên hướng nét, cần bổ sung..."
-                                />
-                            </div>
-
-                            <div className="modal-actions">
-                                <button className="btn btn-danger-outline" onClick={onFlag}>Yêu cầu chỉnh sửa</button>
-                                <button className="btn btn-primary" onClick={onApprove} disabled={!allValid}>Duyệt dữ liệu</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
     }
 
     return (
@@ -270,16 +234,142 @@ export default function AdminStrokeData() {
                 {filtered.length === 0 && <div className="empty-state">Không tìm thấy ký tự phù hợp.</div>}
             </div>
 
-            {/* ---------------- MODAL CHI TIẾT / DUYỆT ---------------- */}
+            {/* ---------------- MODAL ---------------- */}
             {activeItem && (
-                <StrokeDetailModal
-                    item={activeItem}
-                    noteDraft={noteDraft}
-                    onNoteChange={setNoteDraft}
-                    onApprove={approve}
-                    onFlag={flag}
-                    onClose={closeDetail}
-                />
+                <div className="modal-overlay" onClick={closeDetail}>
+                    <div className="modal-card wide" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-head">
+                            <div className="modal-head-glyph">{selectedItem?.glyph}</div>
+
+                            <div>
+                                <h3>{selectedItem?.glyph} · {selectedItem?.romanization}</h3>
+                                <span className={`status-badge ${selectedItem?.status}`}>{STATUS_LABEL[selectedItem?.status]}</span>
+                            </div>
+
+                            <button className="close-btn" onClick={closeDetail}>
+                                <svg viewBox="0 0 24 24"><path d="M18 6L6 18" /><path d="M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+
+                        <div className="detail-body">
+                            <div className="preview-col">
+                                {selectedItem?.pendingUrl && (
+                                    <div style={{justifyItems: "center"}}>
+                                        <div className="svg-preview">
+                                            <p>Ảnh mới</p>
+                                            <img src={selectedItem?.pendingUrl} alt={selectedItem?.glyph}/>
+                                        </div>
+                                        <p>↓</p>
+                                    </div>
+                                )}
+
+                                {selectedItem?.sourceFile ? (
+                                    <div className="svg-preview">
+                                        {selectedItem?.pendingUrl && (<p>Ảnh cũ</p>)}
+                                        <img src={selectedItem?.sourceFile} alt={selectedItem?.glyph}/>
+                                    </div>
+                                ) : (
+                                    <div className="no-preview">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M12 9v4m0 4h.01" />
+                                            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                                        </svg>
+                                        Chưa có file SVG để xem trước
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* ---- checklist + metadata ---- */}
+                            <div className="info-col">
+                                <div className="meta-row"><span>Số nét khai báo</span><strong>{selectedItem?.declaredStrokes} nét</strong></div>
+                                <div className="meta-row"><span>File nguồn</span><strong className="mono">{formatStrokeId(selectedItem?.svgRaw)}</strong></div>
+                                <div className="meta-row"><span>Cập nhật lần cuối</span><strong>{selectedItem?.updatedAt ?? '—'}</strong></div>
+
+                                {selectedItem?.status === 'verified' && (
+                                    selectedItem?.options.map((option, index) => (
+                                        <div key={index} className={`check-row ${index === loadOptionStrokeData.length - 1 && `last`}`}>
+                                            <span className="check-item">{option?.content}</span>
+
+                                            <div className="radio-group">
+                                                <label className="radio-label">
+                                                    <input
+                                                        type="radio"
+                                                        value="true"
+                                                        name={option?.id}
+                                                        checked={option?.accepted === true}
+                                                        readOnly
+                                                    />
+                                                    Có
+                                                </label>
+
+                                                <label className="radio-label">
+                                                    <input
+                                                        type="radio"
+                                                        value="false"
+                                                        name={option?.id}
+                                                        checked={option?.accepted === false}
+                                                        readOnly
+                                                    />
+                                                    Không
+                                                </label>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+
+                                {selectedItem?.status !== 'verified' && loadOptionStrokeData.map((option, index) => (
+                                    <div key={index} className={`check-row ${index === loadOptionStrokeData.length - 1 && `last`}`}>
+                                        <span className="check-item">{option?.content}</span>
+
+                                        <div className="radio-group">
+                                            <label className="radio-label">
+                                                <input
+                                                    type="radio"
+                                                    value="true"
+                                                    name={option?.id}
+                                                    checked={currentSelected(option?.id) === true}
+                                                    onChange={() => handleCheckChange(option, true, selectedItem?.id)}
+                                                />
+                                                Có
+                                            </label>
+
+                                            <label className="radio-label">
+                                                <input
+                                                    type="radio"
+                                                    value="false"
+                                                    name={option?.id}
+                                                    checked={currentSelected(option?.id) === false}
+                                                    onChange={() => handleCheckChange(option, false, selectedItem?.id)}
+                                                />
+                                                Không
+                                            </label>
+                                        </div>
+                                    </div>
+                                ))}
+
+                                <div className="field">
+                                    <label>Ghi chú (bắt buộc nếu yêu cầu chỉnh sửa)</label>
+                                    <textarea
+                                        rows={3}
+                                        defaultValue={selectedItem?.note ?? ''}
+                                        disabled={selectedItem?.status === 'verified'}
+                                        onChange={(e) => setNoteDraft(e.target.value)}
+                                        placeholder="VD: Thiếu mũi tên hướng nét, cần bổ sung..."
+                                    />
+                                </div>
+
+                                <div className="modal-actions">
+                                    <button className="btn btn-danger-outline" onClick={flag}>Yêu cầu chỉnh sửa</button>
+                                    <button onClick={approve} disabled={selectedItem?.status === 'verified'} className={`btn btn-primary ${loadingHandleActive ? `gs-btn-loading` : ``}`}
+                                            style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+                                        <span className="gs-btn-spinner"></span>
+                                        <span className="gs-btn-label" style={{marginLeft: '5px'}}>Duyệt dữ liệu</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

@@ -16,7 +16,7 @@ const TYPE_OPTIONS = [
     {value: false, label: 'Đơn'},
 ];
 
-const EMPTY_FORM = { name: '', transcription: '', type: 'VOWEL', double: false, strokeCount: '', imgUrl: '', fileName: '' };
+const EMPTY_FORM = { name: '', transcription: '', type: 'VOWEL', double: false, strokeCount: '', imgUrl: '', fileName: '', note: '', status: '' };
 
 const AdminCharacter = () => {
     const {data: getAllChars} = useFetch(`${API_URL}/admin/all-char`);
@@ -29,9 +29,10 @@ const AdminCharacter = () => {
         transcription: char?.transcription,
         type: char?.type,
         fileName: char?.fileName,
-        status: char?.status,
+        status: char?.status?.toLowerCase(),
         pendingUrl: char?.pendingUrl,
         pendingPublicId: char?.pendingPublicId,
+        note: char?.note,
     });
     const charsRes = getAllChars.map(mapChars);
     const [chars, setChars] = useState([]);
@@ -188,6 +189,13 @@ const AdminCharacter = () => {
         return path.split("/").pop();
     }
 
+    const STATUS_LABEL = {
+        verified: 'Đã duyệt',
+        pending: 'Chờ duyệt',
+        flagged: 'Cần chỉnh sửa',
+        missing: 'Thiếu dữ liệu',
+    };
+
     return (
         <div className="admin-chars">
             <div className="page-head">
@@ -254,7 +262,6 @@ const AdminCharacter = () => {
                         <th>Ký tự</th>
                         <th>Cách đọc</th>
                         <th style={{whiteSpace: "nowrap"}}>Danh mục</th>
-                        <th style={{whiteSpace: "nowrap"}}>Số nét</th>
                         <th>Hình ảnh</th>
                         <th>Dữ liệu nét</th>
                         <th>Trạng thái</th>
@@ -269,22 +276,11 @@ const AdminCharacter = () => {
                             <td><div className="glyph-cell">{c.name}</div></td>
                             <td className="mono">|{c.transcription}|</td>
                             <td style={{whiteSpace: "nowrap"}}><span className={`category-badge ${c.type}`}>{categoryLabel(c.type)}</span></td>
-                            <td className="mono">{c.strokeCount > 0 ? `${c.strokeCount} nét` : ``}</td>
                             <td>
-                                {c?.imgUrl ? (
-                                    <div style={{display: "flex", alignItems: "center", gap: '10px'}}>
+                                <div style={{display: "flex", alignItems: "center", gap: '10px'}}>
+                                    {c?.imgUrl ? (
                                         <span className="stroke-badge has"><img src={c?.imgUrl} alt={c?.name}/></span>
-                                        {c?.status === 'PENDING' && (
-                                            <>
-                                                <p>&rarr;</p>
-                                                <span className="stroke-badge has">
-                                                    <img src={c?.pendingUrl} alt={c?.name}/>
-                                                </span>
-                                            </>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div style={{display: "flex", alignItems: "center", gap: '10px'}}>
+                                    ) : (
                                         <span className="stroke-badge missing">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                 <path d="M12 9v4m0 4h.01" />
@@ -292,21 +288,21 @@ const AdminCharacter = () => {
                                             </svg>
                                             Chưa có
                                         </span>
-                                        {c?.status === 'PENDING' && (
-                                            <>
-                                                <p>&rarr;</p>
-                                                <span className="stroke-badge has">
-                                                    <img src={c?.pendingUrl} alt={c?.name}/>
-                                                </span>
-                                            </>
-                                        )}
-                                    </div>
-                                )}
+                                    )}
+                                    {c?.status === 'pending' && (
+                                        <>
+                                            <p>&rarr;</p>
+                                            <span className="stroke-badge has">
+                                                <img src={c?.pendingUrl} alt={c?.name}/>
+                                            </span>
+                                        </>
+                                    )}
+                                </div>
                             </td>
                             <td>
                                 <div style={{display: "flex", alignItems: "center", gap: '10px'}}>
                                     <span className="stroke-badge has">{formatStrokeId(c?.fileName)}</span>
-                                    {c?.status === 'PENDING' && (
+                                    {c?.status === 'pending' && (
                                         <>
                                             <p>&rarr;</p>
                                             <span className="stroke-badge has">
@@ -316,7 +312,7 @@ const AdminCharacter = () => {
                                     )}
                                 </div>
                             </td>
-                            <td><span className="stroke-badge">{c?.status}</span></td>
+                            <td><span className="stroke-badge">{STATUS_LABEL[c?.status]}</span></td>
                             <td className="mono">{c.double ? `Đôi` : `Đơn`}</td>
                             <td>
                                 <div className="row-actions">
@@ -405,6 +401,17 @@ const AdminCharacter = () => {
                                     />
                                 </div>
                             </div>
+
+                            {form?.status === 'flagged' && (
+                                <div className="field">
+                                    <label>Lý do</label>
+                                    <textarea
+                                        rows={3}
+                                        defaultValue={form?.note ?? ''}
+                                        disabled
+                                    />
+                                </div>
+                            )}
 
                             <div className="field">
                                 <label>File dữ liệu nét (SVG)</label>
