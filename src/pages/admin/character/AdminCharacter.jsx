@@ -159,12 +159,13 @@ const AdminCharacter = () => {
     // Handle Stat
     const vowelsLength = charsRes.filter(char => char.type === "VOWEL").length;
     const consonantsLength = charsRes.filter(char => char.type === "CONSONANT").length;
+    const totalLoss = charsRes.filter(char => !char.imgUrl).length;
     // Stat Row
     const statRows = [
         {name: "Tổng số ký tự", amount: charsRes.length, icon: "chars", tone: "tone-a"},
         {name: "Nguyên âm", amount: vowelsLength, icon: "vowels", tone: "tone-b"},
         {name: "Phụ âm", amount: consonantsLength, icon: "consonants", tone: "tone-c"},
-        // {name: "Thiếu dữ liệu nét", amount: "", icon: "cate", tone: "tone-d"},
+        {name: "Thiếu dữ liệu nét", amount: totalLoss, icon: "notFound", tone: "tone-d"},
     ];
     const iconStatRows = {
         chars: (
@@ -179,7 +180,10 @@ const AdminCharacter = () => {
             </svg>
         ),
         notFound: (
-            <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" /></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 9v4m0 4h.01" />
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
         )
     };
 

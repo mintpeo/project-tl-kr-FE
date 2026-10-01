@@ -4,20 +4,6 @@ import useFetch from "../../../components/use/useFetch.js";
 import {API_URL} from "../../../components/API_URL.jsx";
 import {usePost} from "../../../components/use/usePost.js";
 
-// Kiểm tra cấu trúc file bằng cách tìm class name trong chuỗi SVG thô —
-// đơn giản nhưng đủ dùng để phát hiện file thiếu thành phần trước khi duyệt.
-function validateSvgStructure(svgRaw) {
-    if (!svgRaw) return { hasJamo: false, hasNumber: false, hasArrow: false };
-    return {
-        hasJamo: svgRaw.includes('class="jamo"'),
-        hasNumber: svgRaw.includes('class="stroke-number"'),
-        hasArrow: svgRaw.includes('class="order-arrow"'),
-    };
-}
-
-/* ============================================================
-   COMPONENT
-   ============================================================ */
 export default function AdminStrokeData() {
     const {data: getAllStroke} = useFetch(`${API_URL}/admin/all-stroke`);
     const mapStroke = (s) => ({
@@ -104,7 +90,10 @@ export default function AdminStrokeData() {
 
     const {executePost: handleActive, loading: loadingHandleActive} = usePost(`${API_URL}/admin/upload-active`);
     const approve = async () => {
-        if (strokeOptionData.length <= 0) return;
+        if (strokeOptionData.length <= 0) {
+            alert("Không để trống các mục Có/Không.");
+            return;
+        }
 
         const req = {
             charId: selectedItem?.charId
@@ -372,17 +361,5 @@ export default function AdminStrokeData() {
                 </div>
             )}
         </div>
-    );
-}
-
-/* ============================================================
-   MODAL: xem SVG tĩnh + checklist cấu trúc file
-   ============================================================ */
-
-function CheckIcon({ ok }) {
-    return ok ? (
-        <svg viewBox="0 0 24 24" className="ic ok"><path d="M20 6L9 17l-5-5" /></svg>
-    ) : (
-        <svg viewBox="0 0 24 24" className="ic bad"><path d="M18 6L6 18" /><path d="M6 6l12 12" /></svg>
     );
 }
