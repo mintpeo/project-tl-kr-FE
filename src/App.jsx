@@ -23,6 +23,8 @@ import AdminLesson from "./pages/admin/lesson/AdminLesson.jsx";
 import AdminCharacter from "./pages/admin/character/AdminCharacter.jsx";
 import AdminExercise from "./pages/admin/exercise/AdminExercise.jsx";
 import AdminSample from "./pages/admin/sample/AdminSample.jsx";
+import AdminActivity from "./pages/admin/activity/AdminActivity.jsx";
+import AdminStrokeData from "./pages/admin/stroke/AdminStrokeData.jsx";
 
 // Not Logged
 import HomeNotLogged from "./pages/notLoggedPages/Home.jsx";
@@ -72,6 +74,8 @@ function App() {
                       <Route path="/admin/character" element={<AdminCharacter />}/>
                       <Route path="/admin/sample" element={<AdminSample />}/>
                       <Route path="/admin/exercise" element={<AdminExercise />}/>
+                      <Route path="/admin/activity" element={<AdminActivity />}/>
+                      <Route path="/admin/stroke" element={<AdminStrokeData />}/>
                   </Route>
               </Route>
 

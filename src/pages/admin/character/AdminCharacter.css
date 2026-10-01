@@ -5,6 +5,11 @@
         letter-spacing: -0.01em;
     }
 
+    .stat-row {
+        display: grid;
+        grid-template-columns:repeat(4, 1fr);
+    }
+
     .table-card {
         overflow: auto;
 
@@ -54,9 +59,18 @@
             border-radius: 20px;
         }
 
+        .stroke-badge svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2.4;
+            flex-shrink: 0;
+        }
+
         .stroke-badge img {
-            width: 100px;
-            height: 100px;
+            width: 50px;
+            height: 50px;
             stroke: currentColor;
             fill: none;
             stroke-width: 2.4;
@@ -132,8 +146,13 @@
             .field-row {
                 display: flex;
                 gap: 12px;
+            }
 
-                .modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }
+            .modal-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+                margin-top: 20px;
             }
 
             .field {

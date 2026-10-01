@@ -395,6 +395,7 @@ const Progress = () => {
                             <div className={`mastery-tile tone-${masteryTone(m?.score)}`} key={index}>
                                 <div className="g">{m?.nameChar}</div>
                                 <div className="p">{m?.score > 0 ? `${m?.score}%` : '—'}</div>
+                                <div className="p">{m?.totalAttempts > 0 ? `${m?.totalAttempts} lần` : '—'}</div>
                             </div>
                         ))}
                     </div>

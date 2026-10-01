@@ -92,7 +92,7 @@ const AdminExercise = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [form, setForm] = useState(EMPTY_FORM);
-    console.log(form);
+    // console.log(form);
 
     const openAddModal = () => {
         setEditingId(null);

@@ -269,7 +269,7 @@ const Practice = () => {
                         {
                             selectedChar >= 0 && (
                                 <div className={`char-guide ${checked ? '' : 'hide-stroke-order'}`}>
-                                    <img className="hide-stroke-order" src={buildCloudinaryUrl(charList[selectedChar]?.imageVersion, charList[selectedChar]?.strokeSvgUrl)} alt={charList[selectedChar]?.name}/>
+                                    <img className="hide-stroke-order" src={charList[selectedChar]?.imgUrl} alt={charList[selectedChar]?.name}/>
                                 </div>
                             )
                         }

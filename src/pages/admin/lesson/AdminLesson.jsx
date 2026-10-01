@@ -22,10 +22,14 @@ const AdminLesson = () => {
         youtubeId: lesson?.youtubeId,
         duration: lesson?.duration,
         cateName: lesson?.cateRoute?.name || 'Chưa phân loại',
-        cateId: lesson?.cateRoute?.id || 0
+        cateId: lesson?.cateRoute?.id || 0,
+        quizId: lesson?.quiz?.id,
     });
     const lessonsRoadRes = lessonsRoad.map(mapLessonRoad);
     const [lessonsRoadListRes, setLessonsRoadListRes] = useState([]);
+
+    // Handle Quiz
+    const {data: loadQuizzes} = useFetch(`${API_URL}/admin/get-quizzes`);
 
     // Create Array ao
     const [reorderList, setReorderList] = useState([]);
@@ -128,16 +132,17 @@ const AdminLesson = () => {
     const [isEditVideoLink, setIsEditVideoLink] = useState(true);
     // Open Modal Edit
     const openEditModal = (lesson)  => {
-        setEditingId(lesson.id);
+        setEditingId(lesson?.id);
         setForm({
-            id: lesson.id,
-            name: lesson.name,
-            cateRouteId: lesson.cateId,
-            orderIndex: lesson.orderIndex,
-            active: lesson.active,
-            duration: lesson.duration,
-            description: lesson.des,
-            youtubeId: lesson.youtubeId
+            id: lesson?.id,
+            name: lesson?.name,
+            cateRouteId: lesson?.cateId,
+            orderIndex: lesson?.orderIndex,
+            active: lesson?.active,
+            duration: lesson?.duration,
+            description: lesson?.des,
+            youtubeId: lesson?.youtubeId,
+            quizId: lesson?.quizId
         });
         setModalOpen(true);
     };
@@ -165,7 +170,8 @@ const AdminLesson = () => {
             isActive: form.active,
             duration: form.duration,
             description: form.description,
-            youtubeId: form.youtubeId
+            youtubeId: form.youtubeId,
+            quizId: form.quizId
         }
 
         try {
@@ -261,6 +267,7 @@ const AdminLesson = () => {
         if (!text || text.length <= maxLength) return text;
         return text.slice(0, maxLength) + '...';
     };
+    console.log(form);
 
     return (
         <div className="admin-lessons">
@@ -441,6 +448,19 @@ const AdminLesson = () => {
                                         onChange={(e) => handleFieldChange("cateRouteId", e.target.value)}
                                     >
                                         {cateList.map((c) => (
+                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="field">
+                                    <label>Bộ câu hỏi</label>
+                                    <select
+                                        value={form?.quizId || ""}
+                                        onChange={(e) => handleFieldChange("quizId", Number(e.target.value))}
+                                    >
+                                        <option value="">Chưa có bộ câu hỏi</option>
+                                        {loadQuizzes.map((c) => (
                                             <option key={c.id} value={c.id}>{c.name}</option>
                                         ))}
                                     </select>
