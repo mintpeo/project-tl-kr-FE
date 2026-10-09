@@ -82,12 +82,6 @@ export default function AdminStrokeData() {
         setStrokeOptionData([]);
     }
 
-    const setStatus = (id, status, reason) => {
-        setItems((prev) =>
-            prev.map((it) => (it.id === id ? { ...it, status, flagReason: reason ?? it.flagReason, updatedAt: 'Vừa xong' } : it))
-        );
-    }
-
     const {executePost: handleActive, loading: loadingHandleActive} = usePost(`${API_URL}/admin/upload-active`);
     const approve = async () => {
         if (strokeOptionData.length <= 0) {

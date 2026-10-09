@@ -13,8 +13,12 @@ import {
 } from "react-icons/ri";
 import { TbAlphabetKorean } from "react-icons/tb";
 import {useNavigate} from "react-router-dom";
+import {LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
 
 const Sidebar = () => {
+    const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
+    const user = JSON.parse(user_info);
+
     const navigate = useNavigate();
     const [selectedPage, setSelectedPage] = useState(0);
 
@@ -77,10 +81,10 @@ const Sidebar = () => {
 
             <div className="sidebar-foot">
                 <div style={{display: 'flex', gap: '10px'}}>
-                    <div className="avatar">TT</div>
+                    <div className="avatar">{user?.email?.charAt(0)}</div>
 
                     <div>
-                        <div className="name">Nguyễn</div>
+                        <div className="name">{user?.email}</div>
                         <div className="role">Quản trị viên</div>
                     </div>
                 </div>

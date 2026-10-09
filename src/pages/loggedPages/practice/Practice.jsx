@@ -21,15 +21,13 @@ const Practice = () => {
     const [predict, setPredict] = useState();
     const [feedBack, setFeedBack] = useState([]);
     const [scoreFB, setScoreFB] = useState(0);
+    const [grade, setGrade] = useState('');
+    const [mess, setMess] = useState('');
     const [scoreDisable, setScoreDisable] = useState(false);
 
     useEffect(() => {
         setCharList(vowels);
     }, [characters]);
-
-    const buildCloudinaryUrl = (version, fileName) => {
-        return `https://res.cloudinary.com/dqzuuzi8z/image/upload/v${version}/${fileName}.svg`;
-    };
 
     const cateList = [
         { name: 'Nguyên âm' },
@@ -72,14 +70,16 @@ const Practice = () => {
         link.click();
     }
 
-    const [charLabel, setCharLabel] = useState('');
-    // Submit Canvas
+    // Submit Canvas, Save Practice
     const {executePost: handlePredict} = usePost(`${API_URL}/predict/data-url`);
+    const {executePost: handleSavePractice} = usePost(`${API_URL}/practice/save`);
     const submitCanvas = async () => {
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        if (!canvas || selectedChar < 0) {
+            alert("Vui lòng chọn kí tự trước khi luyện viết!");
+            return;
+        }
 
-        // Tao canvas tam de to nen trang (giong logic cu)
         const tempCanvas = document.createElement("canvas");
         tempCanvas.width = canvas.width;
         tempCanvas.height = canvas.height;
@@ -91,46 +91,51 @@ const Practice = () => {
         const dataUrl = tempCanvas.toDataURL("image/png");
 
         try {
-            const data = await handlePredict({dataUrl});
-            console.log("Ket qua du doan:", data);
+            const data = await handlePredict({ dataUrl });
+            if (!data || !data.prediction) {
+                alert("Không nhận được phản hồi từ AI, vui lòng thử lại!");
+                return;
+            }
 
-            const char = charList.find(item => item.transcription === data?.prediction.label);
-            setCharLabel(char?.name);
+            setPredict(data.prediction);
 
-            setPredict(data?.prediction);
-            // setFeedBack(data?.assessment?.feedback);
-            // setScoreFB(data?.assessment?.score);
+            const predictLabel = data.prediction.label;
+            const selectLabel = charList[selectedChar];
+
+            // predictLabel !== charList[selectChar]
+            if (predictLabel !== selectLabel?.transcription) {
+                setGrade("Chưa khớp ký tự");
+                setMess(`Bạn đang chọn chữ '${selectLabel?.name || selectLabel?.transcription}', nhưng AI thấy nét vẽ giống chữ '${data.prediction.char}' hơn.`);
+                setFeedBack(["Hãy quan sát kỹ nét mẫu và thử viết lại."]);
+                setScoreFB(0);
+                setScoreDisable(true); // Vẫn mở bảng để hiện góp ý
+                return;
+            }
+
+            // predictLabel === charList[selectChar]
+            const simScore = data.evaluation?.similarity_score ?? 0;
+            setFeedBack(data.evaluation?.suggestions || []);
+            setGrade(data.evaluation?.grade || "Đạt");
+            setMess(data.evaluation?.message || "");
+            setScoreFB(simScore);
             setScoreDisable(true);
+
+            // Save Practice
+            const char = charList.find(item => item.transcription === predictLabel);
+            if (char && user?.userId) {
+                await handleSavePractice({
+                    userId: user.userId,
+                    predictedLabel: char.name,
+                    confidence: data.prediction.confidence,
+                    characterId: char.id,
+                    score: simScore
+                });
+            }
         } catch (e) {
             console.error("Error Predict AI:", e);
+            alert("Có lỗi xảy ra trong quá trình chấm điểm!");
         }
     };
-
-    // Save Practice
-    const {executePost: handleSavePractice} = usePost(`${API_URL}/practice/save`);
-    useEffect(() => {
-        if (!scoreDisable) return;
-
-        const savePractice = async () => {
-            const char = charList.find(item => item.transcription === predict?.label);
-
-            const req = {
-                userId: user.userId,
-                predictedLabel: char?.name,
-                confidence: predict?.confidence,
-                characterId: char?.id,
-                score: scoreFB
-            }
-
-            try {
-                await handleSavePractice(req);
-            } catch (e) {
-                console.log("Error Save Practice", e);
-            }
-        }
-
-        savePractice();
-    }, [predict]);
 
     // Tinh toa do theo do phan giai
     const getCoordinates = (e, canvas) => {
@@ -301,7 +306,7 @@ const Practice = () => {
                         <div className="scoreResult" style={{display: `${scoreDisable ? `block` : `none`}`}}>
                             <div style={{textAlign: "center", whiteSpace: "nowrap", marginBottom: '20px'}}>
                                 <div className="score-label">
-                                    Nhận diện là kí tự: <strong>{predict?.char}</strong> - Với độ chính xác: <strong>{predict?.confidence}%</strong>
+                                    Nhận diện là kí tự: <strong>{predict?.char}</strong> - Với độ chính xác: <strong>{(predict?.confidence * 100).toFixed(1)}%</strong>
                                 </div>
                             </div>
 
@@ -312,9 +317,11 @@ const Practice = () => {
                             </div>
 
                             <ul className="fb-list" id="fbList">
+                                <li>{grade}</li>
+                                <li>{mess}</li>
                                 {
                                     feedBack.map((fb, index) => (
-                                        <li key={index}>{fb.text}</li>
+                                        <li key={index}>{fb}</li>
                                     ))
                                 }
                             </ul>
