@@ -7,11 +7,9 @@ import './App.css';
 import Layout from "./utils/Layout.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Home from "./pages/loggedPages/home/Home.jsx";
-import Lesson from "./pages/loggedPages/lesson/Lesson.jsx";
 import Practice from "./pages/loggedPages/practice/Practice.jsx";
 import Progress from "./pages/loggedPages/progress/Progress.jsx";
 import AuthWrapper from "./components/AuthWrapper.jsx";
-import VideoLearningPage from "./pages/loggedPages/lesson/videoLearn/VideoLearningPage.jsx";
 import Stroke from "./pages/loggedPages/stroke/Stroke.jsx";
 import Combine from "./pages/loggedPages/combine/Combine.jsx";
 import LessonRoad from "./pages/loggedPages/lessonRoad/LessonRoad.jsx";
@@ -54,12 +52,10 @@ function App() {
                   <Route element={<AuthWrapper />}>
                       <Route element={<Layout />}>
                           <Route path="/home" element={<Home />} />
-                          <Route path="/lessons/:categoryId" element={<Lesson />} />
                           <Route path="/practice" element={<Practice />} />
                           <Route path="/progress" element={<Progress />} />
                           <Route path="/profile" element={<Profile />} />
                           <Route path="/setting" element={<Setting />} />
-                          <Route path="/video/:lessonId" element={<VideoLearningPage />} />
                           <Route path="/strokes" element={<Stroke />} />
                           <Route path="/combine" element={<Combine />} />
                           <Route path="/road" element={<LessonRoad />} />

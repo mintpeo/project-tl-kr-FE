@@ -17,7 +17,7 @@ const ICONS = {
     flame: <path d="M12 2s6 5.5 6 10.5a6 6 0 01-12 0C6 7.5 12 2 12 2z" />,
     lock: <><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /><path d="M8 11V7a4 4 0 118 0v4" /></>,
 };
-function Icon({ name }) {
+const Icon = ({ name }) => {
     return (
         <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8">
             {ICONS[name]}
@@ -36,7 +36,23 @@ const Progress = () => {
         handleLessonProgress();
         handleUserStreak();
         handleTotalPractice();
+        loadDataUserPracticeRes();
     }, []);
+
+    // Get User Practice
+    const {executePost: loadUserPractice, loading: loadingUserPractice} = usePost(`${API_URL}/progress/get-user-practice`);
+    const [userPractice, setUserPractice] = useState([]);
+    const loadDataUserPracticeRes = async () => {
+        const req = {
+            userId: user.userId
+        }
+        try {
+            const data = await loadUserPractice(req);
+            setUserPractice(data);
+        } catch (e) {
+            console.log("Error User Level", e);
+        }
+    }
 
     // Handle User Level
     // Set User Level
@@ -181,7 +197,7 @@ const Progress = () => {
     const STATS = [
         { icon: 'check', tone: 'a', num: `${progress?.averageScore}%`, label: 'Độ chính xác trung bình' },
         { icon: 'pen', tone: 'b', num: `${progress?.countPractices}`, label: 'Lượt luyện viết' },
-        { icon: 'book', tone: 'c', num: `${progress?.countIsPass}/24`, label: 'Ký tự đã thành thạo' },
+        { icon: 'book', tone: 'c', num: `${progress?.countIsPass}/${mastery.length}`, label: 'Ký tự đã thành thạo' },
         { icon: 'flame', tone: 'd', num: `${streak} ngày`, label: 'Chuỗi học liên tiếp' },
     ];
 
@@ -267,47 +283,77 @@ const Progress = () => {
                 ))}
             </div>
 
-            <div className="level-card">
-                {loadingUserLevel && (<Skeleton />)}
-                {!loadingUserLevel && (
-                    <>
-                        <div className="level-header">
-                            <div className="level-badge">
-                                <span className="badge-icon">🌿</span>
-                                <span className="badge-title">{userLevelRes?.userLevel}</span>
-                            </div>
-                            <span className="level-tag">Level {userLevel?.levelNumber}</span>
-                        </div>
-
-                        <div className="level-stats">
-                            <div className="stat-item">
-                                <span className="stat-label">Độ chính xác</span>
-                                <span className="stat-val">{`${userLevelRes?.accuracyRate}%`}</span>
+            <div className="l-cards" style={{display: "flex", gap: "24px"}}>
+                <div className="level-card">
+                    {loadingUserPractice && (<Skeleton />)}
+                    {!loadingUserPractice && (
+                        <>
+                            <div className="level-header">
+                                <div className="level-badge">
+                                    <span className="badge-icon">✏️</span>
+                                    <span className="badge-title">Tổng quan luyện viết với AI</span>
+                                </div>
+                                <span className="level-tag">Ngày {userPractice?.today}</span>
                             </div>
 
-                            <div className="stat-divider"></div>
-                            <div className="stat-item">
-                                <span className="stat-label">Số câu đúng</span>
-                                <span className="stat-val">{userLevelRes?.totalScore}<small>/{userLevelRes?.totalQuestions}</small></span>
-                            </div>
-                        </div>
+                            <div className="level-stats">
+                                <div className="stat-item">
+                                    <span className="stat-label">Điểm trung bình</span>
+                                    <span className="stat-val">{`${userPractice?.totalScore}%`}</span>
+                                </div>
 
-                        <div className="progress-section">
-                            <div className="progress-label">
-                                <span>{userLevelRes?.nextLevelTitle}</span>
-                                {userLevelRes?.remainingQuestions === 0 ? (
-                                    <span>Cần cải thiện độ chính xác</span>
-                                ) : (
-                                    <span>{userLevelRes?.remainingQuestions} câu nữa</span>
-                                )}
+                                <div className="stat-divider"></div>
+                                <div className="stat-item">
+                                    <span className="stat-label">Số lần luyện</span>
+                                    <span className="stat-val">{userPractice?.totalPractice}</span>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
+
+                <div className="level-card">
+                    {loadingUserLevel && (<Skeleton />)}
+                    {!loadingUserLevel && (
+                        <>
+                            <div className="level-header">
+                                <div className="level-badge">
+                                    <span className="badge-icon">🌿</span>
+                                    <span className="badge-title">{userLevelRes?.userLevel}</span>
+                                </div>
+                                <span className="level-tag">Level {userLevel?.levelNumber}</span>
                             </div>
 
-                            <div className="progress-bar">
-                                <div className="progress-fill" style={{width: `${userLevelRes?.progressPercent}%`}}></div>
+                            <div className="level-stats">
+                                <div className="stat-item">
+                                    <span className="stat-label">Độ chính xác</span>
+                                    <span className="stat-val">{`${userLevelRes?.accuracyRate}%`}</span>
+                                </div>
+
+                                <div className="stat-divider"></div>
+                                <div className="stat-item">
+                                    <span className="stat-label">Số câu đúng</span>
+                                    <span className="stat-val">{userLevelRes?.totalScore}<small>/{userLevelRes?.totalQuestions}</small></span>
+                                </div>
                             </div>
-                        </div>
-                    </>
-                )}
+
+                            <div className="progress-section">
+                                <div className="progress-label">
+                                    <span>{userLevelRes?.nextLevelTitle}</span>
+                                    {userLevelRes?.remainingQuestions === 0 ? (
+                                        <span>Cần cải thiện độ chính xác</span>
+                                    ) : (
+                                        <span>{userLevelRes?.remainingQuestions} câu nữa</span>
+                                    )}
+                                </div>
+
+                                <div className="progress-bar">
+                                    <div className="progress-fill" style={{width: `${userLevelRes?.progressPercent}%`}}></div>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
 
             {/* ---------------- CHART + HEATMAP ---------------- */}
@@ -411,24 +457,24 @@ const Progress = () => {
             </div>
 
             {/* ---------------- ACHIEVEMENTS ---------------- */}
-            <div className="card achieve-card">
-                <div className="panel-head no-margin">
-                    <div>
-                        <h3>Thành tích</h3>
-                        <p>Những cột mốc bạn đã đạt được trên hành trình học tiếng Hàn</p>
-                    </div>
-                </div>
+            {/*<div className="card achieve-card">*/}
+            {/*    <div className="panel-head no-margin">*/}
+            {/*        <div>*/}
+            {/*            <h3>Thành tích</h3>*/}
+            {/*            <p>Những cột mốc bạn đã đạt được trên hành trình học tiếng Hàn</p>*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
 
-                <div className="achieve-grid">
-                    {ACHIEVEMENTS.map((a) => (
-                        <div className={`achieve-item${a.locked ? ' locked' : ''}`} key={a.title}>
-                            <div className={`achieve-icon tone-${a.tone}`}><Icon name={a.icon}/></div>
-                            <h5>{a.title}</h5>
-                            <p>{a.desc}</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
+            {/*    <div className="achieve-grid">*/}
+            {/*        {ACHIEVEMENTS.map((a) => (*/}
+            {/*            <div className={`achieve-item${a.locked ? ' locked' : ''}`} key={a.title}>*/}
+            {/*                <div className={`achieve-icon tone-${a.tone}`}><Icon name={a.icon}/></div>*/}
+            {/*                <h5>{a.title}</h5>*/}
+            {/*                <p>{a.desc}</p>*/}
+            {/*            </div>*/}
+            {/*        ))}*/}
+            {/*    </div>*/}
+            {/*</div>*/}
         </div>
     );
 }

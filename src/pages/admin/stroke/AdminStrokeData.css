@@ -15,7 +15,7 @@
     }
 
     .stat-row {
-        grid-template-columns:repeat(4, 1fr);
+        /*grid-template-columns:repeat(4, 1fr);*/
     }
 
     .char-grid {
@@ -327,6 +327,7 @@
 
                 .modal-actions {
                     display: flex;
+                    justify-content: flex-end;
                     gap: 10px;
                     margin-top: auto;
                 }

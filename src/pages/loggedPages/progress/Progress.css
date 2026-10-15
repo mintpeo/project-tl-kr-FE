@@ -8,6 +8,10 @@
         letter-spacing: -0.01em;
     }
 
+    h3 {
+        margin-top: 0;
+    }
+
     .page-head {
         display: flex;
         margin-bottom: 22px;
@@ -102,7 +106,7 @@
 
     .level-card {
         width: 100%;
-        max-width: 360px;
+        height: 100%;
         background-color: var(--paper-card);
         border: 1px solid var(--paper-dim);
         border-radius: var(--radius);
@@ -657,6 +661,7 @@
             .panel {
                 padding: 20px;
                 max-width: 100%;
+                overflow: hidden;
 
                 .bars {
                     height: 140px;
@@ -712,20 +717,23 @@
 
 @media (max-width: 768px) {
     #progress-page {
+
         .page-head {
             margin-bottom: 16px;
 
             h1 {
                 font-size: 21px;
+                line-height: 1.35;
             }
 
             p {
                 font-size: 13px;
+                line-height: 1.5;
             }
         }
 
         .stat-row {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin-bottom: 18px;
             white-space: normal;
@@ -745,7 +753,7 @@
                 }
 
                 .stat-num {
-                    font-size: 20px;
+                    font-size: 19px;
                 }
 
                 .stat-label {
@@ -754,10 +762,16 @@
             }
         }
 
+        .l-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
         .level-card {
             max-width: 100%;
             padding: 16px;
-            margin-bottom: 18px;
+            margin-bottom: 0;
 
             .level-header {
                 margin-bottom: 14px;
@@ -778,9 +792,20 @@
                 margin-bottom: 14px;
 
                 .stat-item {
+                    min-width: 0;
+
+                    .stat-label {
+                        font-size: 11px;
+                        text-align: center;
+                    }
+
                     .stat-val {
                         font-size: 16px;
                     }
+                }
+
+                .stat-divider {
+                    height: 24px;
                 }
             }
         }
@@ -789,10 +814,11 @@
             grid-template-columns: 1fr;
             gap: 16px;
             margin-bottom: 18px;
+            margin-top: 18px;
 
             .panel {
-                padding: 16px;
                 width: 100%;
+                padding: 16px;
                 overflow: hidden;
 
                 .panel-head {
@@ -800,6 +826,14 @@
                     gap: 10px;
                     align-items: flex-start;
                     margin-bottom: 14px;
+
+                    h3 {
+                        font-size: 15px;
+                    }
+
+                    p {
+                        font-size: 11px;
+                    }
 
                     .range-toggle {
                         width: 100%;
@@ -809,16 +843,20 @@
                             flex: 1;
                             padding: 6px 0;
                             text-align: center;
+                            font-size: 11px;
                         }
                     }
                 }
 
                 .bars {
+                    width: 100%;
                     overflow-x: auto;
                     height: 130px;
                     gap: 6px;
 
                     .bar-col {
+                        min-width: 30px;
+
                         .bar-val,
                         .bar-day {
                             font-size: 9px;
@@ -854,6 +892,14 @@
                     font-size: 15px;
                     margin-bottom: 10px;
                 }
+
+                h4 {
+                    font-size: 13px;
+                }
+
+                .cat-sub {
+                    font-size: 11px;
+                }
             }
         }
 
@@ -880,7 +926,7 @@
             .mastery-legend {
                 gap: 10px 14px;
                 margin-top: 14px;
-                font-size: 10.5px;
+                font-size: 11px;
             }
         }
 
@@ -917,6 +963,344 @@
 
                     p {
                         font-size: 10px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    #progress-page {
+
+        .page-head {
+            margin-bottom: 14px;
+
+            h1 {
+                font-size: 19px;
+            }
+
+            p {
+                font-size: 12px;
+            }
+
+            .eyebrow {
+                font-size: 10px;
+            }
+        }
+
+        .stat-row {
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
+
+            .stat-card {
+                padding: 12px 14px;
+                gap: 10px;
+
+                .stat-icon {
+                    width: 34px;
+                    height: 34px;
+                    border-radius: 9px;
+
+                    svg {
+                        width: 15px;
+                        height: 15px;
+                    }
+                }
+
+                .stat-num {
+                    font-size: 18px;
+                }
+
+                .stat-label {
+                    font-size: 10px;
+                }
+            }
+        }
+
+        .level-card {
+            padding: 14px;
+
+            .level-header {
+                gap: 8px;
+                flex-wrap: wrap;
+                margin-bottom: 12px;
+
+                .level-badge {
+                    font-size: 12px;
+                    padding: 5px 9px;
+                }
+
+                .level-tag {
+                    font-size: 11px;
+                    padding: 3px 7px;
+                }
+            }
+
+            .level-stats {
+                padding: 9px 4px;
+                margin-bottom: 12px;
+
+                .stat-item {
+                    .stat-label {
+                        font-size: 10px;
+                    }
+
+                    .stat-val {
+                        font-size: 15px;
+
+                        small {
+                            font-size: 10px;
+                        }
+                    }
+                }
+
+                .stat-divider {
+                    height: 22px;
+                }
+            }
+
+            .progress-section {
+                gap: 6px;
+
+                .progress-label {
+                    font-size: 11px;
+                }
+
+                .progress-bar {
+                    height: 7px;
+                }
+            }
+        }
+
+        .row-2col {
+            gap: 12px;
+            margin-top: 14px;
+            margin-bottom: 14px;
+
+            .panel {
+                padding: 14px;
+
+                .panel-head {
+                    margin-bottom: 12px;
+
+                    h3 {
+                        font-size: 10px;
+                    }
+
+                    p {
+                        font-size: 8px;
+                    }
+                }
+
+                .bars {
+                    height: 115px;
+                    gap: 5px;
+
+                    .bar-col {
+                        min-width: 26px;
+
+                        .bar-val,
+                        .bar-day {
+                            font-size: 8px;
+                        }
+                    }
+                }
+
+                .heatmap-grid {
+                    grid-template-columns: repeat(7, 1fr);
+                    gap: 3px;
+                }
+
+                .heatmap-foot {
+                    font-size: 10px;
+                }
+            }
+        }
+
+        .category-row {
+            gap: 10px;
+            margin-bottom: 14px;
+
+            .cat-card {
+                padding: 14px;
+
+                .cat-glyph {
+                    width: 32px;
+                    height: 32px;
+                    font-size: 14px;
+                    margin-bottom: 8px;
+                }
+
+                h4 {
+                    font-size: 12px;
+                }
+
+                .cat-sub {
+                    font-size: 10px;
+                }
+
+                .cat-progress-num {
+                    font-size: 11px;
+                }
+
+                .cat-track {
+                    height: 6px;
+                }
+            }
+        }
+
+        .mastery-card {
+            padding: 14px;
+            margin-bottom: 14px;
+
+            .mastery-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 6px;
+                margin-top: 10px;
+
+                .mastery-tile {
+                    border-radius: 8px;
+
+                    .g {
+                        font-size: 14px;
+                    }
+
+                    .p {
+                        font-size: 7px;
+                    }
+                }
+            }
+
+            .mastery-legend {
+                gap: 8px 10px;
+                margin-top: 12px;
+                font-size: 10px;
+
+                .dot {
+                    width: 8px;
+                    height: 8px;
+                }
+            }
+        }
+
+        .achieve-card {
+            padding: 14px;
+
+            .achieve-grid {
+                gap: 8px;
+                margin-top: 10px;
+
+                .achieve-item {
+                    gap: 10px;
+                    padding: 10px;
+
+                    .achieve-icon {
+                        width: 36px;
+                        height: 36px;
+                        border-radius: 10px;
+
+                        svg {
+                            width: 16px;
+                            height: 16px;
+                        }
+                    }
+
+                    h5 {
+                        font-size: 11px;
+                    }
+
+                    p {
+                        font-size: 9px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 360px) {
+    #progress-page {
+
+        .page-head {
+            h1 {
+                font-size: 18px;
+            }
+
+            p {
+                font-size: 11px;
+            }
+        }
+
+        .stat-row {
+            .stat-card {
+                padding: 11px 12px;
+
+                .stat-icon {
+                    width: 32px;
+                    height: 32px;
+                }
+
+                .stat-num {
+                    font-size: 17px;
+                }
+            }
+        }
+
+        .level-card {
+            padding: 12px;
+
+            .level-header {
+                .level-badge {
+                    font-size: 11px;
+                }
+
+                .level-tag {
+                    font-size: 10px;
+                }
+            }
+
+            .level-stats {
+                .stat-item {
+                    .stat-label {
+                        font-size: 9px;
+                    }
+
+                    .stat-val {
+                        font-size: 14px;
+                    }
+                }
+            }
+        }
+
+        .row-2col {
+            .panel {
+                padding: 12px;
+
+                .bars {
+                    height: 105px;
+                }
+
+                .heatmap-grid {
+                    gap: 2px;
+                }
+            }
+        }
+
+        .mastery-card {
+            padding: 12px;
+
+            .mastery-grid {
+                gap: 5px;
+
+                .mastery-tile {
+                    .g {
+                        font-size: 13px;
+                    }
+
+                    .p {
+                        font-size: 6px;
                     }
                 }
             }

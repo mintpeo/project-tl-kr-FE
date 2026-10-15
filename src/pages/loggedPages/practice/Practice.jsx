@@ -257,17 +257,17 @@ const Practice = () => {
                             </p>
                         </div>
 
-                        <div className="char-switch">
-                            <p style={{ margin: 0, fontSize: '12px', color: 'var(--ink-soft)' }}>Hiện thứ tự nét</p>
+                        {/*<div className="char-switch">*/}
+                        {/*    <p style={{ margin: 0, fontSize: '12px', color: 'var(--ink-soft)' }}>Hiện thứ tự nét</p>*/}
 
-                            <button
-                                type="button"
-                                className={`toggle-btn ${checked ? 'active' : ''}`}
-                                onClick={toggle}
-                            >
-                                <span className="toggle-thumb" />
-                            </button>
-                        </div>
+                        {/*    <button*/}
+                        {/*        type="button"*/}
+                        {/*        className={`toggle-btn ${checked ? 'active' : ''}`}*/}
+                        {/*        onClick={toggle}*/}
+                        {/*    >*/}
+                        {/*        <span className="toggle-thumb" />*/}
+                        {/*    </button>*/}
+                        {/*</div>*/}
                     </div>
 
                     <div className="canvas-wrap">

@@ -14,6 +14,7 @@ import {
 import { TbAlphabetKorean } from "react-icons/tb";
 import {useNavigate} from "react-router-dom";
 import {LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
+import {IoMenu} from "react-icons/io5";
 
 const Sidebar = () => {
     const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
@@ -21,6 +22,7 @@ const Sidebar = () => {
 
     const navigate = useNavigate();
     const [selectedPage, setSelectedPage] = useState(0);
+    const [isMenuContent, setIsMenuContent] = useState(false);
 
     const dataPages = [
         {name: "Tài khoản", navi: "/", icon: "RiUser3Line"},

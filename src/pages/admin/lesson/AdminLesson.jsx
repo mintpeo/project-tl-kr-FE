@@ -277,10 +277,16 @@ const AdminLesson = () => {
                     <h1>Quản lý bài học</h1>
                     <p>Thêm, chỉnh sửa và xuất bản các bài học video theo từng danh mục.</p>
                 </div>
-                <button className="btn btn-primary" onClick={openAddModal}>
-                    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
-                    Thêm bài học
-                </button>
+                <div>
+                    {/*<button className="btn btn-ghost" style={{marginRight: '10px'}}>*/}
+                    {/*    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>*/}
+                    {/*    Thêm danh mục*/}
+                    {/*</button>*/}
+                    <button className="btn btn-primary" onClick={openAddModal}>
+                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
+                        Thêm bài học
+                    </button>
+                </div>
             </div>
 
             <div className="stat-row">

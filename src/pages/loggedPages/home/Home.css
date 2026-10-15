@@ -1,6 +1,6 @@
 .home-grid {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr;
+    display: flex;
+    /*grid-template-columns: 1.4fr 1fr;*/
     gap: 18px;
     margin-bottom: 20px;
 
@@ -53,7 +53,7 @@
 }
 
 .streak-card {
-    max-height: 15vh;
+    height: 100%;
 
     .streak-row {
         display: flex;
@@ -153,13 +153,14 @@
 
 @media (max-width: 1024px) {
     .streak-card {
-        max-height: 15vh;
+        height: 100%;
     }
 }
 
 @media (max-width: 768px) {
     .home-grid {
-        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
         gap: 14px;
         margin-bottom: 16px;
 
