@@ -461,6 +461,502 @@
     }
 }
 
-@media (max-width: 900px){
-    .char-grid{ grid-template-columns:repeat(3,1fr); }
+@media (max-width: 1200px) {
+    #admin-samples {
+        .modal-overlay {
+            padding: 20px;
+
+            .modal-card {
+                max-width: 440px;
+                max-height: 90vh;
+                padding: 24px;
+
+                &.wide {
+                    max-width: 540px;
+                }
+
+                .modal-head {
+                    gap: 12px;
+                    margin-bottom: 18px;
+
+                    .modal-head-glyph {
+                        width: 46px;
+                        height: 46px;
+                        font-size: 21px;
+                    }
+
+                    h3 {
+                        font-size: 15px;
+                    }
+
+                    .close-btn {
+                        width: 29px;
+                        height: 29px;
+                    }
+                }
+
+                .sample-grid {
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 10px;
+
+                    .sample-tile {
+                        padding: 9px;
+
+                        .sample-thumb {
+                            img {
+                                transform: scale(4);
+                            }
+
+                            span {
+                                font-size: 26px;
+                            }
+                        }
+
+                        .sample-info {
+                            p {
+                                font-size: 11px;
+                            }
+
+                            span {
+                                font-size: 9px;
+                            }
+                        }
+                    }
+
+                    .add-tile {
+                        min-height: 105px;
+                    }
+                }
+
+                .empty-hint {
+                    font-size: 11px;
+                    padding: 9px 11px;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 1024px) {
+    #admin-samples {
+        .modal-overlay {
+            padding: 18px;
+
+            .modal-card {
+                width: 100%;
+                max-width: 500px;
+                max-height: 88vh;
+                padding: 22px;
+
+                &.wide {
+                    max-width: 560px;
+                }
+
+                .modal-head {
+                    gap: 11px;
+                    margin-bottom: 17px;
+
+                    .modal-head-glyph {
+                        width: 44px;
+                        height: 44px;
+                        border-radius: 11px;
+                        font-size: 20px;
+                    }
+
+                    h3 {
+                        font-size: 15px;
+                        padding-right: 35px;
+                    }
+
+                    .close-btn {
+                        width: 29px;
+                        height: 29px;
+                    }
+                }
+
+                .sample-grid {
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 10px;
+
+                    .sample-tile {
+                        padding: 8px;
+                        border-radius: 10px;
+
+                        .sample-thumb {
+                            margin-bottom: 7px;
+
+                            img {
+                                transform: scale(3.5);
+                            }
+
+                            span {
+                                font-size: 25px;
+                            }
+                        }
+
+                        .sample-info {
+                            p {
+                                font-size: 11px;
+                            }
+
+                            span {
+                                font-size: 9px;
+                            }
+                        }
+
+                        .sample-remove {
+                            top: 5px;
+                            right: 5px;
+                            width: 19px;
+                            height: 19px;
+                        }
+                    }
+
+                    .add-tile {
+                        min-height: 100px;
+
+                        svg {
+                            width: 19px;
+                            height: 19px;
+                        }
+
+                        span {
+                            font-size: 10px;
+                        }
+                    }
+                }
+
+                .empty-hint {
+                    margin-top: 14px;
+                    font-size: 11px;
+                    padding: 9px 11px;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    #admin-samples {
+        .modal-overlay {
+            padding: 14px;
+
+            .modal-card {
+                width: 100%;
+                max-width: 500px;
+                max-height: 90vh;
+                padding: 20px;
+                border-radius: 14px;
+
+                &.wide {
+                    max-width: 500px;
+                }
+
+                .modal-head {
+                    gap: 10px;
+                    margin-bottom: 16px;
+
+                    .modal-head-glyph {
+                        width: 42px;
+                        height: 42px;
+                        border-radius: 10px;
+                        font-size: 19px;
+                    }
+
+                    h3 {
+                        font-size: 15px;
+                        margin-bottom: 4px;
+                        padding-right: 32px;
+                    }
+
+                    .close-btn {
+                        width: 28px;
+                        height: 28px;
+                        border-radius: 7px;
+
+                        svg {
+                            width: 13px;
+                            height: 13px;
+                        }
+                    }
+                }
+
+                .sample-grid {
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 9px;
+
+                    .sample-tile {
+                        padding: 8px;
+                        border-radius: 10px;
+
+                        .sample-thumb {
+                            border-radius: 8px;
+
+                            img {
+                                transform: scale(3);
+                            }
+
+                            span {
+                                font-size: 24px;
+                            }
+                        }
+
+                        .sample-info {
+                            p {
+                                font-size: 10px;
+                            }
+
+                            span {
+                                font-size: 9px;
+                            }
+                        }
+
+                        .sample-remove {
+                            width: 18px;
+                            height: 18px;
+                            top: 5px;
+                            right: 5px;
+
+                            svg {
+                                width: 9px;
+                                height: 9px;
+                            }
+                        }
+                    }
+
+                    .add-tile {
+                        min-height: 90px;
+
+                        svg {
+                            width: 18px;
+                            height: 18px;
+                        }
+
+                        span {
+                            font-size: 10px;
+                        }
+                    }
+                }
+
+                .empty-hint {
+                    margin-top: 13px;
+                    font-size: 11px;
+                    padding: 9px 10px;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    #admin-samples {
+        .char-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+
+        .modal-overlay {
+            padding: 10px;
+            align-items: center;
+
+            .modal-card {
+                width: 100%;
+                max-width: none;
+                max-height: 92vh;
+                padding: 16px;
+                border-radius: 13px;
+
+                &.wide {
+                    max-width: none;
+                }
+
+                .modal-head {
+                    gap: 9px;
+                    margin-bottom: 14px;
+
+                    .modal-head-glyph {
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 9px;
+                        font-size: 18px;
+                    }
+
+                    h3 {
+                        font-size: 14px;
+                        margin-bottom: 3px;
+                        padding-right: 30px;
+                    }
+
+                    .close-btn {
+                        width: 27px;
+                        height: 27px;
+                        border-radius: 7px;
+
+                        svg {
+                            width: 12px;
+                            height: 12px;
+                        }
+                    }
+                }
+
+                .sample-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 8px;
+
+                    .sample-tile {
+                        padding: 7px;
+                        border-radius: 9px;
+
+                        .sample-thumb {
+                            margin-bottom: 6px;
+                            border-radius: 7px;
+
+                            img {
+                                transform: scale(2.5);
+                            }
+
+                            span {
+                                font-size: 22px;
+                            }
+                        }
+
+                        .sample-info {
+                            p {
+                                font-size: 10px;
+                            }
+
+                            span {
+                                font-size: 8px;
+                            }
+                        }
+
+                        .sample-remove {
+                            width: 18px;
+                            height: 18px;
+                            top: 4px;
+                            right: 4px;
+
+                            svg {
+                                width: 9px;
+                                height: 9px;
+                            }
+                        }
+                    }
+
+                    .add-tile {
+                        min-height: 85px;
+
+                        svg {
+                            width: 18px;
+                            height: 18px;
+                        }
+
+                        span {
+                            font-size: 10px;
+                            text-align: center;
+                        }
+                    }
+                }
+
+                .empty-hint {
+                    margin-top: 12px;
+                    font-size: 10px;
+                    padding: 8px 10px;
+                    line-height: 1.45;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 375px) {
+    #admin-samples {
+        .modal-overlay {
+            padding: 7px;
+
+            .modal-card {
+                max-height: 94vh;
+                padding: 14px;
+                border-radius: 12px;
+
+                .modal-head {
+                    margin-bottom: 12px;
+
+                    .modal-head-glyph {
+                        width: 37px;
+                        height: 37px;
+                        font-size: 17px;
+                    }
+
+                    h3 {
+                        font-size: 13px;
+                        padding-right: 28px;
+                    }
+
+                    .close-btn {
+                        width: 25px;
+                        height: 25px;
+
+                        svg {
+                            width: 11px;
+                            height: 11px;
+                        }
+                    }
+                }
+
+                .sample-grid {
+                    gap: 7px;
+
+                    .sample-tile {
+                        padding: 6px;
+
+                        .sample-thumb {
+                            img {
+                                transform: scale(2.2);
+                            }
+
+                            span {
+                                font-size: 20px;
+                            }
+                        }
+
+                        .sample-info {
+                            p {
+                                font-size: 9px;
+                            }
+
+                            span {
+                                font-size: 8px;
+                            }
+                        }
+
+                        .sample-remove {
+                            width: 17px;
+                            height: 17px;
+                            top: 3px;
+                            right: 3px;
+                        }
+                    }
+
+                    .add-tile {
+                        min-height: 78px;
+
+                        svg {
+                            width: 16px;
+                            height: 16px;
+                        }
+
+                        span {
+                            font-size: 9px;
+                        }
+                    }
+                }
+
+                .empty-hint {
+                    margin-top: 10px;
+                    font-size: 9px;
+                    padding: 7px 8px;
+                }
+            }
+        }
+    }
 }

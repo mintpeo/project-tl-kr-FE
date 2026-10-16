@@ -340,7 +340,527 @@
     }
 }
 
-@media (max-width: 640px){
-    .detail-body{ grid-template-columns:1fr; }
-    .char-grid{ grid-template-columns:repeat(3,1fr); }
+/* =========================
+   MODAL - LAPTOP
+   ========================= */
+@media (max-width: 1200px) {
+    .modal-overlay {
+        padding: 20px;
+
+        .modal-card {
+            max-width: 450px;
+            max-height: 90vh;
+            padding: 24px;
+
+            &.wide {
+                max-width: 620px;
+            }
+
+            .modal-head {
+                gap: 12px;
+                margin-bottom: 18px;
+
+                .modal-head-glyph {
+                    width: 46px;
+                    height: 46px;
+                    font-size: 21px;
+                }
+
+                h3 {
+                    font-size: 15px;
+                }
+
+                .close-btn {
+                    width: 29px;
+                    height: 29px;
+                }
+            }
+
+            .detail-body {
+                grid-template-columns: 180px 1fr;
+                gap: 18px;
+
+                .svg-preview,
+                .no-preview {
+                    padding: 16px;
+                }
+
+                .info-col {
+                    .meta-row {
+                        font-size: 12px;
+                    }
+
+                    .check-row {
+                        .check-item {
+                            font-size: 11px;
+                        }
+
+                        .radio-group {
+                            gap: 12px;
+
+                            .radio-label {
+                                font-size: 12px;
+                            }
+                        }
+                    }
+
+                    .field {
+                        label {
+                            font-size: 11px;
+                        }
+
+                        textarea {
+                            font-size: 12px;
+                        }
+                    }
+
+                    .modal-actions {
+                        gap: 8px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 1024px) {
+    .modal-overlay {
+        padding: 18px;
+
+        .modal-card {
+            width: 100%;
+            max-width: 500px;
+            max-height: 88vh;
+            padding: 22px;
+
+            &.wide {
+                max-width: 600px;
+            }
+
+            .modal-head {
+                gap: 11px;
+                margin-bottom: 17px;
+
+                .modal-head-glyph {
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 11px;
+                    font-size: 20px;
+                }
+
+                h3 {
+                    font-size: 15px;
+                    padding-right: 35px;
+                }
+
+                .close-btn {
+                    width: 29px;
+                    height: 29px;
+
+                    svg {
+                        width: 13px;
+                        height: 13px;
+                    }
+                }
+            }
+
+            .detail-body {
+                grid-template-columns: 170px 1fr;
+                gap: 18px;
+
+                .svg-preview,
+                .no-preview {
+                    padding: 14px;
+                    border-radius: 11px;
+                }
+
+                .no-preview {
+                    font-size: 11px;
+
+                    svg {
+                        width: 22px;
+                        height: 22px;
+                    }
+                }
+
+                .info-col {
+                    .meta-row {
+                        font-size: 12px;
+                        padding: 7px 0;
+                    }
+
+                    .check-row {
+                        padding: 7px 0;
+
+                        .check-item {
+                            gap: 6px;
+                            font-size: 11px;
+                            padding: 7px 8px;
+                        }
+
+                        .radio-group {
+                            gap: 12px;
+
+                            .radio-label {
+                                gap: 5px;
+                                font-size: 12px;
+                            }
+                        }
+                    }
+
+                    .field {
+                        margin-bottom: 12px;
+
+                        label {
+                            font-size: 11px;
+                            margin-bottom: 5px;
+                        }
+
+                        textarea {
+                            padding: 8px 10px;
+                            font-size: 12px;
+                        }
+                    }
+
+                    .modal-actions {
+                        gap: 8px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-overlay {
+        padding: 14px;
+
+        .modal-card {
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            padding: 20px;
+            border-radius: 14px;
+
+            &.wide {
+                max-width: 520px;
+            }
+
+            .modal-head {
+                gap: 10px;
+                margin-bottom: 16px;
+
+                .modal-head-glyph {
+                    width: 42px;
+                    height: 42px;
+                    border-radius: 10px;
+                    font-size: 19px;
+                }
+
+                h3 {
+                    font-size: 15px;
+                    margin-bottom: 4px;
+                    padding-right: 32px;
+                }
+
+                .close-btn {
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 7px;
+
+                    svg {
+                        width: 13px;
+                        height: 13px;
+                    }
+                }
+            }
+
+            .detail-body {
+                grid-template-columns: 150px 1fr;
+                gap: 16px;
+
+                .svg-preview,
+                .no-preview {
+                    padding: 12px;
+                    border-radius: 10px;
+                }
+
+                .no-preview {
+                    font-size: 10px;
+
+                    svg {
+                        width: 21px;
+                        height: 21px;
+                    }
+                }
+
+                .info-col {
+                    .meta-row {
+                        font-size: 11px;
+                        padding: 7px 0;
+                    }
+
+                    .check-row {
+                        padding: 6px 0;
+
+                        .check-item {
+                            font-size: 10px;
+                            padding: 6px 7px;
+                        }
+
+                        .radio-group {
+                            gap: 10px;
+
+                            .radio-label {
+                                font-size: 11px;
+                            }
+                        }
+                    }
+
+                    .field {
+                        margin-bottom: 11px;
+
+                        label {
+                            font-size: 10px;
+                            margin-bottom: 5px;
+                        }
+
+                        textarea {
+                            padding: 8px 10px;
+                            font-size: 11px;
+                            border-radius: 8px;
+                        }
+                    }
+
+                    .modal-actions {
+                        gap: 7px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .char-grid {
+        grid-template-columns:  repeat(2, 1fr) !important;
+    }
+
+    .modal-overlay {
+        padding: 10px;
+        align-items: center;
+
+        .modal-card {
+            width: 100%;
+            max-width: none;
+            max-height: 92vh;
+            padding: 16px;
+            border-radius: 13px;
+
+            &.wide {
+                max-width: none;
+            }
+
+            .modal-head {
+                gap: 9px;
+                margin-bottom: 14px;
+
+                .modal-head-glyph {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 9px;
+                    font-size: 18px;
+                }
+
+                h3 {
+                    font-size: 14px;
+                    margin-bottom: 3px;
+                    padding-right: 30px;
+                }
+
+                .close-btn {
+                    width: 27px;
+                    height: 27px;
+                    border-radius: 7px;
+
+                    svg {
+                        width: 12px;
+                        height: 12px;
+                    }
+                }
+            }
+
+            .detail-body {
+                grid-template-columns: 1fr;
+                gap: 14px;
+
+                .svg-preview,
+                .no-preview {
+                    width: 100%;
+                    max-width: 190px;
+                    margin: 0 auto;
+                    padding: 14px;
+                    border-radius: 10px;
+                }
+
+                .no-preview {
+                    font-size: 10px;
+
+                    svg {
+                        width: 22px;
+                        height: 22px;
+                    }
+                }
+
+                .info-col {
+                    width: 100%;
+
+                    .meta-row {
+                        font-size: 11px;
+                        padding: 7px 0;
+                    }
+
+                    .check-row {
+                        flex-direction: column;
+                        align-items: stretch;
+                        gap: 7px;
+                        padding: 7px 0;
+
+                        .check-item {
+                            width: 100%;
+                            font-size: 10px;
+                            padding: 7px 8px;
+                        }
+
+                        .radio-group {
+                            justify-content: space-between;
+                            gap: 8px;
+
+                            .radio-label {
+                                font-size: 11px;
+                            }
+                        }
+                    }
+
+                    .field {
+                        margin-bottom: 10px;
+
+                        label {
+                            font-size: 10px;
+                            margin-bottom: 5px;
+                        }
+
+                        textarea {
+                            width: 100%;
+                            padding: 8px 10px;
+                            font-size: 11px;
+                            border-radius: 8px;
+                        }
+                    }
+
+                    .modal-actions {
+                        flex-direction: column;
+                        gap: 8px;
+                        margin-top: 12px;
+
+                        .btn,
+                        button {
+                            width: 100%;
+                            justify-content: center;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 375px) {
+    .modal-overlay {
+        padding: 7px;
+
+        .modal-card {
+            max-height: 94vh;
+            padding: 14px;
+            border-radius: 12px;
+
+            .modal-head {
+                margin-bottom: 12px;
+
+                .modal-head-glyph {
+                    width: 37px;
+                    height: 37px;
+                    font-size: 17px;
+                }
+
+                h3 {
+                    font-size: 13px;
+                    padding-right: 28px;
+                }
+
+                .close-btn {
+                    width: 25px;
+                    height: 25px;
+
+                    svg {
+                        width: 11px;
+                        height: 11px;
+                    }
+                }
+            }
+
+            .detail-body {
+                gap: 12px;
+
+                .svg-preview,
+                .no-preview {
+                    max-width: 170px;
+                    padding: 12px;
+                }
+
+                .info-col {
+                    .meta-row {
+                        font-size: 10px;
+                        padding: 6px 0;
+                    }
+
+                    .check-row {
+                        gap: 6px;
+                        padding: 6px 0;
+
+                        .check-item {
+                            font-size: 9px;
+                            padding: 6px 7px;
+                        }
+
+                        .radio-group {
+                            gap: 6px;
+
+                            .radio-label {
+                                font-size: 10px;
+                            }
+                        }
+                    }
+
+                    .field {
+                        margin-bottom: 9px;
+
+                        label {
+                            font-size: 9px;
+                        }
+
+                        textarea {
+                            padding: 7px 8px;
+                            font-size: 10px;
+                        }
+                    }
+
+                    .modal-actions {
+                        gap: 7px;
+                        margin-top: 10px;
+                    }
+                }
+            }
+        }
+    }
 }

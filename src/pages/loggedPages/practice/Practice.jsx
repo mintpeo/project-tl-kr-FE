@@ -24,6 +24,12 @@ const Practice = () => {
     const [grade, setGrade] = useState('');
     const [mess, setMess] = useState('');
     const [scoreDisable, setScoreDisable] = useState(false);
+    const [matchedTemplate, setMatchedTemplate] = useState('');
+    const historyRef = useRef([]);
+    const MAX_UNDO = 30;
+    const [undoCount, setUndoCount] = useState(0);
+    const canvasRef = useRef(null);
+    const isDrawing = useRef(false);
 
     useEffect(() => {
         setCharList(vowels);
@@ -35,40 +41,17 @@ const Practice = () => {
         // { name: 'Âm ghép' }
     ];
 
-    const canvasRef = useRef(null);
-    const isDrawing = useRef(false);
-
     const clearCanvas = () => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
         const ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        historyRef.current = [];
+        setUndoCount(0);
         setScoreDisable(false);
+        setMatchedTemplate('');
     };
-
-    const savePNG = () => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        const tempCanvas = document.createElement("canvas");
-        tempCanvas.width = canvas.width;
-        tempCanvas.height = canvas.height;
-
-        const tempCtx = tempCanvas.getContext("2d");
-        tempCtx.fillStyle = "#FFFFFF";
-        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-        tempCtx.drawImage(canvas, 0, 0);
-
-        // Lấy dữ liệu ảnh Base64 (Nền trắng, nét đen)
-        const image = tempCanvas.toDataURL("image/png");
-
-        // Tải ảnh về máy để test với Python model
-        const link = document.createElement("a");
-        link.href = image;
-        link.download = "jamo-test.png";
-        link.click();
-    }
 
     // Submit Canvas, Save Practice
     const {executePost: handlePredict} = usePost(`${API_URL}/predict/data-url`);
@@ -92,12 +75,14 @@ const Practice = () => {
 
         try {
             const data = await handlePredict({ dataUrl });
+            console.log(data);
             if (!data || !data.prediction) {
                 alert("Không nhận được phản hồi từ AI, vui lòng thử lại!");
                 return;
             }
 
             setPredict(data.prediction);
+            setScoreDisable(true);
 
             const predictLabel = data.prediction.label;
             const selectLabel = charList[selectedChar];
@@ -108,17 +93,19 @@ const Practice = () => {
                 setMess(`Bạn đang chọn chữ '${selectLabel?.name || selectLabel?.transcription}', nhưng AI thấy nét vẽ giống chữ '${data.prediction.char}' hơn.`);
                 setFeedBack(["Hãy quan sát kỹ nét mẫu và thử viết lại."]);
                 setScoreFB(0);
-                setScoreDisable(true); // Vẫn mở bảng để hiện góp ý
+                setMatchedTemplate('');
+                // setScoreDisable(true);
                 return;
             }
 
             // predictLabel === charList[selectChar]
-            const simScore = data.evaluation?.similarity_score ?? 0;
-            setFeedBack(data.evaluation?.suggestions || []);
-            setGrade(data.evaluation?.grade || "Đạt");
-            setMess(data.evaluation?.message || "");
+            const simScore = data?.evaluation?.similarity_score ?? 0;
+            setFeedBack(data?.evaluation?.suggestions || []);
+            setGrade(data?.evaluation?.grade || "Đạt");
+            setMess(data?.evaluation?.message || "");
             setScoreFB(simScore);
-            setScoreDisable(true);
+            setMatchedTemplate(data?.matched_template?.img_url);
+            // setScoreDisable(true);
 
             // Save Practice
             const char = charList.find(item => item.transcription === predictLabel);
@@ -160,12 +147,41 @@ const Practice = () => {
         if (!canvas) return;
 
         const ctx = canvas.getContext("2d");
+
+        historyRef.current.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+        if (historyRef.current.length > MAX_UNDO) historyRef.current.shift();
+        setUndoCount(historyRef.current.length);
+
         isDrawing.current = true;
 
         const { x, y } = getCoordinates(e, canvas);
         ctx.beginPath();
         ctx.moveTo(x, y);
     };
+
+    const undoStroke = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const prev = historyRef.current.pop();
+        if (!prev) return;
+
+        canvas.getContext("2d").putImageData(prev, 0, 0);
+        setUndoCount(historyRef.current.length);
+        setScoreDisable(false);
+        setMatchedTemplate('');
+    };
+
+    useEffect(() => {
+        const onKey = (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+                e.preventDefault();
+                undoStroke();
+            }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, []);
 
     const draw = (e) => {
         if (!isDrawing.current) return;
@@ -251,7 +267,7 @@ const Practice = () => {
                 <div className="card canvas-card">
                     <div className="canvas-top-row">
                         <div className="selected-char-content">
-                            <p>Chữ đang luyện:</p>
+                            <p style={{fontSize: '14px'}}>Chữ đang luyện:</p>
                             <p className={`${selectedChar >= 0 ? `selected-char` : ``}`}>
                                 {selectedChar >= 0 ? charList[selectedChar]?.name : 'Chưa chọn'}
                             </p>
@@ -293,6 +309,7 @@ const Practice = () => {
                     <div className="canvas-actions">
                         <button className="btn btn-ghost" onClick={clearCanvas}>Xóa</button>
                         {/*<button className="btn btn-ghost" onClick={savePNG}>Save PNG</button>*/}
+                        <button className="btn btn-ghost" onClick={undoStroke} disabled={undoCount === 0}>Hoàn tác</button>
                         <button className="btn btn-primary" onClick={submitCanvas}>Gửi để AI chấm điểm</button>
                     </div>
                 </div>
@@ -327,6 +344,22 @@ const Practice = () => {
                             </ul>
                         </div>
                     </div>
+
+                    {matchedTemplate && (
+                        <div className="card sw-box">
+                            <span className="sw-title">Chữ mẫu</span>
+
+                            <div className="sw-frame">
+                                <div className="sw-grid" aria-hidden="true" />
+                                <div
+                                    className="sw-glyph"
+                                    role="img"
+                                    aria-label="Chữ mẫu"
+                                    style={{ backgroundImage: `url("${matchedTemplate}")` }}
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

@@ -26,7 +26,6 @@ const Sidebar = () => {
     const location = useLocation();
 
     const [isMenuContent, setIsMenuContent] = useState(false);
-
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const {executePost: getInfoUser} = usePost(`${API_URL}/user/me`);
 

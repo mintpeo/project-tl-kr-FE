@@ -336,8 +336,8 @@ const AdminActivity = () => {
                     <tr>
                         <th>STT</th>
                         <th>Người dùng</th>
-                        <th>Lượt luyện viết</th>
-                        <th>Độ chính xác TB</th>
+                        {/*<th>Lượt luyện viết</th>*/}
+                        <th>Mức độ tương đồng TB</th>
                         <th>Streak</th>
                         {/*<th>Hoạt động gần nhất</th>*/}
                         <th>Trạng thái</th>
@@ -358,14 +358,14 @@ const AdminActivity = () => {
                                     </div>
                                 </div>
                             </td>
-                            <td className="mono">{u?.practices}</td>
+                            {/*<td className="mono">{u?.practices}</td>*/}
                             <td>
                                 <span className={`score-chip tone-${scoreTone(u?.avgScore)}`}>{u?.avgScore}%</span>
                             </td>
                             <td className="mono" style={{whiteSpace: "nowrap"}}>{u?.streak > 0 ? `${u?.streak} ngày` : '—'}</td>
                             {/*<td className="muted">{u.lastActive}</td>*/}
                             <td>
-                                <span className={`status-badge ${u?.status}`}>
+                                <span className={`status-badge ${u?.status}`} style={{whiteSpace: "nowrap"}}>
                                     {u?.status ? 'Đã kích hoạt' : 'Chưa kích hoạt'}
                                 </span>
                             </td>

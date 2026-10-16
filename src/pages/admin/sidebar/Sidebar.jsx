@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import './Sidebar.css';
+// import './Sidebar.css';
 
 // import Icons
 import {
@@ -23,6 +23,7 @@ const Sidebar = () => {
     const navigate = useNavigate();
     const [selectedPage, setSelectedPage] = useState(0);
     const [isMenuContent, setIsMenuContent] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const dataPages = [
         {name: "Tài khoản", navi: "/", icon: "RiUser3Line"},
@@ -49,52 +50,68 @@ const Sidebar = () => {
     };
 
     return (
-        <div className="sidebar">
-            <div className="brand">
-                <div className="brand-mark">글</div>
+        <div id="sidebar">
+            <button
+                className="btn btn-ghost mobile-toggle-btn"
+                onClick={() => setIsMenuContent(prev => !prev)}
+            >
+                <IoMenu />
+            </button>
 
-                <div>
-                    <div className="brand-name">글씨</div>
-                    <div className="brand-sub">Bảng quản trị</div>
-                </div>
-            </div>
+            {isMenuContent && (
+                <div
+                    className="sidebar-backdrop"
+                    onClick={() => setIsMenuContent(false)}
+                />
+            )}
 
-            <div>
-                <div className="nav-group-label">Quản lý</div>
+            <div className={`menu-content ${isMenuContent ? 'open' : ''}`}>
+                <div className="header-sidebar">
+                    <div className="brand-sidebar">
+                        <div className="brand-mark">글</div>
 
-                <div className="nav">
-                    {
-                        dataPages.map((item, index) => {
+                        <div>
+                            <div className="brand-name">글씨</div>
+                            <div className="brand-sub">Bảng quản trị</div>
+                        </div>
+                    </div>
+
+                    <div className="nav">
+                        {dataPages.map((item, index) => {
                             const IconComponent = ICON_MAP[item.icon];
 
                             return (
-                                <button key={index} className={`nav-item ${selectedPage === index ? `active` : ``}`} onClick={() => {
-                                    setSelectedPage(index);
-                                    changeNavi(item.navi);
-                                }}>
+                                <button key={index}
+                                        className={`nav-item ${selectedPage === index ? `active` : ``}`}
+                                        onClick={() => {
+                                            changeNavi(`/${item.navi}`);
+                                            setSelectedPage(index);
+                                        }}>
                                     {IconComponent && <IconComponent size={24} />}
                                     {item.name}
                                 </button>
-                            )
-                        })
-                    }
-                </div>
-            </div>
-
-            <div className="sidebar-foot">
-                <div style={{display: 'flex', gap: '10px'}}>
-                    <div className="avatar">{user?.email?.charAt(0)}</div>
-
-                    <div>
-                        <div className="name">{user?.email}</div>
-                        <div className="role">Quản trị viên</div>
+                            );
+                        })}
                     </div>
                 </div>
 
-                <div className="logout" onClick={() => {
-                    localStorage.clear();
-                    window.location.reload();
-                }}><RiLogoutCircleRLine /></div>
+                <div className="sidebar-foot-wrapper">
+                    <div className="sidebar-foot-logged" style={{justifyContent: 'space-between'}}>
+                        <div style={{display: 'flex', gap: '10px'}}>
+                            <div className="avatar">{user?.email?.charAt(0)}</div>
+
+                            <div>
+                                <div className="name">{user?.email}</div>
+                                <div className="role">Quản trị viên</div>
+                            </div>
+                        </div>
+
+                        <div className="logout" onClick={() => {
+                            localStorage.clear();
+                            window.location.reload();
+                        }}><RiLogoutCircleRLine /></div>
+                    </div>
+                </div>
             </div>
         </div>
     );
