@@ -36,7 +36,8 @@ const LessonRoute = () => {
         des: item?.des,
         learnContent: item?.learnContent,
         quizId: item?.quizId,
-        totalQuestions: item?.totalQuestions
+        totalQuestions: item?.totalQuestions,
+        desFinish: item?.desFinish,
     }));
 
     // Handle Lesson Content
@@ -157,9 +158,13 @@ const LessonRoute = () => {
     }, [selectedCateId]);
 
     // Click sub category
-    const selectedClickAgain = (id) => {
+    const selectedClickAgain = (id, conditionLearned, conditionIsPrevLearned) => {
+        if (!conditionLearned && !conditionIsPrevLearned) {
+            alert("Chưa mở do bài học trước chưa hoàn thành.");
+            return;
+        }
         if (id === selectedCateId) setSelectedCateId(-1);
-        else setSelectedCateId(id)
+        else setSelectedCateId(id);
     }
 
     // Scroll to Element
@@ -188,7 +193,7 @@ const LessonRoute = () => {
                             <div key={item.id}
                                  className={`module ${selectedCateId === item.id ? `expanded active` : ``}`}
                             >
-                                <div className="module-head" onClick={() => selectedClickAgain(item.id)}>
+                                <div className="module-head" onClick={() => selectedClickAgain(item.id, item.learned, isPrevLearned)}>
                                     {item.learned ? (
                                         <div className="module-status done">
                                             <svg viewBox="0 0 24 24">
@@ -199,13 +204,14 @@ const LessonRoute = () => {
                                         <div className="module-status current"></div>
                                     ) : (
                                         <div className="module-status locked">
-                                            <svg viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>
                                                 <path d="M8 11V7a4 4 0 118 0v4"/>
                                             </svg>
                                         </div>
                                     )}
                                     <div className="module-title">
-                                        <p>{item.name}</p>
+                                        <p>Phần {index + 1} - {item.name}</p>
                                         <span>{item.lessonsSize} video · {item.des}</span>
                                     </div>
                                 </div>
@@ -214,7 +220,7 @@ const LessonRoute = () => {
                                     {loadingLessonCate && (<Skeleton />)}
 
                                     {lessons.sort((a, b) => a.orderIndex - b.orderIndex)
-                                        .map((lesson) => (
+                                        .map((lesson, index) => (
                                             <>
                                                 <div className={`sub-item ${selectedLessonRoute === lesson.orderIndex ? `active` : ``}`}
                                                      onClick={() => setSelectedLessonRoute(lesson.orderIndex)}
@@ -224,34 +230,49 @@ const LessonRoute = () => {
                                                             <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
                                                         </div>
                                                     ) : (
-                                                        <svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                                                        <svg viewBox="0 0 24 24">
+                                                            <path d="M23 7l-7 5 7 5V7z"/>
+                                                            <rect x="1" y="5" width="15" height="14" rx="2"/>
+                                                        </svg>
                                                     )}
-                                                    {lesson.name}
+                                                    Bài học {index + 1}: {lesson.name}
                                                 </div>
 
                                                 {lesson.learnContent && (
-                                                    <div className={`sub-item ${selectedLessonRoute === lesson.orderIndex ? `active` : ``}`}
+                                                    <div className={`sub-item sub-item-child ${selectedLessonRoute === lesson.orderIndex ? `active` : ``}`}
                                                          onClick={() => {
                                                              scrollToElement("lesson-content");
                                                              setSelectedLessonRoute(lesson.orderIndex)
                                                          }}>
-                                                        <svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 012-2h11v16H6a2 2 0 00-2 2V5z"/><path d="M17 3v16"/></svg>
+                                                        <svg viewBox="0 0 24 24">
+                                                            <path d="M4 5a2 2 0 012-2h11v16H6a2 2 0 00-2 2V5z"/>
+                                                            <path d="M17 3v16"/>
+                                                        </svg>
                                                         Nội dung bài học
                                                     </div>
                                                 )}
 
                                                 {lesson?.quizId && (
-                                                    <div className={`sub-item ${selectedLessonRoute === lesson.orderIndex ? `active` : ``}`}
+                                                    <div className={`sub-item sub-item-child ${selectedLessonRoute === lesson.orderIndex ? `active` : ``}`}
                                                          onClick={() => {
                                                              scrollToElement("lesson-content");
                                                              setSelectedLessonRoute(lesson.orderIndex)
                                                          }}>
-                                                        <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                                                        <svg viewBox="0 0 24 24">
+                                                            <path d="M9 11l3 3L22 4"/>
+                                                            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                                                        </svg>
                                                         Bài luyện tập ({lesson?.totalQuestions} câu)
                                                     </div>
                                                 )}
                                             </>
                                         ))}
+
+                                    {lessons && lessons.length <= 0 && (
+                                        <div className="sub-item sub-item-child">
+                                            <p>Không có bài học nào.</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                     )})}
@@ -263,7 +284,10 @@ const LessonRoute = () => {
                         <div className="content-head">
                             <h2>Lộ trình học Hangul</h2>
                             <p>
-                                Được xây dựng từ những kiến thức cơ bản đến nâng cao, giúp người học từng bước làm quen và sử dụng tiếng Hàn một cách hiệu quả. Trước tiên, bạn sẽ học các phụ âm và nguyên âm cơ bản, sau đó luyện ghép chúng thành các âm tiết và từ đơn giản. Tiếp theo, người học sẽ làm quen với quy tắc phát âm, phụ âm cuối và cách viết Hangul đúng thứ tự nét. Cuối cùng, bạn có thể luyện đọc, viết và áp dụng Hangul vào các từ vựng và câu tiếng Hàn trong thực tế.
+                                Được xây dựng từ những kiến thức cơ bản đến nâng cao, giúp người học từng bước làm quen và sử dụng tiếng Hàn một cách hiệu quả.
+                                Trước tiên, bạn sẽ học các phụ âm và nguyên âm cơ bản, sau đó luyện ghép chúng thành các âm tiết và từ đơn giản.
+                                Tiếp theo, người học sẽ làm quen với quy tắc phát âm, phụ âm cuối và cách viết Hangul đúng thứ tự nét.
+                                Cuối cùng, bạn có thể luyện đọc, viết và áp dụng Hangul vào các từ vựng và câu tiếng Hàn trong thực tế.
                             </p>
                         </div>
                     </div>
@@ -293,8 +317,9 @@ const LessonRoute = () => {
                         </div>
 
                         <div className="content-head">
-                            <h2>{lessonRoute?.name}</h2>
-                            <p>{lessonRoute?.des}</p>
+                            <h2>Tên bài học: {lessonRoute?.name}</h2>
+                            <p style={{whiteSpace: 'pre-line'}}><strong>Nội dung:</strong> {lessonRoute?.des}</p>
+                            <p style={{whiteSpace: 'pre-line'}}><strong>Nội dung sau khi học bài này:</strong> {lessonRoute?.desFinish}</p>
                             {hasCompleted && (
                                 <div style={{textAlign: "right", marginBottom: "10px"}}>
                                     <button className="btn" style={{padding: '5px 10px'}}

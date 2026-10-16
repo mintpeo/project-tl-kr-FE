@@ -21,15 +21,19 @@ const Practice = () => {
     const [predict, setPredict] = useState();
     const [feedBack, setFeedBack] = useState([]);
     const [scoreFB, setScoreFB] = useState(0);
+    const [grade, setGrade] = useState('');
+    const [mess, setMess] = useState('');
     const [scoreDisable, setScoreDisable] = useState(false);
+    const [matchedTemplate, setMatchedTemplate] = useState('');
+    const historyRef = useRef([]);
+    const MAX_UNDO = 30;
+    const [undoCount, setUndoCount] = useState(0);
+    const canvasRef = useRef(null);
+    const isDrawing = useRef(false);
 
     useEffect(() => {
         setCharList(vowels);
     }, [characters]);
-
-    const buildCloudinaryUrl = (version, fileName) => {
-        return `https://res.cloudinary.com/dqzuuzi8z/image/upload/v${version}/${fileName}.svg`;
-    };
 
     const cateList = [
         { name: 'Nguyên âm' },
@@ -37,49 +41,28 @@ const Practice = () => {
         // { name: 'Âm ghép' }
     ];
 
-    const canvasRef = useRef(null);
-    const isDrawing = useRef(false);
-
     const clearCanvas = () => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
         const ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        historyRef.current = [];
+        setUndoCount(0);
         setScoreDisable(false);
+        setMatchedTemplate('');
     };
 
-    const savePNG = () => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        const tempCanvas = document.createElement("canvas");
-        tempCanvas.width = canvas.width;
-        tempCanvas.height = canvas.height;
-
-        const tempCtx = tempCanvas.getContext("2d");
-        tempCtx.fillStyle = "#FFFFFF";
-        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-        tempCtx.drawImage(canvas, 0, 0);
-
-        // Lấy dữ liệu ảnh Base64 (Nền trắng, nét đen)
-        const image = tempCanvas.toDataURL("image/png");
-
-        // Tải ảnh về máy để test với Python model
-        const link = document.createElement("a");
-        link.href = image;
-        link.download = "jamo-test.png";
-        link.click();
-    }
-
-    const [charLabel, setCharLabel] = useState('');
-    // Submit Canvas
+    // Submit Canvas, Save Practice
     const {executePost: handlePredict} = usePost(`${API_URL}/predict/data-url`);
+    const {executePost: handleSavePractice} = usePost(`${API_URL}/practice/save`);
     const submitCanvas = async () => {
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        if (!canvas || selectedChar < 0) {
+            alert("Vui lòng chọn kí tự trước khi luyện viết!");
+            return;
+        }
 
-        // Tao canvas tam de to nen trang (giong logic cu)
         const tempCanvas = document.createElement("canvas");
         tempCanvas.width = canvas.width;
         tempCanvas.height = canvas.height;
@@ -91,46 +74,55 @@ const Practice = () => {
         const dataUrl = tempCanvas.toDataURL("image/png");
 
         try {
-            const data = await handlePredict({dataUrl});
-            console.log("Ket qua du doan:", data);
+            const data = await handlePredict({ dataUrl });
+            console.log(data);
+            if (!data || !data.prediction) {
+                alert("Không nhận được phản hồi từ AI, vui lòng thử lại!");
+                return;
+            }
 
-            const char = charList.find(item => item.transcription === data?.prediction.label);
-            setCharLabel(char?.name);
-
-            setPredict(data?.prediction);
-            // setFeedBack(data?.assessment?.feedback);
-            // setScoreFB(data?.assessment?.score);
+            setPredict(data.prediction);
             setScoreDisable(true);
+
+            const predictLabel = data.prediction.label;
+            const selectLabel = charList[selectedChar];
+
+            // predictLabel !== charList[selectChar]
+            if (predictLabel !== selectLabel?.transcription) {
+                setGrade("Chưa khớp ký tự");
+                setMess(`Bạn đang chọn chữ '${selectLabel?.name || selectLabel?.transcription}', nhưng AI thấy nét vẽ giống chữ '${data.prediction.char}' hơn.`);
+                setFeedBack(["Hãy quan sát kỹ nét mẫu và thử viết lại."]);
+                setScoreFB(0);
+                setMatchedTemplate('');
+                // setScoreDisable(true);
+                return;
+            }
+
+            // predictLabel === charList[selectChar]
+            const simScore = data?.evaluation?.similarity_score ?? 0;
+            setFeedBack(data?.evaluation?.suggestions || []);
+            setGrade(data?.evaluation?.grade || "Đạt");
+            setMess(data?.evaluation?.message || "");
+            setScoreFB(simScore);
+            setMatchedTemplate(data?.matched_template?.img_url);
+            // setScoreDisable(true);
+
+            // Save Practice
+            const char = charList.find(item => item.transcription === predictLabel);
+            if (char && user?.userId) {
+                await handleSavePractice({
+                    userId: user.userId,
+                    predictedLabel: char.name,
+                    confidence: data.prediction.confidence,
+                    characterId: char.id,
+                    score: simScore
+                });
+            }
         } catch (e) {
             console.error("Error Predict AI:", e);
+            alert("Có lỗi xảy ra trong quá trình chấm điểm!");
         }
     };
-
-    // Save Practice
-    const {executePost: handleSavePractice} = usePost(`${API_URL}/practice/save`);
-    useEffect(() => {
-        if (!scoreDisable) return;
-
-        const savePractice = async () => {
-            const char = charList.find(item => item.transcription === predict?.label);
-
-            const req = {
-                userId: user.userId,
-                predictedLabel: char?.name,
-                confidence: predict?.confidence,
-                characterId: char?.id,
-                score: scoreFB
-            }
-
-            try {
-                await handleSavePractice(req);
-            } catch (e) {
-                console.log("Error Save Practice", e);
-            }
-        }
-
-        savePractice();
-    }, [predict]);
 
     // Tinh toa do theo do phan giai
     const getCoordinates = (e, canvas) => {
@@ -155,12 +147,41 @@ const Practice = () => {
         if (!canvas) return;
 
         const ctx = canvas.getContext("2d");
+
+        historyRef.current.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+        if (historyRef.current.length > MAX_UNDO) historyRef.current.shift();
+        setUndoCount(historyRef.current.length);
+
         isDrawing.current = true;
 
         const { x, y } = getCoordinates(e, canvas);
         ctx.beginPath();
         ctx.moveTo(x, y);
     };
+
+    const undoStroke = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const prev = historyRef.current.pop();
+        if (!prev) return;
+
+        canvas.getContext("2d").putImageData(prev, 0, 0);
+        setUndoCount(historyRef.current.length);
+        setScoreDisable(false);
+        setMatchedTemplate('');
+    };
+
+    useEffect(() => {
+        const onKey = (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+                e.preventDefault();
+                undoStroke();
+            }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, []);
 
     const draw = (e) => {
         if (!isDrawing.current) return;
@@ -246,23 +267,23 @@ const Practice = () => {
                 <div className="card canvas-card">
                     <div className="canvas-top-row">
                         <div className="selected-char-content">
-                            <p>Chữ đang luyện:</p>
+                            <p style={{fontSize: '14px'}}>Chữ đang luyện:</p>
                             <p className={`${selectedChar >= 0 ? `selected-char` : ``}`}>
                                 {selectedChar >= 0 ? charList[selectedChar]?.name : 'Chưa chọn'}
                             </p>
                         </div>
 
-                        <div className="char-switch">
-                            <p style={{ margin: 0, fontSize: '12px', color: 'var(--ink-soft)' }}>Hiện thứ tự nét</p>
+                        {/*<div className="char-switch">*/}
+                        {/*    <p style={{ margin: 0, fontSize: '12px', color: 'var(--ink-soft)' }}>Hiện thứ tự nét</p>*/}
 
-                            <button
-                                type="button"
-                                className={`toggle-btn ${checked ? 'active' : ''}`}
-                                onClick={toggle}
-                            >
-                                <span className="toggle-thumb" />
-                            </button>
-                        </div>
+                        {/*    <button*/}
+                        {/*        type="button"*/}
+                        {/*        className={`toggle-btn ${checked ? 'active' : ''}`}*/}
+                        {/*        onClick={toggle}*/}
+                        {/*    >*/}
+                        {/*        <span className="toggle-thumb" />*/}
+                        {/*    </button>*/}
+                        {/*</div>*/}
                     </div>
 
                     <div className="canvas-wrap">
@@ -288,6 +309,7 @@ const Practice = () => {
                     <div className="canvas-actions">
                         <button className="btn btn-ghost" onClick={clearCanvas}>Xóa</button>
                         {/*<button className="btn btn-ghost" onClick={savePNG}>Save PNG</button>*/}
+                        <button className="btn btn-ghost" onClick={undoStroke} disabled={undoCount === 0}>Hoàn tác</button>
                         <button className="btn btn-primary" onClick={submitCanvas}>Gửi để AI chấm điểm</button>
                     </div>
                 </div>
@@ -301,7 +323,7 @@ const Practice = () => {
                         <div className="scoreResult" style={{display: `${scoreDisable ? `block` : `none`}`}}>
                             <div style={{textAlign: "center", whiteSpace: "nowrap", marginBottom: '20px'}}>
                                 <div className="score-label">
-                                    Nhận diện là kí tự: <strong>{predict?.char}</strong> - Với độ chính xác: <strong>{predict?.confidence}%</strong>
+                                    Nhận diện là kí tự: <strong>{predict?.char}</strong> - Với độ chính xác: <strong>{(predict?.confidence * 100).toFixed(1)}%</strong>
                                 </div>
                             </div>
 
@@ -312,14 +334,32 @@ const Practice = () => {
                             </div>
 
                             <ul className="fb-list" id="fbList">
+                                <li>{grade}</li>
+                                <li>{mess}</li>
                                 {
                                     feedBack.map((fb, index) => (
-                                        <li key={index}>{fb.text}</li>
+                                        <li key={index}>{fb}</li>
                                     ))
                                 }
                             </ul>
                         </div>
                     </div>
+
+                    {matchedTemplate && (
+                        <div className="card sw-box">
+                            <span className="sw-title">Chữ mẫu</span>
+
+                            <div className="sw-frame">
+                                <div className="sw-grid" aria-hidden="true" />
+                                <div
+                                    className="sw-glyph"
+                                    role="img"
+                                    aria-label="Chữ mẫu"
+                                    style={{ backgroundImage: `url("${matchedTemplate}")` }}
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

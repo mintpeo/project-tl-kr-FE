@@ -1,5 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import './AdminSample.css';
+import useFetch from "../../../components/use/useFetch.js";
+import {API_URL} from "../../../components/API_URL.jsx";
+import {usePutUploadFile} from "../../../components/use/usePut.js";
+import Skeleton from "../../../components/loading/Skeleton.jsx";
+import {useDelete} from "../../../components/use/useDelete.js";
 
 /* ============================================================
    DỮ LIỆU MẪU — thay bằng dữ liệu thật từ API /api/admin/samples
@@ -9,43 +14,29 @@ import './AdminSample.css';
 const CATEGORY_OPTIONS = [
     { value: 'vowel', label: 'Nguyên âm' },
     { value: 'consonant', label: 'Phụ âm' },
-    { value: 'syllable', label: 'Âm tiết ghép' },
 ];
-
-const INITIAL_CHARS = [
-    { id: 1, glyph: 'ㅏ', romanization: 'a', category: 'vowel',
-        samples: [
-            { id: 's1', label: 'Mẫu chuẩn', uploadedAt: '12/06/2026' },
-            { id: 's2', label: 'Viết tay 1', uploadedAt: '15/06/2026' },
-        ] },
-    { id: 2, glyph: 'ㅑ', romanization: 'ya', category: 'vowel', samples: [] },
-    { id: 3, glyph: 'ㅓ', romanization: 'eo', category: 'vowel',
-        samples: [{ id: 's3', label: 'Mẫu chuẩn', uploadedAt: '12/06/2026' }] },
-    { id: 4, glyph: 'ㅗ', romanization: 'o', category: 'vowel', samples: [] },
-    { id: 5, glyph: 'ㄱ', romanization: 'giyeok', category: 'consonant',
-        samples: [
-            { id: 's4', label: 'Mẫu chuẩn', uploadedAt: '10/06/2026' },
-            { id: 's5', label: 'Viết tay 1', uploadedAt: '14/06/2026' },
-            { id: 's6', label: 'Viết tay 2', uploadedAt: '18/06/2026' },
-        ] },
-    { id: 6, glyph: 'ㄴ', romanization: 'nieun', category: 'consonant', samples: [] },
-    { id: 7, glyph: 'ㄷ', romanization: 'digeut', category: 'consonant',
-        samples: [{ id: 's7', label: 'Mẫu chuẩn', uploadedAt: '11/06/2026' }] },
-    { id: 8, glyph: 'ㅁ', romanization: 'mieum', category: 'consonant', samples: [] },
-    { id: 9, glyph: '한', romanization: 'han', category: 'syllable',
-        samples: [{ id: 's8', label: 'Mẫu chuẩn', uploadedAt: '20/06/2026' }] },
-    { id: 10, glyph: '가', romanization: 'ga', category: 'syllable', samples: [] },
-];
-
-function categoryLabel(value) {
-    return CATEGORY_OPTIONS.find((c) => c.value === value)?.label ?? value;
-}
 
 /* ============================================================
    COMPONENT
    ============================================================ */
 const AdminSample = () => {
-    const [chars, setChars] = useState(INITIAL_CHARS);
+    const {data: getAllTempChars} = useFetch(`${API_URL}/admin/all-temp`);
+    const mapChars = (c) => ({
+        id: c?.id,
+        glyph: c?.glyph,
+        romanization: c?.romanization,
+        category: c?.category?.toLowerCase(),
+        samples: c?.samples
+    });
+    const [chars, setChars] = useState([]);
+    useEffect(() => {
+        setChars(getAllTempChars.map(mapChars));
+    }, [getAllTempChars]);
+
+    const categoryLabel = (value) => {
+        return CATEGORY_OPTIONS.find((c) => c.value === value)?.label ?? value;
+    }
+
     const [search, setSearch] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('all');
     const [sampleFilter, setSampleFilter] = useState('all'); // all | has | missing
@@ -73,26 +64,40 @@ const AdminSample = () => {
 
     const activeChar = chars.find((c) => c.id === activeCharId) ?? null;
 
-    function addSample(charId, file) {
+    // Add Char Temp
+    const {executePutUploadFile: uploadCharTemp, loading: loadingUploadCharTemp} = usePutUploadFile(`${API_URL}/admin/upload-char-temp`);
+    const addSample = async (charId, file) => {
         const label = file ? file.name : `Viết tay ${Math.floor(Math.random() * 90 + 10)}`;
-        setChars((prev) =>
-            prev.map((c) =>
-                c.id === charId
-                    ? { ...c, samples: [...c.samples, { id: 'new-' + Date.now(), label, uploadedAt: 'Vừa xong' }] }
-                    : c
-            )
-        );
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("charId", charId);
+        try {
+            const data = await uploadCharTemp(formData);
+            if (data !== null) {
+                alert("Tải lên ảnh mẫu thành công.");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error Upload Character Temp", e);
+        }
     }
 
-    function removeSample(charId, sampleId) {
-        setChars((prev) =>
-            prev.map((c) =>
-                c.id === charId ? { ...c, samples: c.samples.filter((s) => s.id !== sampleId) } : c
-            )
-        );
+    const {executeDelete: deleteChar, loading: loadingDeleteCharTemp} = useDelete(`${API_URL}/admin/delete-char-temp`);
+    const removeSample = async (sampleId) => {
+        const req = {
+            id: sampleId
+        }
+        try {
+            await deleteChar(req);
+        } catch (e) {
+            console.log("Error Delete Char Temp", e);
+        }
+        alert("Xoá ảnh mẫu thành công.");
+        window.location.reload();
     }
 
-    function handleFileInput(e, charId) {
+    const handleFileInput = (e, charId) => {
         const file = e.target.files?.[0];
         if (file) addSample(charId, file);
         e.target.value = '';
@@ -206,28 +211,35 @@ const AdminSample = () => {
                         </div>
 
                         <div className="sample-grid">
-                            {activeChar.samples.map((s) => (
-                                <div className="sample-tile" key={s.id}>
-                                    <div className="sample-thumb">
-                                        <span>{activeChar.glyph}</span>
-                                    </div>
+                            {(loadingUploadCharTemp || loadingDeleteCharTemp) && (<Skeleton />)}
+                            {!(loadingUploadCharTemp || loadingDeleteCharTemp) && (
+                                <>
+                                    {activeChar?.samples?.map((s) => (
+                                        <div className="sample-tile" key={s.id}>
+                                            <div className="sample-thumb">
+                                                <img src={s?.imgUrl} alt={activeChar.glyph}/>
+                                            </div>
 
-                                    <div className="sample-info">
-                                        <p>{s.label}</p>
-                                        <span>{s.uploadedAt}</span>
-                                    </div>
+                                            <div className="sample-info">
+                                                <p>{s.label}</p>
+                                                <span>{s.uploadedAt}</span>
+                                            </div>
 
-                                    <button className="sample-remove" onClick={() => removeSample(activeChar.id, s.id)} title="Xóa mẫu này">
-                                        <svg viewBox="0 0 24 24"><path d="M18 6L6 18" /><path d="M6 6l12 12" /></svg>
-                                    </button>
-                                </div>
-                            ))}
+                                            <button className="sample-remove" onClick={() => removeSample(s.id)} title="Xóa mẫu này">
+                                                <svg viewBox="0 0 24 24"><path d="M18 6L6 18" /><path d="M6 6l12 12" /></svg>
+                                            </button>
+                                        </div>
+                                    ))}
 
-                            <label className="sample-tile add-tile">
-                                <input type="file" accept="image/*" hidden onChange={(e) => handleFileInput(e, activeChar.id)} />
-                                <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
-                                <span>Thêm chữ mẫu</span>
-                            </label>
+                                    {activeChar.samples.length < 3 && (
+                                        <label className="sample-tile add-tile">
+                                            <input type="file" accept="image/*" hidden onChange={(e) => handleFileInput(e, activeChar.id)} />
+                                            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
+                                            <span>Thêm chữ mẫu</span>
+                                        </label>
+                                    )}
+                                </>
+                            )}
                         </div>
 
                         {activeChar.samples.length === 0 && (

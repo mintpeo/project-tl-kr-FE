@@ -4,6 +4,8 @@ import useFetch from "../../../components/use/useFetch.js";
 import {API_URL} from "../../../components/API_URL.jsx";
 import {usePost} from "../../../components/use/usePost.js";
 import Skeleton from "../../../components/loading/Skeleton.jsx";
+import {USER_DETAIL_MOCK} from "../../loggedPages/progress/userDetailMock.js";
+import UserDetailModal from "../../loggedPages/progress/UserDetailModal.jsx";
 
 const AdminActivity = () => {
     const {data: loadUserActivity} = useFetch(`${API_URL}/admin/get-user-activity`);
@@ -17,6 +19,35 @@ const AdminActivity = () => {
         status: u?.active
     });
     const USERS = loadUserActivity.map(mapUserRes);
+
+    // User Detail
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [showUserModal, setShowUserModal] = useState(false);
+
+    const handleViewUser = (email) => {
+        setSelectedUser(email);
+        setShowUserModal(true);
+    };
+
+    // Lessons Activity
+    const {data: loadLessonActivity, loading: loadingLessons} = useFetch(`${API_URL}/admin/lessons-activity`);
+    const LESSON_STATS = (Array.isArray(loadLessonActivity) ? loadLessonActivity : [])
+        .slice()
+        .sort((a, b) => a?.lessonId - b?.lessonId)
+        .map((l) => ({
+            ...l,
+            completedPct: l?.totalUser > 0 ? Math.round((l?.totalUserCompleted / l?.totalUser) * 100) : 0,
+            startedPct: l?.totalUser > 0 ? Math.round((l?.totalUserStarted / l?.totalUser) * 100) : 0,
+        }));
+    const totalCompleted = LESSON_STATS.reduce((sum, l) => sum + l.totalUserCompleted, 0);
+    const totalNotCompleted = LESSON_STATS.reduce((sum, l) => sum + l.totalUserStarted, 0);
+    const totalUsersLessons = LESSON_STATS.reduce((sum, l) => sum + l?.totalUser, 0);
+
+    // User Level
+    const {data: loadUserLevels} = useFetch(`${API_URL}/admin/user-levels-activity`);
+    const LEVEL_STATS = loadUserLevels;
+    const maxCount = Math.max(...LEVEL_STATS.map((l) => l?.totalUser), 1);
+    const totalUsers = LEVEL_STATS.reduce((sum, l) => sum + l?.totalUser, 0);
 
     // Lowest Char
     const {data: loadLowestChar} = useFetch(`${API_URL}/admin/hard-char`);
@@ -85,10 +116,10 @@ const AdminActivity = () => {
     }, [search, statusFilter, sortBy, loadUserActivity]);
 
     const statRows = [
-        {name: "Người dùng đang hoạt động", amount: USERS.filter((u) => u.status).length, icon: "chars", tone: "tone-a"},
+        {name: "Người dùng đã kích hoạt", amount: USERS.filter((u) => u.status).length, icon: "chars", tone: "tone-a"},
         {name: "Tổng lượt luyện viết", amount: USERS.reduce((sum, u) => sum + u.practices, 0), icon: "vowels", tone: "tone-b"},
-        {name: "Độ chính xác TB toàn hệ thống", amount: Math.round(USERS.reduce((sum, u) => sum + u.avgScore, 0) / USERS.length), icon: "consonants", tone: "tone-c"},
-        {name: "Streak trung bình", amount: (USERS.reduce((sum, u) => sum + u.streak, 0) / USERS.length).toFixed(1), icon: "cate", tone: "tone-d"},
+        {name: "Mức độ tương đồng TB toàn hệ thống", amount: `${Math.round(USERS.reduce((sum, u) => sum + u.avgScore, 0) / USERS.length)} %`, icon: "consonants", tone: "tone-c"},
+        {name: "Streak trung bình", amount: (USERS.reduce((sum, u) => sum + u.streak, 0) / USERS.length).toFixed(1), icon: "notFound", tone: "tone-d"},
     ];
     const iconStatRows = {
         chars: (
@@ -174,28 +205,104 @@ const AdminActivity = () => {
                     <div className="panel-head no-margin">
                         <div>
                             <h3>Ký tự khó nhất hệ thống</h3>
-                            <p>Điểm trung bình thấp nhất trên toàn bộ người học</p>
+                            <p>Mức độ tương đồng thấp nhất trên toàn bộ người học</p>
                         </div>
                     </div>
 
                     <div className="hardest-list">
                         {loadingAllChar && <Skeleton />}
                         {!loadingAllChar && HARDEST_CHARS.map((c) => (
-                            <div className="hardest-row" key={c.glyph}>
-                                <div className="hardest-glyph">{c.glyph}</div>
+                            <div className="hardest-row" key={c?.glyph}>
+                                <div className="hardest-glyph">{c?.glyph}</div>
 
                                 <div className="hardest-info">
-                                    <p>{handleRoma(c.charId)} <span className="mono">· {c.attempts} lượt luyện</span></p>
+                                    <p>
+                                        {handleRoma(c?.charId)}
+                                        <span className="mono">- {c?.attempts} lượt luyện -</span>
+                                        <span className="mono">{c?.avgScore}%</span>
+                                    </p>
 
                                     <div className="hardest-track">
-                                        <div className={`hardest-fill tone-${scoreTone(c.avgScore)}`} style={{ width: `${c.avgScore}%` }} />
+                                        <div className={`hardest-fill tone-${scoreTone(c?.avgScore)}`} style={{ width: `${c.avgScore}%` }} />
                                     </div>
                                 </div>
 
-                                <div className={`hardest-score tone-${scoreTone(c.avgScore)}`}>{c.avgScore}%</div>
+                                <div className={`hardest-score tone-${scoreTone(c?.avgScore)}`}>{c.avgScore}%</div>
                             </div>
                         ))}
                     </div>
+                </div>
+            </div>
+
+            <div className="row-2col">
+                <div className="card panel">
+                    <div className="panel-head">
+                        <div>
+                            <h3>Số người học theo level</h3>
+                            <p>Tổng {totalUsers} người học trên tất cả các level</p>
+                        </div>
+                    </div>
+
+                    <div className="bars">
+                        {LEVEL_STATS.map((level, index) => (
+                            <div className="bar-col" key={level?.levelName}>
+                                <div className="bar-val">{level?.totalUser}</div>
+                                <div
+                                    className={`bar level-${index + 1}`}
+                                    style={{ height: `${Math.round((level?.totalUser / maxCount) * 110)}px` }}
+                                />
+                                <div className="bar-day">{level?.levelName}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="card panel">
+                    <div className="panel-head no-margin">
+                        <div>
+                            <h3>Tiến độ theo bài học</h3>
+                            <p>Số người đang học và đã hoàn thành ở từng bài</p>
+                        </div>
+                    </div>
+
+                    <div className="hardest-list">
+                        {loadingLessons && <Skeleton />}
+                        {!loadingLessons && LESSON_STATS.map((l, index) => (
+                            <div className="hardest-row" key={l?.lessonId}>
+                                <div className="hardest-glyph">{index + 1}</div>
+
+                                <div className="hardest-info">
+                                    <p className="lesson-name" title={l?.lessonName}>{l?.lessonName}</p>
+
+                                    <div className="hardest-track stacked">
+                                        <div className="seg completed" style={{ width: `${l?.completedPct}%` }} />
+                                        <div className="seg started" style={{ width: `${l?.startedPct}%` }} />
+                                    </div>
+
+                                    <div className="lesson-meta mono">
+                                        <span><i className="dot completed" /> {l?.totalUserCompleted} hoàn thành</span>
+                                        <span><i className="dot started" /> {l?.totalUserStarted} đang học</span>
+                                        <span>/ {l?.totalUser} người</span>
+                                    </div>
+                                </div>
+
+                                <div className="hardest-score tone-celadon">{l?.completedPct}%</div>
+                            </div>
+                        ))}
+                        {!loadingLessons && LESSON_STATS.length === 0 && (
+                            <div className="empty-state">Chưa có dữ liệu bài học.</div>
+                        )}
+                    </div>
+
+                    {!loadingLessons && LESSON_STATS.length > 0 && (
+                        <div className="lesson-summary">
+                            Tổng cộng: <strong>{totalUsersLessons}</strong> người học
+                            <span className="sep">·</span>
+                            <strong className="done">{totalCompleted}</strong> lượt hoàn thành
+                            <span className="sep">·</span>
+                            <strong className="pending">{totalNotCompleted}</strong> lượt chưa hoàn thành
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -212,8 +319,8 @@ const AdminActivity = () => {
                 </div>
                 <select value={statusFilter} onChange={(e) => setStatusFilter(JSON.parse(e.target.value))}>
                     <option value="null">Tất cả trạng thái</option>
-                    <option value="true">Đang hoạt động</option>
-                    <option value="false">Không hoạt động</option>
+                    <option value="true">Đã kích hoạt</option>
+                    <option value="false">Chưa kích hoạt</option>
                 </select>
                 <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
                     <option value="practices">Sắp xếp: Lượt luyện viết</option>
@@ -229,11 +336,12 @@ const AdminActivity = () => {
                     <tr>
                         <th>STT</th>
                         <th>Người dùng</th>
-                        <th>Lượt luyện viết</th>
-                        <th>Độ chính xác TB</th>
+                        {/*<th>Lượt luyện viết</th>*/}
+                        <th>Mức độ tương đồng TB</th>
                         <th>Streak</th>
-                        <th>Hoạt động gần nhất</th>
+                        {/*<th>Hoạt động gần nhất</th>*/}
                         <th>Trạng thái</th>
+                        <th>Hành động</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -242,24 +350,29 @@ const AdminActivity = () => {
                             <td>{index + 1}</td>
                             <td>
                                 <div className="user-cell">
-                                    <div className="user-avatar">{u.name.split(' ').slice(-2).map((w) => w[0]).join('')}</div>
+                                    <div className="user-avatar">{u?.name.charAt(0)}</div>
 
                                     <div>
-                                        <div className="user-name">{u.name}</div>
-                                        <div className="user-email">{u.email}</div>
+                                        <div className="user-name">{u?.name}</div>
+                                        <div className="user-email">{u?.email}</div>
                                     </div>
                                 </div>
                             </td>
-                            <td className="mono">{u.practices}</td>
+                            {/*<td className="mono">{u?.practices}</td>*/}
                             <td>
-                                <span className={`score-chip tone-${scoreTone(u.avgScore)}`}>{u.avgScore}%</span>
+                                <span className={`score-chip tone-${scoreTone(u?.avgScore)}`}>{u?.avgScore}%</span>
                             </td>
-                            <td className="mono" style={{whiteSpace: "nowrap"}}>{u.streak > 0 ? `${u.streak} ngày` : '—'}</td>
-                            <td className="muted">{u.lastActive}</td>
+                            <td className="mono" style={{whiteSpace: "nowrap"}}>{u?.streak > 0 ? `${u?.streak} ngày` : '—'}</td>
+                            {/*<td className="muted">{u.lastActive}</td>*/}
                             <td>
-                                <span className={`status-badge ${u.status}`}>
-                                    {u.status ? 'Đang hoạt động' : 'Không hoạt động'}
+                                <span className={`status-badge ${u?.status}`} style={{whiteSpace: "nowrap"}}>
+                                    {u?.status ? 'Đã kích hoạt' : 'Chưa kích hoạt'}
                                 </span>
+                            </td>
+                            <td>
+                                <button className="btn btn-primary" style={{whiteSpace: "nowrap", fontSize: '10px'}} onClick={() => handleViewUser(u?.email)}>
+                                    Xem chi tiết
+                                </button>
                             </td>
                         </tr>
                     ))}
@@ -269,6 +382,16 @@ const AdminActivity = () => {
                     </tbody>
                 </table>
             </div>
+
+            {showUserModal && (
+                <UserDetailModal
+                    email={selectedUser}
+                    onClose={() => {
+                        setShowUserModal(false);
+                        setSelectedUser(null);
+                    }}
+                />
+            )}
         </div>
     );
 }

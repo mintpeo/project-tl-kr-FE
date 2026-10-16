@@ -267,7 +267,6 @@ const AdminLesson = () => {
         if (!text || text.length <= maxLength) return text;
         return text.slice(0, maxLength) + '...';
     };
-    console.log(form);
 
     return (
         <div className="admin-lessons">
@@ -277,10 +276,16 @@ const AdminLesson = () => {
                     <h1>Quản lý bài học</h1>
                     <p>Thêm, chỉnh sửa và xuất bản các bài học video theo từng danh mục.</p>
                 </div>
-                <button className="btn btn-primary" onClick={openAddModal}>
-                    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
-                    Thêm bài học
-                </button>
+                <div>
+                    {/*<button className="btn btn-ghost" style={{marginRight: '10px'}}>*/}
+                    {/*    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>*/}
+                    {/*    Thêm danh mục*/}
+                    {/*</button>*/}
+                    <button className="btn btn-primary" onClick={openAddModal}>
+                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
+                        Thêm bài học
+                    </button>
+                </div>
             </div>
 
             <div className="stat-row">
@@ -445,7 +450,7 @@ const AdminLesson = () => {
                                     <label>Danh mục</label>
                                     <select
                                         value={form.cateRouteId || ""}
-                                        onChange={(e) => handleFieldChange("cateRouteId", e.target.value)}
+                                        onChange={(e) => handleFieldChange("cateRouteId", Number(e.target.value))}
                                     >
                                         {cateList.map((c) => (
                                             <option key={c.id} value={c.id}>{c.name}</option>
@@ -457,7 +462,7 @@ const AdminLesson = () => {
                                     <label>Bộ câu hỏi</label>
                                     <select
                                         value={form?.quizId || ""}
-                                        onChange={(e) => handleFieldChange("quizId", Number(e.target.value))}
+                                        onChange={(e) => handleFieldChange("quizId", e.target.value ? Number(e.target.value) : null)}
                                     >
                                         <option value="">Chưa có bộ câu hỏi</option>
                                         {loadQuizzes.map((c) => (
@@ -472,10 +477,10 @@ const AdminLesson = () => {
                                     <label>Trạng thái</label>
                                     <select
                                         value={String(form.active)}
-                                        onChange={(e) => handleFieldChange("isActive", e.target.value)}
+                                        onChange={(e) => handleFieldChange("active", e.target.value === "true")}
                                     >
-                                        <option value={String(form.active)}>{form.active ? `Đang hiển thị` : `Đang ẩn`}</option>
-                                        <option value={String(!form.active)}>{!form.active ? `Đang hiển thị` : `Đang ẩn`}</option>
+                                        <option value="true">Đang hiển thị</option>
+                                        <option value="false">Đang ẩn</option>
                                     </select>
                                 </div>
 
@@ -495,7 +500,7 @@ const AdminLesson = () => {
 
                                 <textarea
                                     rows={5}
-                                    defaultValue={form.des}
+                                    value={form.description || ""}
                                     onChange={(e) => handleFieldChange("description", e.target.value)}
                                     placeholder="Mô tả ngắn về nội dung bài học..."
                                 />
@@ -514,7 +519,7 @@ const AdminLesson = () => {
                                             style={{ border: 'none', outline: 'none', padding: '8px', flex: 1 }}
                                             placeholder="Nhập ID video..."
                                             value={form.youtubeId || ""}
-                                            onChange={(e) => handleFieldChange("youtube", e.target.value)}
+                                            onChange={(e) => handleFieldChange("youtubeId", e.target.value)}
                                         />
                                     </div>
                                 ) : (

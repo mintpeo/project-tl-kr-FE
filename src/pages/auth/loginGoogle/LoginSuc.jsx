@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import './LoginSuc.css';
 import {useNavigate} from "react-router-dom";
-import {LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
+import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
 import Skeleton from "../../../components/loading/Skeleton.jsx";
+import {usePost} from "../../../components/use/usePost.js";
 
 const LoginSuc = () => {
     const navigate = useNavigate();
@@ -12,9 +13,15 @@ const LoginSuc = () => {
     const user = {
         name: data?.fullName,
         email: data?.email,
-        isGoogle: data?.google
+        isGoogle: data?.google,
+        userId: data?.userId
     }
 
+    // User Streak
+    const {executePost: loadUserStreak, loading: loadingUserStreak} = usePost(`${API_URL}/user-streak/get`);
+    const [userStreak, setUserStreak] = useState(0);
+
+    // Load User When Login Success => LocalStorage
     useEffect(() => {
         const loadGoogleUser = async () => {
             setLoading(true);
@@ -28,6 +35,9 @@ const LoginSuc = () => {
                 if (data) {
                     localStorage.setItem(LOCAL_STORAGE_KEYS.USER_INFO, JSON.stringify(data));
                     setData(data);
+
+                    const streak = await loadUserStreak({userId: data?.userId});
+                    setUserStreak(streak?.currentStreak);
                     setLoading(false);
 
                     if (data.role === "ADMIN") navigate("/admin");
@@ -94,13 +104,15 @@ const LoginSuc = () => {
                     </div>
                 </div>
 
-                {/*<div className="streak-teaser">*/}
-                {/*    <svg viewBox="0 0 24 24">*/}
-                {/*        <path d="M12 2s6 5.5 6 10.5a6 6 0 01-12 0C6 7.5 12 2 12 2z"/>*/}
-                {/*    </svg>*/}
+                {!loadingUserStreak ? (
+                    <div className="streak-teaser">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2s6 5.5 6 10.5a6 6 0 01-12 0C6 7.5 12 2 12 2z"/>
+                        </svg>
 
-                {/*    <p>Chuỗi <strong>12 ngày</strong> luyện viết của bạn đang chờ được tiếp tục hôm nay.</p>*/}
-                {/*</div>*/}
+                        <p>Chuỗi <strong>{userStreak} ngày</strong> luyện viết của bạn đang chờ được tiếp tục hôm nay.</p>
+                    </div>
+                ) : (<Skeleton />)}
 
                 <div className="progress-track">
                     <div className="progress-fill" id="progressFill" style={{

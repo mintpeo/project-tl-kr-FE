@@ -139,7 +139,7 @@ const Home = () => {
 
             <div className="lesson-row">
                 {loadingLesson && <Skeleton />}
-                {!loadingLesson && (
+                {(!loadingLesson && categories.length > 0) && (
                     categories.map((lesson, index) => (
                         <div onClick={() => navigate("/road")} className="card lesson-card">
                             <div className="lesson-glyph">{glyphCate(index)}</div>
@@ -151,6 +151,10 @@ const Home = () => {
                             </div>
                         </div>
                     ))
+                )}
+
+                {(!loadingLesson && categories.length <= 0) && (
+                    <p>Chưa có bài học nào.</p>
                 )}
             </div>
         </>

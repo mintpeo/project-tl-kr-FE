@@ -80,8 +80,10 @@ const LessonRoad = () => {
                                     <span className="preview-num">{index + 1}</span>
 
                                     <div>
-                                        <p>{category.name}</p>
-                                        <span>{category.lessonsSize} video · {category.des}</span>
+                                        <p>Bài {index + 1} - {category.name}</p>
+                                        <span>Tổng bài học: <strong>{category.lessonsSize} video</strong><br />
+                                            Nội dung sẽ được học: <strong>{category.des}</strong>
+                                        </span>
                                     </div>
                                 </div>
                             ))}

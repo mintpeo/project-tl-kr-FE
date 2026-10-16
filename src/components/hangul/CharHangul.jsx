@@ -21,12 +21,7 @@ const CharHangul = ({isVowels}) => {
 
     const [selectedPairIndex, setSelectedPairIndex] = useState(0);
     const selectedPair = char_pair[selectedPairIndex] || char_pair[0];
-
-    const buildCloudinaryUrl = (version, fileName) => {
-        return `https://res.cloudinary.com/dqzuuzi8z/image/upload/v${version}/${fileName}.svg`;
-    };
-
-    console.log(characters);
+    // console.log(characters);
 
     useEffect(() => {
         setSelectedSingleIndex(0);

@@ -132,6 +132,8 @@
                         flex: 1;
                         min-width: 0;
                         white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
 
                         p {
                             margin: 0;
@@ -178,6 +180,12 @@
                         color: var(--ink-soft);
                         cursor: pointer;
 
+                        &.sub-item-child {
+                            padding-left: 18px;
+                            font-size: 13px;
+                            opacity: 0.9;
+                        }
+
                         &:hover {
                             color: var(--ink);
                         }
@@ -223,7 +231,7 @@
     .content-card {
         padding: 0;
         overflow: hidden;
-
+        /*min-height: 100vh;*/
         /* video player mock */
         .video-player {
             position: relative;
@@ -458,8 +466,36 @@
     }
 }
 
+@media (max-width: 1100px) {
+    #lesson-road {
+        .lesson-shell {
+            grid-template-columns: 240px 1fr;
+            gap: 16px;
+        }
+
+        .content-card {
+            .content-head {
+                padding: 16px 20px 0;
+            }
+
+            .content-tabs {
+                padding: 0 20px;
+
+                .content-tab {
+                    margin-right: 18px;
+                }
+            }
+
+            .tab-panel {
+                padding: 20px;
+            }
+        }
+    }
+}
+
 @media (max-width: 768px) {
     #lesson-road {
+
         .page-head {
             margin-bottom: 16px;
 
@@ -475,25 +511,26 @@
         .lesson-shell {
             grid-template-columns: 1fr;
             gap: 16px;
+        }
 
-            .curriculum {
-                .curriculum-head {
-                    padding: 12px 12px 8px;
+        .curriculum {
+            .curriculum-head {
+                padding: 12px 12px 8px;
+            }
+
+            .module {
+                .module-head {
+                    padding: 11px 12px;
                 }
 
-                .module {
-                    .module-head {
-                        padding: 11px 12px;
-                    }
-
-                    .submodule-list {
-                        padding: 0 12px 10px 42px;
-                    }
+                .submodule-list {
+                    padding: 0 12px 10px 42px;
                 }
             }
         }
 
         .content-card {
+
             .video-player {
                 .play-btn {
                     width: 48px;
@@ -510,6 +547,13 @@
                     right: -10px;
                     bottom: -20px;
                 }
+
+                .video-duration {
+                    bottom: 10px;
+                    right: 10px;
+                    font-size: 10px;
+                    padding: 3px 7px;
+                }
             }
 
             .content-head {
@@ -520,7 +564,7 @@
                 }
 
                 p {
-                    font-size: 12.5px;
+                    font-size: 13px;
                     margin-bottom: 12px;
                 }
             }
@@ -537,6 +581,7 @@
 
                 .content-tab {
                     padding: 10px 0;
+                    margin-right: 20px;
                     font-size: 12px;
                     flex-shrink: 0;
                 }
@@ -575,6 +620,196 @@
                     align-items: flex-start;
                     gap: 12px;
                     padding: 14px;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    #lesson-road {
+
+        .page-head {
+            h1 {
+                font-size: 18px;
+            }
+
+            p {
+                font-size: 12px;
+            }
+        }
+
+        .lesson-shell {
+            gap: 12px;
+        }
+
+        .curriculum {
+            .curriculum-head {
+                padding: 11px;
+            }
+
+            .module {
+                .module-head {
+                    padding: 10px;
+                    gap: 8px;
+                }
+
+                .module-status {
+                    width: 20px;
+                    height: 20px;
+                }
+
+                .module-title {
+                    p {
+                        font-size: 12px;
+                    }
+
+                    span {
+                        font-size: 10px;
+                    }
+                }
+
+                .submodule-list {
+                    padding-left: 34px;
+                }
+            }
+        }
+
+        .content-card {
+            .video-player {
+                .play-btn {
+                    width: 44px;
+                    height: 44px;
+
+                    svg {
+                        width: 16px;
+                        height: 16px;
+                    }
+                }
+
+                .ghost-char {
+                    font-size: 100px;
+                    right: -8px;
+                    bottom: -14px;
+                }
+
+                .video-duration {
+                    bottom: 7px;
+                    right: 7px;
+                    font-size: 9px;
+                    padding: 2px 6px;
+                }
+            }
+
+            .content-head {
+                padding: 14px 12px 0;
+
+                h2 {
+                    font-size: 16px;
+                }
+
+                p {
+                    font-size: 12px;
+                    margin-bottom: 10px;
+                }
+            }
+
+            .content-tabs {
+                padding: 0 12px;
+
+                .content-tab {
+                    margin-right: 16px;
+                    padding: 9px 0;
+                    font-size: 11px;
+
+                    .count-badge {
+                        font-size: 9px;
+                        padding: 1px 5px;
+                    }
+                }
+            }
+
+            .tab-panel {
+                padding: 12px;
+
+                .demo-card {
+                    .char-switch {
+                        gap: 6px;
+
+                        button {
+                            width: 42px;
+                            height: 42px;
+                            font-size: 13px;
+                        }
+                    }
+
+                    .svg-stage {
+                        width: 140px;
+                        height: 140px;
+                    }
+
+                    .audio-stage {
+                        audio {
+                            max-width: 100%;
+                        }
+                    }
+                }
+
+                .stroke-detail {
+                    padding: 12px;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 360px) {
+    #lesson-road {
+
+        .page-head {
+            h1 {
+                font-size: 17px;
+            }
+
+            p {
+                font-size: 11px;
+            }
+        }
+
+        .content-card {
+
+            .content-head {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .content-tabs {
+                padding: 0 10px;
+
+                .content-tab {
+                    margin-right: 14px;
+                    font-size: 10px;
+                }
+            }
+
+            .tab-panel {
+                padding: 10px;
+
+                .demo-card {
+                    .char-switch {
+                        gap: 5px;
+
+                        button {
+                            width: 38px;
+                            height: 38px;
+                            font-size: 12px;
+                        }
+                    }
+
+                    .svg-stage {
+                        width: 125px;
+                        height: 125px;
+                    }
                 }
             }
         }

@@ -12,131 +12,576 @@
     gap: 28px;
     border-right: 1px solid var(--paper-dim);
 
-    .brand {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 0 6px;
-
-        .brand-mark {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            background: var(--celadon);
-            color: var(--paper-card);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Noto Serif KR', serif;
-            font-size: 19px;
-            font-weight: 700;
-        }
-
-        .brand-name {
-            font-family: 'Noto Serif KR', serif;
-            font-size: 19px;
-            font-weight: 700;
-        }
-
-        .brand-sub {
-            font-size: 11px;
-            color: var(--ink-soft);
-            margin-top: 1px;
-        }
+    .mobile-toggle-btn {
+        width: 40px;
+        height: 40px;
+        display: none;
     }
 
-    .nav-group-label {
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: .06em;
-        color: var(--ink-soft);
-        font-weight: 700;
-        padding: 0 12px;
-        margin: 4px 0 2px;
-    }
-
-    .nav {
+    .menu-content {
         display: flex;
         flex-direction: column;
-        gap: 3px;
+        justify-content: space-between;
+        padding-bottom: 32px;
+        height: 100%;
 
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            padding: 10px 12px;
-            border-radius: 10px;
-            font-size: 14px;
-            color: var(--ink-soft);
-            cursor: pointer;
-            border: none;
-            background: transparent;
-            text-align: left;
-            width: 100%;
-            font-family: 'Be Vietnam Pro', sans-serif;
-            transition: background .15s ease, color .15s ease;
+        .sidebar-foot-wrapper {
+            margin-top: auto;
+            position: relative;
 
-            svg {
-                width: 17px;
-                height: 17px;
-                flex-shrink: 0;
-                stroke: currentColor;
+            .user-dropdown-menu {
+                position: absolute;
+                bottom: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--paper-card);
+                border: 1px solid var(--paper-dim);
+                border-radius: 12px;
+                padding: 6px;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                z-index: 100;
+                animation: fadeIn 0.15s ease-in-out;
+
+                .menu-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 8px 10px;
+                    border: none;
+                    background: transparent;
+                    border-radius: 8px;
+                    font-size: 13px;
+                    color: var(--ink);
+                    font-family: 'Be Vietnam Pro', sans-serif;
+                    cursor: pointer;
+                    width: 100%;
+                    text-align: left;
+                    transition: background 0.15s ease;
+
+                    svg {
+                        color: var(--ink-soft);
+                    }
+
+                    &:hover {
+                        background: var(--paper-dim);
+                    }
+
+                    &.logout {
+                        color: var(--plum);
+
+                        svg {
+                            color: var(--plum);
+                        }
+
+                        &:hover {
+                            background: var(--plum-light);
+                        }
+                    }
+                }
+
+                .menu-divider {
+                    height: 1px;
+                    background: var(--paper-dim);
+                    margin: 4px 0;
+                }
             }
 
-            &:hover {
-                background: var(--paper-dim);
-                color: var(--ink);
-            }
-        }
+            .brand {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 0 6px;
 
-        .active {
-            background: var(--celadon-light);
-            color: var(--celadon-dark);
-            font-weight: 600;
+                .brand-mark {
+                    width: 38px;
+                    height: 38px;
+                    border-radius: 10px;
+                    background: var(--celadon);
+                    color: var(--paper-card);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-family: 'Noto Serif KR', serif;
+                    font-size: 19px;
+                    font-weight: 700;
+                }
+
+                .brand-name {
+                    font-family: 'Noto Serif KR', serif;
+                    font-size: 19px;
+                    font-weight: 700;
+                }
+
+                .brand-sub {
+                    font-size: 11px;
+                    color: var(--ink-soft);
+                    margin-top: 1px;
+                }
+            }
+
+            .nav-group-label {
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                color: var(--ink-soft);
+                font-weight: 700;
+                padding: 0 12px;
+                margin: 4px 0 2px;
+            }
+
+            .nav {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+
+                .nav-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 11px;
+                    padding: 10px 12px;
+                    border-radius: 10px;
+                    font-size: 14px;
+                    color: var(--ink-soft);
+                    cursor: pointer;
+                    border: none;
+                    background: transparent;
+                    text-align: left;
+                    width: 100%;
+                    font-family: 'Be Vietnam Pro', sans-serif;
+                    transition: background .15s ease, color .15s ease;
+
+                    svg {
+                        width: 17px;
+                        height: 17px;
+                        flex-shrink: 0;
+                        stroke: currentColor;
+                    }
+
+                    &:hover {
+                        background: var(--paper-dim);
+                        color: var(--ink);
+                    }
+                }
+
+                .active {
+                    background: var(--celadon-light);
+                    color: var(--celadon-dark);
+                    font-weight: 600;
+                }
+            }
+
+            .sidebar-foot {
+                margin-top: auto;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                padding: 10px 12px;
+                border-radius: 10px;
+                background: var(--paper-card);
+                border: 1px solid var(--paper-dim);
+                cursor: default !important;
+
+                .avatar {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    background: var(--plum);
+                    color: #fff;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 13px;
+                    font-weight: 600;
+                    font-family: 'Noto Serif KR', serif;
+                    flex-shrink: 0;
+                }
+
+                .name {
+                    font-size: 13px;
+                    font-weight: 600;
+                }
+
+                .role {
+                    font-size: 11px;
+                    color: var(--ink-soft);
+                }
+
+                .logout {
+                    cursor: pointer !important;
+                    display: flex;
+                    align-items: center;
+                }
+            }
         }
     }
+}
 
-    .sidebar-foot {
-        margin-top: auto;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        padding: 10px 12px;
-        border-radius: 10px;
+@media (max-width: 1024px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: min(280px, 80vw);
+        max-height: 100vh;
+        padding: 24px 16px;
         background: var(--paper-card);
-        border: 1px solid var(--paper-dim);
-        cursor: default !important;
+        border-right: 1px solid var(--paper-dim);
+        transform: translateX(-100%);
+        transition: transform 0.28s ease-in-out;
+        z-index: 1000;
+        overflow-y: auto;
+        overflow-x: hidden;
 
-        .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--plum);
-            color: #fff;
+        .mobile-toggle-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
-            font-weight: 600;
-            font-family: 'Noto Serif KR', serif;
-            flex-shrink: 0;
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            width: 40px;
+            height: 40px;
+            z-index: 1001;
+            background: var(--paper-card);
+            border: 1px solid var(--paper-dim);
+            border-radius: 8px;
+            padding: 6px;
+            cursor: pointer;
+            color: var(--ink);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
-        .name {
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .role {
-            font-size: 11px;
-            color: var(--ink-soft);
-        }
-
-        .logout {
-            cursor: pointer !important;
+        .menu-content {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: min(320px, 85vw);
+            max-width: 320px;
+            height: 100vh;
+            max-height: 100vh;
+            background: var(--paper-card);
+            z-index: 1003;
+            transform: translateX(-100%);
+            transition: transform 0.28s ease-in-out;
+            box-shadow: none;
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 18px;
+            overflow-y: auto;
+            overflow-x: hidden;
+
+            &.open {
+                transform: translateX(0);
+                box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+                padding-bottom: 24px;
+            }
+
+            .sidebar-backdrop {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.45);
+                backdrop-filter: blur(3px);
+                z-index: 1002;
+            }
+
+            .brand {
+                padding: 0 4px;
+
+                .brand-mark {
+                    width: 36px;
+                    height: 36px;
+                    font-size: 18px;
+                }
+
+                .brand-name {
+                    font-size: 18px;
+                }
+
+                .brand-sub {
+                    font-size: 10px;
+                }
+            }
+
+            .nav-group-label {
+                font-size: 10px;
+                padding: 0 10px;
+            }
+
+            .nav {
+                .nav-item {
+                    gap: 10px;
+                    padding: 9px 10px;
+                    font-size: 13px;
+
+                    svg {
+                        width: 17px;
+                        height: 17px;
+                    }
+                }
+            }
+
+            .sidebar-foot {
+                padding: 9px 10px;
+
+                .avatar {
+                    width: 30px;
+                    height: 30px;
+                    font-size: 12px;
+                }
+
+                .name {
+                    font-size: 12px;
+                }
+
+                .role {
+                    font-size: 10px;
+                }
+            }
+        }
+
+        &.open {
+            transform: translateX(0);
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: min(270px, 82vw);
+        padding: 20px 14px;
+        gap: 22px;
+
+        .mobile-toggle-btn {
+            width: 38px;
+            height: 38px;
+            top: 12px;
+            left: 12px;
+        }
+
+        .menu-content {
+            width: min(300px, 82vw);
+            padding: 20px 16px;
+
+            &.open {
+                padding-bottom: 20px;
+            }
+
+            .brand {
+                gap: 8px;
+
+                .brand-mark {
+                    width: 35px;
+                    height: 35px;
+                    border-radius: 9px;
+                    font-size: 17px;
+                }
+
+                .brand-name {
+                    font-size: 17px;
+                }
+
+                .brand-sub {
+                    font-size: 10px;
+                }
+            }
+
+            .nav-group-label {
+                font-size: 10px;
+                padding: 0 9px;
+                margin: 3px 0 2px;
+            }
+
+            .nav {
+                gap: 2px;
+
+                .nav-item {
+                    gap: 9px;
+                    padding: 9px 9px;
+                    font-size: 13px;
+                    border-radius: 9px;
+
+                    svg {
+                        width: 16px;
+                        height: 16px;
+                    }
+                }
+            }
+
+            .sidebar-foot {
+                gap: 8px;
+                padding: 8px 9px;
+
+                .avatar {
+                    width: 29px;
+                    height: 29px;
+                    font-size: 11px;
+                }
+
+                .name {
+                    font-size: 12px;
+                }
+
+                .role {
+                    font-size: 10px;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: min(260px, 86vw);
+
+        padding: 18px 12px;
+
+        gap: 18px;
+
+        .brand {
+            gap: 7px;
+            padding: 0 3px;
+
+            .brand-mark {
+                width: 34px;
+                height: 34px;
+                border-radius: 9px;
+                font-size: 16px;
+            }
+
+            .brand-name {
+                font-size: 16px;
+            }
+
+            .brand-sub {
+                font-size: 9px;
+            }
+        }
+
+        .nav-group-label {
+            font-size: 9px;
+            padding: 0 8px;
+        }
+
+        .nav {
+            gap: 2px;
+
+            .nav-item {
+                gap: 8px;
+                padding: 8px;
+                font-size: 12px;
+                border-radius: 8px;
+
+                svg {
+                    width: 16px;
+                    height: 16px;
+                }
+            }
+        }
+
+        .sidebar-foot {
+            gap: 7px;
+            padding: 7px 8px;
+
+            .avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 11px;
+            }
+
+            .name {
+                font-size: 11px;
+            }
+
+            .role {
+                font-size: 9px;
+            }
+
+            .logout {
+                svg {
+                    width: 16px;
+                    height: 16px;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 360px) {
+    .sidebar {
+        width: min(245px, 88vw);
+
+        padding: 16px 10px;
+
+        gap: 16px;
+
+        .brand {
+            gap: 6px;
+
+            .brand-mark {
+                width: 32px;
+                height: 32px;
+                font-size: 15px;
+            }
+
+            .brand-name {
+                font-size: 15px;
+            }
+
+            .brand-sub {
+                font-size: 8px;
+            }
+        }
+
+        .nav-group-label {
+            font-size: 8px;
+            padding: 0 7px;
+        }
+
+        .nav {
+            .nav-item {
+                gap: 7px;
+                padding: 7px;
+                font-size: 11px;
+
+                svg {
+                    width: 15px;
+                    height: 15px;
+                }
+            }
+        }
+
+        .sidebar-foot {
+            gap: 6px;
+            padding: 6px 7px;
+
+            .avatar {
+                width: 26px;
+                height: 26px;
+                font-size: 10px;
+            }
+
+            .name {
+                font-size: 10px;
+            }
+
+            .role {
+                font-size: 8px;
+            }
+
+            .logout {
+                svg {
+                    width: 15px;
+                    height: 15px;
+                }
+            }
         }
     }
 }

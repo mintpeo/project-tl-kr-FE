@@ -36,6 +36,7 @@ const AdminCharacter = () => {
     });
     const charsRes = getAllChars.map(mapChars);
     const [chars, setChars] = useState([]);
+    // console.log(charsRes);
 
     // Modal
     const [modalOpen, setModalOpen] = useState(false);
@@ -165,7 +166,7 @@ const AdminCharacter = () => {
         {name: "Tổng số ký tự", amount: charsRes.length, icon: "chars", tone: "tone-a"},
         {name: "Nguyên âm", amount: vowelsLength, icon: "vowels", tone: "tone-b"},
         {name: "Phụ âm", amount: consonantsLength, icon: "consonants", tone: "tone-c"},
-        {name: "Thiếu dữ liệu nét", amount: totalLoss, icon: "notFound", tone: "tone-d"},
+        // {name: "Thiếu dữ liệu nét", amount: totalLoss, icon: "notFound", tone: "tone-d"},
     ];
     const iconStatRows = {
         chars: (
@@ -243,18 +244,18 @@ const AdminCharacter = () => {
                     />
                 </div>
 
-                <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
-                    <option value="all">Tất cả danh mục</option>
-                    {CATEGORY_OPTIONS.map((c) => (
-                        <option key={c.value} value={c.value}>{c.label}</option>
-                    ))}
-                </select>
+                {/*<select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>*/}
+                {/*    <option value="all">Tất cả danh mục</option>*/}
+                {/*    {CATEGORY_OPTIONS.map((c) => (*/}
+                {/*        <option key={c.value} value={c.value}>{c.label}</option>*/}
+                {/*    ))}*/}
+                {/*</select>*/}
 
-                <select value={strokeFilter} onChange={(e) => setStrokeFilter(e.target.value)}>
-                    <option value="all">Tất cả dữ liệu nét</option>
-                    <option value="has">Đã có SVG</option>
-                    <option value="missing">Chưa có SVG</option>
-                </select>
+                {/*<select value={strokeFilter} onChange={(e) => setStrokeFilter(e.target.value)}>*/}
+                {/*    <option value="all">Tất cả dữ liệu nét</option>*/}
+                {/*    <option value="has">Đã có SVG</option>*/}
+                {/*    <option value="missing">Chưa có SVG</option>*/}
+                {/*</select>*/}
             </div>
 
             {/* ---------------- TABLE ---------------- */}
@@ -266,58 +267,60 @@ const AdminCharacter = () => {
                         <th>Ký tự</th>
                         <th>Cách đọc</th>
                         <th style={{whiteSpace: "nowrap"}}>Danh mục</th>
-                        <th>Hình ảnh</th>
-                        <th>Dữ liệu nét</th>
-                        <th>Trạng thái</th>
-                        <th>Âm</th>
+                        <th>Số nét</th>
+                        {/*<th>Hình ảnh</th>*/}
+                        {/*<th>Dữ liệu nét</th>*/}
+                        {/*<th>Trạng thái</th>*/}
+                        {/*<th>Âm</th>*/}
                         <th style={{ textAlign: 'right' }}>Hành động</th>
                     </tr>
                     </thead>
                     <tbody>
                     {chars.map((c, index) => (
-                        <tr key={c.id}>
+                        <tr key={c?.id}>
                             <td>{index + 1}</td>
-                            <td><div className="glyph-cell">{c.name}</div></td>
-                            <td className="mono">|{c.transcription}|</td>
-                            <td style={{whiteSpace: "nowrap"}}><span className={`category-badge ${c.type}`}>{categoryLabel(c.type)}</span></td>
-                            <td>
-                                <div style={{display: "flex", alignItems: "center", gap: '10px'}}>
-                                    {c?.imgUrl ? (
-                                        <span className="stroke-badge has"><img src={c?.imgUrl} alt={c?.name}/></span>
-                                    ) : (
-                                        <span className="stroke-badge missing">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                <path d="M12 9v4m0 4h.01" />
-                                                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-                                            </svg>
-                                            Chưa có
-                                        </span>
-                                    )}
-                                    {c?.status === 'pending' && (
-                                        <>
-                                            <p>&rarr;</p>
-                                            <span className="stroke-badge has">
-                                                <img src={c?.pendingUrl} alt={c?.name}/>
-                                            </span>
-                                        </>
-                                    )}
-                                </div>
-                            </td>
-                            <td>
-                                <div style={{display: "flex", alignItems: "center", gap: '10px'}}>
-                                    <span className="stroke-badge has">{formatStrokeId(c?.fileName)}</span>
-                                    {c?.status === 'pending' && (
-                                        <>
-                                            <p>&rarr;</p>
-                                            <span className="stroke-badge has">
-                                                {formatStrokeId(c?.pendingPublicId)}
-                                            </span>
-                                        </>
-                                    )}
-                                </div>
-                            </td>
-                            <td><span className="stroke-badge">{STATUS_LABEL[c?.status]}</span></td>
-                            <td className="mono">{c.double ? `Đôi` : `Đơn`}</td>
+                            <td><div className="glyph-cell">{c?.name}</div></td>
+                            <td className="mono">|{c?.transcription}|</td>
+                            <td style={{whiteSpace: "nowrap"}}><span className={`category-badge ${c?.type}`}>{categoryLabel(c?.type)}</span></td>
+                            <td>{c?.strokeCount}</td>
+                            {/*<td>*/}
+                            {/*    <div style={{display: "flex", alignItems: "center", gap: '10px'}}>*/}
+                            {/*        {c?.imgUrl ? (*/}
+                            {/*            <span className="stroke-badge has"><img src={c?.imgUrl} alt={c?.name}/></span>*/}
+                            {/*        ) : (*/}
+                            {/*            <span className="stroke-badge missing">*/}
+                            {/*                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">*/}
+                            {/*                    <path d="M12 9v4m0 4h.01" />*/}
+                            {/*                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />*/}
+                            {/*                </svg>*/}
+                            {/*                Chưa có*/}
+                            {/*            </span>*/}
+                            {/*        )}*/}
+                            {/*        {c?.status === 'pending' && (*/}
+                            {/*            <>*/}
+                            {/*                <p>&rarr;</p>*/}
+                            {/*                <span className="stroke-badge has">*/}
+                            {/*                    <img src={c?.pendingUrl} alt={c?.name}/>*/}
+                            {/*                </span>*/}
+                            {/*            </>*/}
+                            {/*        )}*/}
+                            {/*    </div>*/}
+                            {/*</td>*/}
+                            {/*<td>*/}
+                            {/*    <div style={{display: "flex", alignItems: "center", gap: '10px'}}>*/}
+                            {/*        <span className="stroke-badge has">{formatStrokeId(c?.fileName)}</span>*/}
+                            {/*        {c?.status === 'pending' && (*/}
+                            {/*            <>*/}
+                            {/*                <p>&rarr;</p>*/}
+                            {/*                <span className="stroke-badge has">*/}
+                            {/*                    {formatStrokeId(c?.pendingPublicId)}*/}
+                            {/*                </span>*/}
+                            {/*            </>*/}
+                            {/*        )}*/}
+                            {/*    </div>*/}
+                            {/*</td>*/}
+                            {/*<td><span className="stroke-badge">{STATUS_LABEL[c?.status]}</span></td>*/}
+                            {/*<td className="mono">{c.double ? `Đôi` : `Đơn`}</td>*/}
                             <td>
                                 <div className="row-actions">
                                     <button className="icon-btn" title="Chỉnh sửa" onClick={() => openEditModal(c)}>
@@ -344,16 +347,16 @@ const AdminCharacter = () => {
                     <div className="modal-card" onClick={(e) => e.stopPropagation()}>
                         <h3>Chỉnh sửa ký tự</h3>
 
-                        <form onSubmit={handleUploadFile}>
+                        <form onSubmit={handleEditChar}>
                             <div className="field-row">
                                 <div className="field" style={{ maxWidth: 100 }}>
                                     <label>Ký tự</label>
                                     <input
                                         type="text"
                                         className="glyph-input"
-                                        disabled={true}
-                                        value={form.name}
+                                        defaultValue={form.name}
                                         maxLength={2}
+                                        onChange={(e) => handleFieldChange('name', e.target.value)}
                                         required
                                     />
                                 </div>
@@ -362,9 +365,9 @@ const AdminCharacter = () => {
                                     <label>Cách đọc</label>
                                     <input
                                         type="text"
-                                        disabled={true}
-                                        value={form.transcription}
+                                        defaultValue={form.transcription}
                                         required
+                                        onChange={(e) => handleFieldChange('transcription', e.target.value)}
                                     />
                                 </div>
 
@@ -372,7 +375,7 @@ const AdminCharacter = () => {
                                     <label>Âm</label>
                                     <select
                                         value={String(form.double)}
-                                        disabled={true}
+                                        onChange={(e) => handleFieldChange('double', e.target.value === 'true')}
                                     >
                                         {TYPE_OPTIONS.map((c) => (
                                             <option key={c.value} value={String(c.value)}>{c.label}</option>
@@ -382,52 +385,64 @@ const AdminCharacter = () => {
                             </div>
 
                             <div className="field-row">
-                                <div className="field">
-                                    <label>Danh mục</label>
-                                    <select
-                                        value={form.type}
-                                        disabled={true}
-                                    >
-                                        {CATEGORY_OPTIONS.map((c) => (
-                                            <option key={c.value} value={c.value}>{c.label}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div className="field">
-                                    <label>Số nét viết</label>
-                                    <input
-                                        type="number"
-                                        min={1}
-                                        max={10}
-                                        value={form.strokeCount}
-                                        disabled={true}
-                                    />
-                                </div>
-                            </div>
-
-                            {form?.status === 'flagged' && (
-                                <div className="field">
-                                    <label>Lý do</label>
-                                    <textarea
-                                        rows={3}
-                                        defaultValue={form?.note ?? ''}
-                                        disabled
-                                    />
-                                </div>
-                            )}
-
-                            <div className="field">
-                                <label>File dữ liệu nét (SVG)</label>
-
-                                <label className="upload-box">
-                                    <input type="file" accept=".svg" hidden onChange={handleFileChange} />
-                                    <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4" /><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" /></svg>
-                                    {previewUrl ? (<span>{`${formatStrokeId(form?.fileName)} -> ${previewUrl}`}</span>) : (
-                                        <span>{formatStrokeId(form?.fileName) || 'Kéo thả file .svg hoặc bấm để chọn'}</span>
+                                <div className="field stroke-preview">
+                                    <label>Hình ảnh</label>
+                                    {form?.imgUrl ? (
+                                        <img src={form?.imgUrl} alt={form?.name} />
+                                    ) : (
+                                        <div className="stroke-preview-empty">Chưa có file</div>
                                     )}
-                                </label>
+                                </div>
+
+                                <div className="field-col">
+                                    <div className="field">
+                                        <label>Danh mục</label>
+                                        <select
+                                            value={form.type}
+                                            onChange={(e) => handleFieldChange('type', e.target.value)}
+                                        >
+                                            {CATEGORY_OPTIONS.map((c) => (
+                                                <option key={c.value} value={c.value}>{c.label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="field">
+                                        <label>Số nét viết</label>
+                                        <input
+                                            type="number"
+                                            min={1}
+                                            max={10}
+                                            defaultValue={form.strokeCount}
+                                            onChange={(e) => handleFieldChange('strokeCount', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
                             </div>
+
+                            {/*{form?.status === 'flagged' && (*/}
+                            {/*    <div className="field">*/}
+                            {/*        <label>Lý do</label>*/}
+                            {/*        <textarea*/}
+                            {/*            rows={3}*/}
+                            {/*            defaultValue={form?.note ?? ''}*/}
+                            {/*            disabled    */}
+                            {/*        />*/}
+                            {/*    </div>*/}
+                            {/*)}*/}
+
+                            {/*<div className="field">*/}
+                            {/*    <label>File dữ liệu nét (SVG)</label>*/}
+                                {/*<img src={form?.imgUrl} alt={form?.name}/>*/}
+
+                                {/*<label className="upload-box">*/}
+                                {/*    <input type="file" accept=".svg" hidden onChange={handleFileChange} />*/}
+                                {/*    <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4" /><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" /></svg>*/}
+                                {/*    {previewUrl ? (<span>{`${formatStrokeId(form?.fileName)} -> ${previewUrl}`}</span>) : (*/}
+                                {/*        <span>{formatStrokeId(form?.fileName) || 'Kéo thả file .svg hoặc bấm để chọn'}</span>*/}
+                                {/*    )}*/}
+                                {/*</label>*/}
+                            {/*</div>*/}
 
                             <div className="modal-actions">
                                 <button type="button" className="btn btn-ghost" onClick={closeModal}>Hủy</button>
