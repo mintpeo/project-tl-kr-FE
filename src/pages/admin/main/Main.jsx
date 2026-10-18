@@ -7,7 +7,7 @@ import {usePost} from "../../../components/use/usePost.js";
 import {usePatch} from "../../../components/use/usePatch.js";
 import {useDelete} from "../../../components/use/useDelete.js";
 
-const EMPTY_FORM = {id: null, fullName: '', email: '', password: '', phone: '', role: 'USER', active: true};
+const EMPTY_FORM = {id: null, fullName: '', email: '', password: '', phone: '', role: 'USER', active: true, changeEmail: ''};
 
 const Main = () => {
     const {data: loadAuth, loading: isLoadingAuth} = useFetch(`${API_URL}/admin/all`);
@@ -49,7 +49,8 @@ const Main = () => {
             password: '',
             phone: auth.phone || '',
             role: auth.role || 'USER',
-            active: Boolean(auth.enabled)
+            active: Boolean(auth.enabled),
+            changeEmail: auth.email || ''
         });
         setModalOpen(true);
     };
@@ -70,7 +71,8 @@ const Main = () => {
                     fullName: form.fullName.trim(),
                     phone: form.phone.trim(),
                     role: form.role,
-                    isActive: form.active
+                    isActive: form.active,
+                    changeEmail: form.changeEmail.trim(),
                 };
 
                 const data = await handleChangeProfile(req);
@@ -346,10 +348,10 @@ const Main = () => {
                                     <label>Email</label>
                                     <input
                                         type="email"
-                                        value={form.email || ""}
-                                        onChange={(e) => handleFieldChange("email", e.target.value)}
+                                        value={form.changeEmail || ""}
+                                        onChange={(e) => handleFieldChange("changeEmail", e.target.value)}
                                         placeholder="example@gmail.com"
-                                        disabled={editingId !== null} // Khóa đổi email khi đang ở chế độ sửa
+                                        // disabled={editingId !== null} // Khóa đổi email khi đang ở chế độ sửa
                                         required
                                     />
                                 </div>

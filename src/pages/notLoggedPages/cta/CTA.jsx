@@ -6,7 +6,7 @@ const Cta = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="cta-section">
+        <div className="cta-section" id="cta">
             <div className="cta-card">
                 <span className="ghost-char">한</span>
                 <h2>Sẵn sàng bắt đầu hành trình học tiếng Hàn?</h2>

@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import "./UserDetailModal.css";
 import {usePost} from "../../../components/use/usePost.js";
 import {API_URL} from "../../../components/API_URL.jsx";
+import Skeleton from "../../../components/loading/Skeleton.jsx";
 
 const UserDetailModal = ({ email, onClose }) => {
     if (!email) return null;
@@ -63,6 +64,7 @@ const UserDetailModal = ({ email, onClose }) => {
                 item.score < 60
     );
 
+    if (loadingUserDetail) return <Skeleton/>
     return (
         <div className="user-detail-overlay" onClick={onClose}>
             <div className="user-detail-modal" onClick={(e) => e.stopPropagation()}>
@@ -426,7 +428,7 @@ const getCharacterStatus = (score) => {
 
 const getCharacterLevel = (score) => {
     if (score >= 80) return "mastered";
-    if (score >= 60) return "good";
+    if (score >= 50) return "good";
     return "weak";
 };
 

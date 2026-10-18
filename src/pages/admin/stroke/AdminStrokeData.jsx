@@ -114,7 +114,7 @@ const AdminStrokeData = () => {
         setSelectedItem(item);
         setNoteDraft(item?.flagReason ?? '');
     }
-    console.log(activeId)
+
     const closeDetail = () => {
         setActiveId(null);
         setStrokeOptionData([]);

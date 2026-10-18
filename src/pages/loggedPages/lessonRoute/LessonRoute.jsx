@@ -218,7 +218,6 @@ const LessonRoute = () => {
 
                                 <div className="submodule-list">
                                     {loadingLessonCate && (<Skeleton />)}
-
                                     {lessons.sort((a, b) => a.orderIndex - b.orderIndex)
                                         .map((lesson, index) => (
                                             <>
