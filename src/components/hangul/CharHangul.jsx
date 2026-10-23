@@ -83,7 +83,7 @@ const CharHangul = ({isVowels}) => {
                 <audio
                     key={selectedPair?.id}
                     controls
-                    src={selectedSingle?.audioUrl}
+                    src={selectedPair?.audioUrl}
                     // src={`${API_URL}/audio/speak?text=${encodeURIComponent(selectedPair?.name)}`}
                 />
 

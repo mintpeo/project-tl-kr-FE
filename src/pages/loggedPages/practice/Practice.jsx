@@ -11,7 +11,11 @@ const Practice = () => {
 
     const {data: characters, loading: isLoading} = useFetch(`${API_URL}/character/all`);
     const vowels = characters.filter(char => char.type === "VOWEL");
+    const vowelsSingle = vowels.filter(char => !char.double);
+    const vowelsDouble = vowels.filter(char => char.double);
     const consonants = characters.filter(char => char.type === "CONSONANT");
+    const consonantsSingle = consonants.filter(char => !char.double);
+    const consonantsDouble = consonants.filter(char => char.double);
 
     const [selectedCate, setSelectedCate] = useState(0);
     const [charList, setCharList] = useState([]);
@@ -32,13 +36,14 @@ const Practice = () => {
     const isDrawing = useRef(false);
 
     useEffect(() => {
-        setCharList(vowels);
+        setCharList(vowelsSingle);
     }, [characters]);
 
     const cateList = [
-        { name: 'Nguyên âm' },
-        { name: 'Phụ âm' },
-        // { name: 'Âm ghép' }
+        { name: 'Nguyên âm đơn' },
+        { name: 'Nguyên âm đôi' },
+        { name: 'Phụ âm đơn' },
+        { name: 'Phụ âm đôi' },
     ];
 
     const clearCanvas = () => {
@@ -206,8 +211,10 @@ const Practice = () => {
     };
 
     useEffect(() => {
-        if (selectedCate === 0) setCharList(vowels);
-        if (selectedCate === 1) setCharList(consonants);
+        if (selectedCate === 0) setCharList(vowelsSingle);
+        if (selectedCate === 1) setCharList(vowelsDouble);
+        if (selectedCate === 2) setCharList(consonantsSingle);
+        if (selectedCate === 3) setCharList(consonantsDouble);
         setSelectedChar(-1);
     }, [selectedCate]);
 

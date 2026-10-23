@@ -1154,6 +1154,11 @@
             }
         }
 
+        .user-level {
+            width: 100%;
+            padding: 14px;
+        }
+
         .row-2col {
             gap: 12px;
             margin-top: 14px;

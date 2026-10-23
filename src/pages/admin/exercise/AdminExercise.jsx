@@ -18,7 +18,7 @@ const INITIAL_QUESTIONS = [
     { id: 7, lesson: 'syllable-combine', question: "ㄱ + ㅏ ghép thành chữ nào?", options: ['가', '나', '다', '사'], correct: 0 },
 ];
 
-const EMPTY_FORM = { quizId: '', question: '', questionMediaUrl: '', options: [...EMPTY_OPTIONS], correct: 0, isAudio: false };
+const EMPTY_FORM = { quizId: '', question: '', questionMediaUrl: '', options: [...EMPTY_OPTIONS], correct: 0, isAudio: false, questionAudio: false };
 
 const AdminExercise = () => {
     const {data: loadAdminQuiz} = useFetch(`${API_URL}/admin/get-quizzes`);
@@ -33,7 +33,9 @@ const AdminExercise = () => {
         question: q?.question,
         options: q?.options,
         correct: q?.options.find((opt) => opt?.correct === true)?.id,
-        audio: q?.audio
+        audio: q?.audio,
+        questionAudio: q?.questionAudio,
+        questionMediaUrl: q?.questionMediaUrl
     });
     const quizRes = loadAdminQuiz.map(mapQuizRes);
 
@@ -137,7 +139,8 @@ const AdminExercise = () => {
                 questionMediaUrl: form?.questionMediaUrl,
                 correct: form?.correct,
                 options: form?.options,
-                isAudio: form?.audio
+                isAudio: form?.audio,
+                isQuestionAudio: form?.questionAudio
             }
             try {
                 const data = await handleUpdateQuestion(req);
@@ -323,12 +326,36 @@ const AdminExercise = () => {
                             </div>
 
                             <div className="field">
-                                <label>Câu hỏi</label>
+                                <div style={{display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: '8px'}}>
+                                    <label>Câu hỏi</label>
+                                    <div className="audio-toggle">
+                                        <span>Dạng âm thanh</span>
+                                        <button
+                                            type="button"
+                                            className={`toggle-switch ${form?.questionAudio ? 'active' : ''}`}
+                                            onClick={() => setForm({... form, questionAudio: !form.questionAudio})}
+                                            aria-label="Bật tắt dạng âm thanh"
+                                        >
+                                            <span className="toggle-thumb"></span>
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <input
                                     type="text"
                                     value={form.question}
+                                    style={{marginBottom: '8px'}}
                                     onChange={(e) => setForm({ ...form, question: e.target.value })}
                                     placeholder="VD: Đâu là nguyên âm đọc là 'a'?"
+                                    required
+                                />
+
+                                <input
+                                    type="text"
+                                    value={form.questionMediaUrl}
+                                    disabled={!form?.questionAudio}
+                                    onChange={(e) => setForm({ ...form, questionMediaUrl: e.target.value })}
+                                    placeholder="Link âm thanh"
                                     required
                                 />
                             </div>

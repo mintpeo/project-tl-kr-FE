@@ -305,7 +305,7 @@ const Progress = () => {
                     )}
                 </div>
 
-                <div style={{width: 'auto'}}>
+                <div className="user-level">
                     {loadingUserLevel && (<Skeleton />)}
                     {!loadingUserLevel && (
                         <>
@@ -400,6 +400,11 @@ const Progress = () => {
                     </div>
 
                     <div className="bars">
+                        {chartData.length <= 0 &&
+                            <div className="bar-col">
+                                <div className="bar-day">Chưa có dữ liệu</div>
+                            </div>
+                        }
                         {chartData.map(([label, val, total], index) => (
                             <div className="bar-col" key={index}>
                                 <div className="bar-val">{val}</div>
@@ -458,7 +463,7 @@ const Progress = () => {
                 <div className="panel-head no-margin">
                     <div>
                         <h3>Mức độ thành thạo theo ký tự</h3>
-                        <p>{completedTotal}/{mastery.length} ký tự đã luyện · dựa trên điểm số trung bình gần nhất</p>
+                        <p>{completedTotal}/{mastery.length} ký tự đã luyện · dựa trên mức độ tương đồng trung bình gần nhất</p>
                     </div>
                 </div>
 

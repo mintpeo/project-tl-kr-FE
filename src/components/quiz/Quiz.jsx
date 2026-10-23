@@ -40,7 +40,9 @@ const Quiz = ({quizId, onFinish}) => {
         id: question?.id,
         title: question?.questionText,
         options: question?.options,
-        audio: question?.audio
+        audio: question?.audio,
+        questionAudio: question?.questionAudio,
+        questionMediaUrl: question?.questionMediaUrl
     });
     const questions = dataQuestions.map(mapQuestions);
 
@@ -182,6 +184,14 @@ const Quiz = ({quizId, onFinish}) => {
             </div>
 
             <div className="quiz-question">{current.title}</div>
+            {current?.questionAudio &&
+                <audio
+                    controls
+                    style={{marginBottom: '18px'}}
+                    // className={`quiz-option ${stateClass} ${answered ? 'disabled' : ''}`}
+                    src={current?.questionMediaUrl}
+                />
+            }
 
             <div className={`quiz-options ${isCharOptions ? 'char-mode' : 'text-mode'}`}>
                 {current.options.map((opt) => {
