@@ -18,7 +18,7 @@ const INITIAL_QUESTIONS = [
     { id: 7, lesson: 'syllable-combine', question: "ㄱ + ㅏ ghép thành chữ nào?", options: ['가', '나', '다', '사'], correct: 0 },
 ];
 
-const EMPTY_FORM = { quizId: '', question: '', questionMediaUrl: '', options: [...EMPTY_OPTIONS], correct: 0 };
+const EMPTY_FORM = { quizId: '', question: '', questionMediaUrl: '', options: [...EMPTY_OPTIONS], correct: 0, isAudio: false };
 
 const AdminExercise = () => {
     const {data: loadAdminQuiz} = useFetch(`${API_URL}/admin/get-quizzes`);
@@ -33,6 +33,7 @@ const AdminExercise = () => {
         question: q?.question,
         options: q?.options,
         correct: q?.options.find((opt) => opt?.correct === true)?.id,
+        audio: q?.audio
     });
     const quizRes = loadAdminQuiz.map(mapQuizRes);
 
@@ -135,7 +136,8 @@ const AdminExercise = () => {
                 question: form?.question,
                 questionMediaUrl: form?.questionMediaUrl,
                 correct: form?.correct,
-                options: form?.options
+                options: form?.options,
+                isAudio: form?.audio
             }
             try {
                 const data = await handleUpdateQuestion(req);
@@ -155,6 +157,7 @@ const AdminExercise = () => {
                 questionMediaUrl: '',
                 correct: form.correct,
                 options: form.options,
+                isAudio: form?.audio
             }
             try {
                 const data = await handleCreateQuestion(req);
@@ -187,11 +190,14 @@ const AdminExercise = () => {
     }
 
     // Spilt Text
-    const truncateText = (text, maxLength = 20) => {
-        if (!text || text.length <= maxLength) return text;
-        return text.slice(0, maxLength) + '...';
+    const truncateText = (text, start = 5, end = 5) => {
+        if (!text) return "";
+        if (text.length <= start + end + 3) {
+            return text;
+        }
+        return `${text.slice(0, start)}...${text.slice(-end)}`;
     };
-
+    console.log(form)
     return (
         <div id="admin-exercises">
             <div className="page-head">
@@ -270,7 +276,7 @@ const AdminExercise = () => {
                                 <div className="options-preview">
                                     {q.options.map((opt) => (
                                         <span key={opt?.id} className={`option-chip ${opt?.id === q.correct ? 'correct' : ''}`}>
-                                        {opt?.optionText}
+                                        {truncateText(opt?.optionText)}
                                       </span>
                                     ))}
                                 </div>
@@ -328,7 +334,21 @@ const AdminExercise = () => {
                             </div>
 
                             <div className="field">
-                                <label>Đáp án (chọn nút tròn để đánh dấu đáp án đúng)</label>
+                                <div className="field-label-row">
+                                    <label>Đáp án</label>
+                                    <div className="audio-toggle">
+                                        <span>Dạng âm thanh</span>
+                                        <button
+                                            type="button"
+                                            className={`toggle-switch ${form?.audio ? 'active' : ''}`}
+                                            onClick={() => setForm({... form, audio: !form.audio})}
+                                            aria-label="Bật tắt dạng âm thanh"
+                                        >
+                                            <span className="toggle-thumb"></span>
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <div className="options-form">
                                     {form.options.map((opt, i) => (
                                         <div className="option-row" key={i}>

@@ -7,6 +7,7 @@ import CharHangul from "../../../components/hangul/CharHangul.jsx";
 import Combine from "../combine/Combine.jsx";
 import {usePost} from "../../../components/use/usePost.js";
 import Quiz from "../../../components/quiz/Quiz.jsx";
+import LevelExam from "./LevelExam.jsx";
 
 const LessonRoute = () => {
     const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
@@ -220,7 +221,7 @@ const LessonRoute = () => {
                                     {loadingLessonCate && (<Skeleton />)}
                                     {lessons.sort((a, b) => a.orderIndex - b.orderIndex)
                                         .map((lesson, index) => (
-                                            <>
+                                            <div key={index}>
                                                 <div className={`sub-item ${selectedLessonRoute === lesson.orderIndex ? `active` : ``}`}
                                                      onClick={() => setSelectedLessonRoute(lesson.orderIndex)}
                                                 >
@@ -264,10 +265,10 @@ const LessonRoute = () => {
                                                         Bài luyện tập ({lesson?.totalQuestions} câu)
                                                     </div>
                                                 )}
-                                            </>
+                                            </div>
                                         ))}
 
-                                    {lessons && lessons.length <= 0 && (
+                                    {(lessons && lessons.length <= 0) && (
                                         <div className="sub-item sub-item-child">
                                             <p>Không có bài học nào.</p>
                                         </div>
@@ -292,7 +293,13 @@ const LessonRoute = () => {
                     </div>
                 )}
 
-                {selectedCateId > 0 && (
+                {selectedCateId === 4 && (
+                    <div className="content-card">
+                        <LevelExam />
+                    </div>
+                )}
+
+                {(selectedCateId > 0 && selectedCateId !== 4) && (
                     <div className="card content-card">
                         <div className="video-player">
                             {lessonRoute?.youtubeId ? (

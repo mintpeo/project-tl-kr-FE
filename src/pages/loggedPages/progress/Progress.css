@@ -214,6 +214,86 @@
         }
     }
 
+    .level-path {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 16px;
+        border-radius: 16px;
+        background: var(--paper-card);
+        border: 1px solid var(--paper-dim);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    .level-path__node {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .level-path__dot {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+    }
+
+    .level-path__info {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .level-path__info small {
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .level-path__info strong {
+        font-size: 15px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    /* Cấp hiện tại: nổi bật */
+    .level-path__node.current .level-path__dot {
+        color: #fff;
+        background: linear-gradient(135deg, var(--celadon), var(--celadon-dark));
+        box-shadow: 0 0 0 4px var(--celadon-light);
+    }
+    .level-path__node.current small  { color: var(--celadon-dark); }
+    .level-path__node.current strong { color: var(--ink); }
+
+    /* Cấp tiếp theo: mờ, chưa mở khóa */
+    .level-path__node.next .level-path__dot {
+        color: var(--ink-soft);
+        background: var(--paper);
+        border: 1px dashed var(--ink-soft);
+    }
+    .level-path__node.next small  { color: var(--ink-soft); }
+    .level-path__node.next strong { color: var(--ink-soft); }
+
+    /* Đường nối */
+    .level-path__line {
+        flex: none;
+        width: 36px;
+        height: 0;
+        border-top: 2px dashed var(--ink-soft);
+        opacity: 0.5;
+    }
+
+    @media (max-width: 480px) {
+        .level-path { gap: 8px; padding: 8px 12px; }
+        .level-path__line { width: 18px; }
+        .level-path__info strong { font-size: 14px; }
+    }
+
     .row-2col {
         display: grid;
         grid-template-columns:1.3fr 1fr;

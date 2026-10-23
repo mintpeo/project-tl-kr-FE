@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import useFetch from "../use/useFetch.js";
 import {API_URL} from "../API_URL.jsx";
+import PronounceCheck from "./PronounceCheck.jsx";
 
 const CharHangul = ({isVowels}) => {
     const {data: characters} = useFetch(`${API_URL}/character/all`);
@@ -33,18 +34,16 @@ const CharHangul = ({isVowels}) => {
             <p>{isVowels ? 'Nguyên âm' : 'Phụ âm'} có tổng cộng <strong>{char.length} kí tự</strong> được chia thành:</p>
             <p><strong>{isVowels ? vowelsSingle.length : consonantsSingle.length}</strong> {isVowels ? 'Nguyên âm đơn' : 'Phụ âm đơn'}:</p>
             <div className="char-switch" id="charSwitch">
-                {
-                    char_single.map((item, index) => (
-                        <button
-                            key={index}
-                            onClick={() => setSelectedSingleIndex(index)}
-                            className={index === selectedSingleIndex ? 'active' : ''}
-                        >
-                            {item.name}
-                            <p>{item.transcription}</p>
-                        </button>
-                    ))
-                }
+                {char_single.map((item, index) => (
+                    <button
+                        key={index}
+                        onClick={() => setSelectedSingleIndex(index)}
+                        className={index === selectedSingleIndex ? 'active' : ''}
+                    >
+                        {item.name}
+                        <p>{item.transcription}</p>
+                    </button>
+                ))}
             </div>
 
             <div className="svg-stage">
@@ -55,24 +54,25 @@ const CharHangul = ({isVowels}) => {
                 <audio
                     key={selectedSingle?.id}
                     controls
-                    src={`${API_URL}/audio/speak?text=${encodeURIComponent(selectedSingle?.name)}`}
+                    src={selectedSingle?.audioUrl}
+                    // src={`${API_URL}/audio/speak?text=${encodeURIComponent(selectedSingle?.name)}`}
                 />
+
+                <PronounceCheck expected={selectedSingle?.name} kind={selectedSingle?.type?.toLowerCase()} endpoint="http://localhost:8000/speech/check" />
             </div>
 
             <p><strong>{isVowels ? vowelsPair.length : consonantsPair.length}</strong> {isVowels ? 'Nguyên âm đôi' : 'Phụ âm kép'}:</p>
             <div className="char-switch" id="charSwitch">
-                {
-                    char_pair.map((item, index) => (
-                        <button
-                            key={index}
-                            onClick={() => setSelectedPairIndex(index)}
-                            className={index === selectedPairIndex ? 'active' : ''}
-                        >
-                            {item.name}
-                            <p>{item.transcription}</p>
-                        </button>
-                    ))
-                }
+                {char_pair.map((item, index) => (
+                    <button
+                        key={index}
+                        onClick={() => setSelectedPairIndex(index)}
+                        className={index === selectedPairIndex ? 'active' : ''}
+                    >
+                        {item.name}
+                        <p>{item.transcription}</p>
+                    </button>
+                ))}
             </div>
 
             <div className="svg-stage">
@@ -83,8 +83,11 @@ const CharHangul = ({isVowels}) => {
                 <audio
                     key={selectedPair?.id}
                     controls
-                    src={`${API_URL}/audio/speak?text=${encodeURIComponent(selectedPair?.name)}`}
+                    src={selectedSingle?.audioUrl}
+                    // src={`${API_URL}/audio/speak?text=${encodeURIComponent(selectedPair?.name)}`}
                 />
+
+                <PronounceCheck expected={selectedPair?.name} kind={selectedPair?.type?.toLowerCase()} endpoint="http://localhost:8000/speech/check" />
             </div>
         </>
     );

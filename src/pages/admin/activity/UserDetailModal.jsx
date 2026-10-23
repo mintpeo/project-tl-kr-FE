@@ -31,10 +31,6 @@ const UserDetailModal = ({ email, onClose }) => {
     };
 
     const level = user.level || {
-        accuracyRate: 0,
-        levelNumber: 1,
-        totalQuestions: 0,
-        totalScore: 0,
         userLevel: "Mới bắt đầu"
     };
 
@@ -97,6 +93,10 @@ const UserDetailModal = ({ email, onClose }) => {
                         <span>Tổng lượt luyện</span>
                         <strong>{user.totalPractices || 0}</strong>
                     </div>
+                    <div className="summary-card">
+                        <span>Trình độ hiện tại</span>
+                        <strong>{level?.userLevel}</strong>
+                    </div>
                 </div>
                 {/* CONTENT */}
                 <div className="user-detail-content">
@@ -154,78 +154,6 @@ const UserDetailModal = ({ email, onClose }) => {
                                     </div>
                                 </div>
                             ))}
-                        </div>
-                    </section>
-
-                    {/* Level */}
-                    <section className="detail-section level-section">
-                        <div className="section-title">
-                            <div>
-                                <h3>Đánh giá</h3>
-                                <span className="section-description">Trình độ học tập</span>
-                            </div>
-                        </div>
-
-                        <div className="level-card">
-                            <div className="level-main">
-                                <div className="level-number">
-                                    <span>Level</span>
-                                    <strong>{level.levelNumber}</strong>
-                                </div>
-
-                                <div className="level-info">
-                                    <div className="level-name">{level.userLevel}</div>
-                                    <div className="level-description">
-                                        Đánh giá dựa trên kết quả các câu hỏi/quiz đã thực hiện.
-                                    </div>
-                                </div>
-
-                                <div className="level-accuracy">
-                                    <strong>{Number(level.accuracyRate || 0).toFixed(2)}%</strong>
-                                    <span>Độ chính xác</span>
-                                </div>
-                            </div>
-
-                            <div className="level-stats">
-                                <div className="level-stat">
-                                    <span className="stat-label">Tổng câu hỏi</span>
-                                    <strong>{level.totalQuestions}</strong>
-                                </div>
-
-                                <div className="level-stat">
-                                    <span className="stat-label">Số câu đúng</span>
-                                    <strong>{level.totalScore}</strong>
-                                </div>
-
-                                <div className="level-stat">
-                                    <span className="stat-label">Số câu sai</span>
-                                    <strong>
-                                        {Math.max(
-                                            0,
-                                            Number(level.totalQuestions || 0) -
-                                            Number(level.totalScore || 0)
-                                        )}
-                                    </strong>
-                                </div>
-                            </div>
-
-                            {/*<div className="level-progress">*/}
-                            {/*    <div className="level-progress-header">*/}
-                            {/*        <span>Độ chính xác</span>*/}
-                            {/*        <strong>{Number(level.accuracyRate || 0).toFixed(2)}%</strong>*/}
-                            {/*    </div>*/}
-
-                            {/*    <div className="level-progress-track">*/}
-                            {/*        <div className="level-progress-fill"*/}
-                            {/*             style={{*/}
-                            {/*                 width: `${Math.min(*/}
-                            {/*                     100,*/}
-                            {/*                     Math.max(0, Number(level.accuracyRate || 0))*/}
-                            {/*                 )}%`*/}
-                            {/*             }}*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
                         </div>
                     </section>
 

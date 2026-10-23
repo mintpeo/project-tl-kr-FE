@@ -49,6 +49,16 @@
         gap: 12px;
         margin-bottom: 16px;
 
+        .select-audio-option {
+            display: block;
+
+            button {
+                display: block;
+                width: auto;
+                margin: 10px auto 0;
+            }
+        }
+
         .quiz-option {
             border-radius: 12px;
             border: 1px solid var(--paper-dim);
@@ -59,6 +69,32 @@
 
             &:hover {
                 border-color: var(--celadon);
+            }
+
+            &[controls] {
+                width: 100%;
+                min-width: 0;
+                height: 48px;
+                padding: 6px 10px;
+                box-sizing: border-box;
+                display: block;
+                border-radius: 12px;
+                background: var(--paper-card);
+                border: 1px solid var(--paper-dim);
+            }
+
+            &.correct {
+                border-color: var(--celadon);
+                background: var(--celadon-light);
+            }
+
+            &.wrong {
+                border-color: var(--plum);
+                background: var(--plum-light);
+            }
+
+            &.disabled {
+                cursor: not-allowed;
             }
         }
     }

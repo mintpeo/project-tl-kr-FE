@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import './Quiz.css';
 import {usePost} from "../use/usePost.js";
 import {API_URL, LOCAL_STORAGE_KEYS} from "../API_URL.jsx";
-
 /**
  * Quiz — component trắc nghiệm dùng chung cho các chương trong LessonRoadmap.
  *
@@ -41,6 +40,7 @@ const Quiz = ({quizId, onFinish}) => {
         id: question?.id,
         title: question?.questionText,
         options: question?.options,
+        audio: question?.audio
     });
     const questions = dataQuestions.map(mapQuestions);
 
@@ -190,7 +190,24 @@ const Quiz = ({quizId, onFinish}) => {
                         if (opt.optionId === isCorrect) stateClass = 'correct';
                         else if (opt.optionId === selected) stateClass = 'wrong';
                     }
-                    return (
+                    return current?.audio ? (
+                        <div className="select-audio-option">
+                            <audio
+                                key={opt.optionId}
+                                controls
+                                className={`quiz-option ${stateClass} ${answered ? 'disabled' : ''}`}
+                                src={opt?.optionText}
+                            />
+
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={() => handleSelect(opt.optionId, current.id)}
+                            >
+                                Chọn đáp án
+                            </button>
+                        </div>
+                    ) : (
                         <button
                             key={opt.optionId}
                             className={`quiz-option ${stateClass} ${answered ? 'disabled' : ''}`}
@@ -198,7 +215,7 @@ const Quiz = ({quizId, onFinish}) => {
                         >
                             {opt?.optionText}
                         </button>
-                    );
+                    )
                 })}
             </div>
 

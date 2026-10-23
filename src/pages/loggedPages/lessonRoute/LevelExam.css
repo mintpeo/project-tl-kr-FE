@@ -1,0 +1,268 @@
+/* ============ Bài kiểm tra lên level (prefix ex-) ============ */
+.ex {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    color: var(--ink);
+    max-width: 640px;
+    margin: 0 auto;
+
+    h2, h3, h4 { margin: 0; }
+
+    .ex-panel {
+        background: var(--paper-card);
+        border: 1px solid var(--paper-dim);
+        border-radius: 18px;
+        padding: 24px;
+        margin-bottom: 16px;
+    }
+
+    .ex-eyebrow {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--celadon-dark);
+    }
+    .ex-sub { margin: 6px 0 0; font-size: 13.5px; color: var(--ink-soft); }
+
+    /* ---------- Nút ---------- */
+    .ex-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+    .ex-btn {
+        border: 1px solid transparent;
+        border-radius: 10px;
+        padding: 11px 18px;
+        min-height: 44px;
+        font-size: 13.5px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+
+        &.primary { background: var(--celadon-dark); color: #fff; }
+        &.ghost   { background: var(--paper-card); color: var(--ink-soft); border-color: var(--paper-dim); }
+        &:disabled { opacity: .4; cursor: not-allowed; }
+    }
+
+    /* ---------- Giới thiệu ---------- */
+    .ex-intro {
+        text-align: center;
+
+        h2 { font-family: 'Noto Serif KR', serif; font-size: 26px; margin: 6px 0 0; }
+        .ex-actions { justify-content: center; }
+    }
+    .ex-level-path {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin: 18px 0;
+    }
+    .ex-level {
+        font-size: 12.5px;
+        font-weight: 700;
+        padding: 7px 14px;
+        border-radius: 20px;
+
+        &.now  { background: var(--paper); color: var(--ink-soft); border: 1px solid var(--paper-dim); }
+        &.next { background: var(--gold-light); color: var(--gold); }
+    }
+    .ex-arrow { color: var(--ink-soft); }
+
+    .ex-rules {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 14px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+
+        li {
+            background: var(--paper);
+            border: 1px solid var(--paper-dim);
+            border-radius: 12px;
+            padding: 12px 6px;
+            display: flex;
+            flex-direction: column;
+        }
+        strong { font-family: 'JetBrains Mono', monospace; font-size: 22px; }
+        span { font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; }
+    }
+    .ex-scope { margin: 0; font-size: 13px; font-weight: 600; }
+    .ex-note { margin: 6px 0 0; font-size: 12px; color: var(--ink-soft); }
+
+    /* ---------- Thanh trên khi làm bài ---------- */
+    .ex-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .ex-chapter {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--celadon-dark);
+        background: var(--celadon-light);
+        padding: 4px 12px;
+        border-radius: 20px;
+    }
+    .ex-timer {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 15px;
+        font-weight: 700;
+
+        &.low { color: var(--plum); }
+    }
+    .ex-progress {
+        height: 5px;
+        border-radius: 3px;
+        background: var(--paper-dim);
+        overflow: hidden;
+        margin-bottom: 12px;
+
+        div { height: 100%; background: var(--celadon); transition: width .2s ease; }
+    }
+
+    /* ---------- Bảng số câu ---------- */
+    .ex-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .ex-dot {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        border: 1px solid var(--paper-dim);
+        background: var(--paper-card);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--ink-soft);
+        cursor: pointer;
+
+        &.done    { background: var(--celadon-light); color: var(--celadon-dark); border-color: var(--celadon); }
+        &.current { background: var(--ink); color: var(--paper-card); border-color: var(--ink); }
+    }
+
+    /* ---------- Câu hỏi ---------- */
+    .ex-qno { margin: 0 0 6px; font-size: 12px; color: var(--ink-soft); }
+    .ex-question { font-size: 19px; line-height: 1.45; margin-bottom: 18px; }
+
+    .ex-options { display: flex; flex-direction: column; gap: 10px; }
+    .ex-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        text-align: left;
+        padding: 13px 14px;
+        min-height: 52px;
+        border: 1.5px solid var(--paper-dim);
+        background: var(--paper);
+        border-radius: 12px;
+        cursor: pointer;
+        font-family: inherit;
+        color: var(--ink);
+
+        .ex-letter {
+            width: 28px;
+            height: 28px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            background: var(--paper-card);
+            border: 1px solid var(--paper-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ink-soft);
+        }
+        .ex-text { font-size: 15px; font-weight: 600; }
+
+        &:hover { border-color: var(--celadon); }
+
+        &.picked {
+            border-color: var(--celadon-dark);
+            background: var(--celadon-light);
+
+            .ex-letter { background: var(--celadon-dark); border-color: var(--celadon-dark); color: #fff; }
+        }
+    }
+
+    .ex-actions { justify-content: space-between; }
+    .ex-submit-link {
+        display: block;
+        margin: 14px auto 0;
+        border: none;
+        background: transparent;
+        font-size: 12px;
+        color: var(--ink-soft);
+        text-decoration: underline;
+        cursor: pointer;
+        font-family: inherit;
+    }
+
+    /* ---------- Kết quả ---------- */
+    .ex-result {
+        text-align: center;
+
+        .ex-score {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 56px;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+        &.pass .ex-score, &.pass .ex-eyebrow { color: var(--celadon-dark); }
+        &.fail .ex-score, &.fail .ex-eyebrow { color: var(--plum); }
+
+        .ex-verdict { margin: 12px 0 0; font-size: 14px; }
+        .ex-actions { justify-content: center; }
+    }
+
+    .ex-breakdown { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; text-align: left; }
+    .ex-bd-row {
+        display: grid;
+        grid-template-columns: 90px 1fr 40px;
+        align-items: center;
+        gap: 10px;
+        font-size: 12.5px;
+        font-weight: 600;
+    }
+    .ex-bd-track {
+        height: 7px;
+        border-radius: 4px;
+        background: var(--paper-dim);
+        overflow: hidden;
+
+        div { height: 100%; background: var(--celadon); border-radius: 4px; }
+    }
+    .ex-bd-num { font-family: 'JetBrains Mono', monospace; font-size: 12px; text-align: right; }
+
+    /* ---------- Xem lại câu sai ---------- */
+    .ex-review {
+        h4 { font-size: 14px; margin-bottom: 12px; }
+    }
+    .ex-review-item {
+        padding: 12px 0;
+        border-top: 1px solid var(--paper-dim);
+
+        &:first-of-type { border-top: none; padding-top: 0; }
+    }
+    .ex-review-q { margin: 0 0 6px; font-size: 13.5px; font-weight: 600; }
+    .ex-review-line { margin: 2px 0; font-size: 12.5px; &.bad { color: var(--plum); } &.good { color: var(--celadon-dark); } }
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+    .ex .ex-panel { padding: 20px; }
+}
+
+@media (max-width: 480px) {
+    .ex .ex-panel { padding: 16px; border-radius: 14px; }
+    .ex .ex-question { font-size: 17px; }
+    .ex .ex-option .ex-text { font-size: 14.5px; }
+    .ex .ex-dot { width: 32px; height: 32px; }
+    .ex .ex-intro h2 { font-size: 22px; }
+    .ex .ex-actions { flex-wrap: wrap; }
+    .ex .ex-actions .ex-btn { flex: 1; }
+    .ex .ex-bd-row { grid-template-columns: 76px 1fr 36px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ex .ex-progress div { transition: none; }
+}

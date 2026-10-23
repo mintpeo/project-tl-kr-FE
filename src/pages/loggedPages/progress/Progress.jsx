@@ -30,7 +30,7 @@ const Progress = () => {
     const user = JSON.parse(user_info);
 
     useEffect(() => {
-        handleUserLevel();
+        // handleUserLevel();
         loadDataUserLevel();
         handleMasterRes();
         handleLessonProgress();
@@ -56,29 +56,22 @@ const Progress = () => {
 
     // Handle User Level
     // Set User Level
-    const {executePost: updateUserLevel} = usePost(`${API_URL}/progress/user-level`);
-    const handleUserLevel = async () => {
-        const req = {
-            userId: user.userId
-        }
-        try {
-            await updateUserLevel(req);
-        } catch (e) {
-            console.log("Error Handle User Level", e);
-        }
-    }
+    // const {executePost: updateUserLevel} = usePost(`${API_URL}/progress/user-level`);
+    // const handleUserLevel = async () => {
+    //     const req = {
+    //         userId: user.userId
+    //     }
+    //     try {
+    //         await updateUserLevel(req);
+    //     } catch (e) {
+    //         console.log("Error Handle User Level", e);
+    //     }
+    // }
     // Get User Level
-    const {executePost: loadUserLevel, loading: loadingUserLevel} = usePost(`${API_URL}/progress/get-user-level`);
+    const {executePost: loadUserLevel, loading: loadingUserLevel} = usePost(`${API_URL}/user-level/get`);
     const [userLevel, setUserLevel] = useState([]);
     const mapUserLevel = (level) => ({
-        accuracyRate: level?.accuracyRate,
-        levelNumber: level?.levelNumber,
         nextLevelTitle: level?.nextLevelTitle,
-        progressPercent: level?.progressPercent,
-        remainingAccuracy: level?.remainingAccuracy,
-        remainingQuestions: level?.remainingQuestions,
-        totalQuestions: level?.totalQuestions,
-        totalScore: level?.totalScore,
         userLevel: level?.userLevel
     })
     const loadDataUserLevel = async () => {
@@ -195,7 +188,7 @@ const Progress = () => {
 
     // Handle Stat
     const STATS = [
-        { icon: 'check', tone: 'a', num: `${progress?.averageScore}%`, label: 'Độ chính xác trung bình' },
+        { icon: 'check', tone: 'a', num: `${progress?.averageScore != null ? progress?.averageScore : 0 }%`, label: 'Độ chính xác trung bình' },
         { icon: 'pen', tone: 'b', num: `${progress?.countPractices}`, label: 'Lượt luyện viết' },
         { icon: 'book', tone: 'c', num: `${progress?.countIsPass}/${mastery.length}`, label: 'Ký tự đã thành thạo' },
         { icon: 'flame', tone: 'd', num: `${streak} ngày`, label: 'Chuỗi học liên tiếp' },
@@ -312,45 +305,79 @@ const Progress = () => {
                     )}
                 </div>
 
-                <div className="level-card">
+                <div style={{width: 'auto'}}>
                     {loadingUserLevel && (<Skeleton />)}
                     {!loadingUserLevel && (
                         <>
-                            <div className="level-header">
-                                <div className="level-badge">
-                                    <span className="badge-icon">🌿</span>
-                                    <span className="badge-title">{userLevelRes?.userLevel}</span>
+                            <div className="level-path">
+                                {/* Cấp hiện tại */}
+                                <div className="level-path__node current">
+                                    <span className="level-path__dot" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" width="14" height="14">
+                                            <path fill="none" stroke="currentColor" strokeWidth="3"
+                                                  strokeLinecap="round" strokeLinejoin="round" d="M5 12.5l4.5 4.5L19 7.5" />
+                                        </svg>
+                                    </span>
+                                    <span className="level-path__info">
+                                        <small>Hiện tại</small>
+                                        <strong>{userLevelRes?.userLevel}</strong>
+                                    </span>
                                 </div>
-                                <span className="level-tag">Level {userLevel?.levelNumber}</span>
+                                {/* Đường nối */}
+                                {userLevelRes?.nextLevelTitle != null &&
+                                    <>
+                                        <span className="level-path__line" aria-hidden="true" />
+                                        {/* Cấp tiếp theo */}
+                                        <div className="level-path__node next">
+                                            <span className="level-path__dot" aria-hidden="true">
+                                                <svg viewBox="0 0 24 24" width="13" height="13">
+                                                <path fill="currentColor"
+                                                      d="M12 2a5 5 0 00-5 5v3H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-1V7a5 5 0 00-5-5zm-3 8V7a3 3 0 016 0v3H9z" />
+                                                </svg>
+                                            </span>
+                                            <span className="level-path__info">
+                                                <small>Tiếp theo</small>
+                                                <strong>{userLevelRes?.nextLevelTitle}</strong>
+                                            </span>
+                                        </div>
+                                    </>
+                                }
                             </div>
+                            {/*<div className="level-header">*/}
+                            {/*    <div className="level-badge">*/}
+                            {/*        <span className="badge-icon">🌿</span>*/}
+                            {/*        <span className="badge-title">{userLevelRes?.userLevel}</span>*/}
+                            {/*    </div>*/}
+                            {/*    <span className="level-tag">Level {userLevel?.levelNumber}</span>*/}
+                            {/*</div>*/}
 
-                            <div className="level-stats">
-                                <div className="stat-item">
-                                    <span className="stat-label">Độ chính xác</span>
-                                    <span className="stat-val">{`${userLevelRes?.accuracyRate}%`}</span>
-                                </div>
+                            {/*<div className="level-stats">*/}
+                            {/*    <div className="stat-item">*/}
+                            {/*        <span className="stat-label">Độ chính xác</span>*/}
+                            {/*        <span className="stat-val">{`${userLevelRes?.accuracyRate}%`}</span>*/}
+                            {/*    </div>*/}
 
-                                <div className="stat-divider"></div>
-                                <div className="stat-item">
-                                    <span className="stat-label">Số câu đúng</span>
-                                    <span className="stat-val">{userLevelRes?.totalScore}<small>/{userLevelRes?.totalQuestions}</small></span>
-                                </div>
-                            </div>
+                            {/*    <div className="stat-divider"></div>*/}
+                            {/*    <div className="stat-item">*/}
+                            {/*        <span className="stat-label">Số câu đúng</span>*/}
+                            {/*        <span className="stat-val">{userLevelRes?.totalScore}<small>/{userLevelRes?.totalQuestions}</small></span>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
 
-                            <div className="progress-section">
-                                <div className="progress-label">
-                                    <span>{userLevelRes?.nextLevelTitle}</span>
-                                    {userLevelRes?.remainingQuestions === 0 ? (
-                                        <span>Cần cải thiện độ chính xác</span>
-                                    ) : (
-                                        <span>{userLevelRes?.remainingQuestions} câu nữa</span>
-                                    )}
-                                </div>
+                            {/*<div className="progress-section">*/}
+                            {/*    <div className="progress-label">*/}
+                            {/*        <span>{userLevelRes?.nextLevelTitle}</span>*/}
+                            {/*        {userLevelRes?.remainingQuestions === 0 ? (*/}
+                            {/*            <span>Cần cải thiện độ chính xác</span>*/}
+                            {/*        ) : (*/}
+                            {/*            <span>{userLevelRes?.remainingQuestions} câu nữa</span>*/}
+                            {/*        )}*/}
+                            {/*    </div>*/}
 
-                                <div className="progress-bar">
-                                    <div className="progress-fill" style={{width: `${userLevelRes?.progressPercent}%`}}></div>
-                                </div>
-                            </div>
+                            {/*    <div className="progress-bar">*/}
+                            {/*        <div className="progress-fill" style={{width: `${userLevelRes?.progressPercent}%`}}></div>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
                         </>
                     )}
                 </div>
@@ -411,6 +438,7 @@ const Progress = () => {
 
             {/* ---------------- CATEGORY PROGRESS ---------------- */}
             <div className="category-row">
+                {CATEGORIES.length < 0 && <p>CHua co</p>}
                 {CATEGORIES.map((c, index) => (
                     <div className="card cat-card" key={index}>
                         <div className={`cat-glyph tone-${toneCate(index)}`}>{glyphCate(index)}</div>
