@@ -187,7 +187,7 @@ const LessonRoute = () => {
                         <p>{countLesson}/{categories.length} chương đã hoàn thành</p>
                     </div>
 
-                    {categories.map((item, index) => {
+                    {categories.sort((a, b) => a.orderIndex - b.orderIndex).map((item, index) => {
                         // Next Lesson if learn lesson before
                         const isPrevLearned = index === 0 || categories[index - 1]?.learned;
                         return (

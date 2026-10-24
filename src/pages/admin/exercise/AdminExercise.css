@@ -178,6 +178,70 @@
                 }
             }
 
+            .quiz-list {
+                margin: 12px 0 16px;
+            }
+
+            .quiz-list__title {
+                margin: 0 0 8px;
+                font-size: 12px;
+                font-weight: 600;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+                color: var(--ink-soft);
+            }
+
+            .quiz-list__items {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                max-height: 220px;          /* danh sách dài thì cuộn trong khung */
+                overflow-y: auto;
+                border: 1px solid var(--paper-dim);
+                border-radius: 12px;
+                background: var(--paper);
+            }
+
+            .quiz-list__item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                padding: 10px 12px;
+                border-bottom: 1px solid var(--paper-dim);
+            }
+
+            .quiz-list__item:last-child {
+                border-bottom: none;
+            }
+
+            .quiz-list__name {
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                color: var(--ink);
+                font-size: 14px;
+            }
+
+            .quiz-list__delete {
+                flex: none;
+                padding: 5px 12px;
+                border-radius: 8px;
+                border: 1px solid var(--plum);
+                background: transparent;
+                color: var(--plum);
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background 0.15s ease, color 0.15s ease;
+            }
+
+            .quiz-list__delete:hover {
+                background: var(--plum);
+                color: #fff;
+            }
+
             .modal-actions {
                 display: flex;
                 justify-content: flex-end;

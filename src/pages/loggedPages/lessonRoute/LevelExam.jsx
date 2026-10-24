@@ -43,7 +43,7 @@ const fmtTime = (sec) => {
  *
  *  result = { correct, total, percent, passed, byChapter: { VOWEL: {correct,total}, ... } }
  */
-export default function LevelExam({onFinish,}) {
+export default function LevelExam({onFinish}) {
     const user = useMemo(() => {
         try { return JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO)); }
         catch { return null; }
@@ -95,7 +95,9 @@ export default function LevelExam({onFinish,}) {
         id: q?.id,
         question: q?.questionText,
         options: q?.options,
-        audio: q?.audio
+        audio: q?.audio,
+        questionMediaUrl: q?.questionMediaUrl,
+        questionAudio: q?.questionAudio
     });
 
     useEffect(() => {
@@ -123,7 +125,9 @@ export default function LevelExam({onFinish,}) {
             chapter: q.chapter,
             question: q.question,
             options: shuffle(q.options || []),
-            audio: q?.audio
+            audio: q?.audio,
+            questionMediaUrl: q?.questionMediaUrl,
+            questionAudio: q?.questionAudio
         }));
     };
 
@@ -310,6 +314,13 @@ export default function LevelExam({onFinish,}) {
                 <div className="ex-panel">
                     <p className="ex-qno">Câu {current + 1} / {exam.length}</p>
                     <h3 className="ex-question">{q.question}</h3>
+                    {q.questionAudio &&
+                        <audio
+                            style={{marginBottom: '10px'}}
+                            controls
+                            src={q?.questionMediaUrl}
+                        />
+                    }
 
                     <div className="ex-options">
                         {q.options.map((opt, i) => (

@@ -10,12 +10,6 @@ const EMPTY_OPTIONS = ['', '', '', ''];
 
 const INITIAL_QUESTIONS = [
     { id: 1, lesson: 'vowel-basic', question: "Đâu là nguyên âm đọc là 'a'?", options: ['ㅏ', 'ㅓ', 'ㅗ', 'ㅜ'], correct: 0 },
-    { id: 2, lesson: 'vowel-basic', question: "Đâu là nguyên âm đọc là 'eo'?", options: ['ㅕ', 'ㅓ', 'ㅑ', 'ㅛ'], correct: 1 },
-    { id: 3, lesson: 'vowel-basic', question: "Đâu là nguyên âm đọc là 'u'?", options: ['ㅡ', 'ㅣ', 'ㅜ', 'ㅠ'], correct: 2 },
-    { id: 4, lesson: 'vowel-basic', question: "Nguyên âm 'ㅣ' có bao nhiêu nét viết?", options: ['1 nét', '2 nét', '3 nét', '4 nét'], correct: 0 },
-    { id: 5, lesson: 'consonant-basic', question: "Đâu là phụ âm đọc là 'nieun'?", options: ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ'], correct: 1 },
-    { id: 6, lesson: 'consonant-basic', question: "Phụ âm 'ㄱ' có bao nhiêu nét viết?", options: ['1 nét', '2 nét', '3 nét', '4 nét'], correct: 0 },
-    { id: 7, lesson: 'syllable-combine', question: "ㄱ + ㅏ ghép thành chữ nào?", options: ['가', '나', '다', '사'], correct: 0 },
 ];
 
 const EMPTY_FORM = { quizId: '', question: '', questionMediaUrl: '', options: [...EMPTY_OPTIONS], correct: 0, isAudio: false, questionAudio: false };
@@ -38,17 +32,52 @@ const AdminExercise = () => {
         questionMediaUrl: q?.questionMediaUrl
     });
     const quizRes = loadAdminQuiz.map(mapQuizRes);
-
     const [questions, setQuestions] = useState([]);
     useEffect(() => {
         setQuestions(loadAdminQuestions.map(mapQuesRes));
     }, [loadAdminQuestions]);
 
+    // Delete Quiz
+    const {executeDelete: deleteQuiz} = useDelete(`${API_URL}/quiz/delete`);
+    const handleDeleteQuiz = async (quizId) => {
+        if (!window.confirm("Bạn có chắc chắn muốn xoá bộ câu hỏi này?")) return;
+        try {
+            const data = await deleteQuiz({quizId: quizId});
+            if (data) {
+                alert("Xoá bộ câu hỏi mới thành công.");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error Delete Quiz", e);
+        }
+    }
+
+    // Handle Quiz size
+    const handleQuizSize = (quizId) => {
+        return questions.filter(q => q.quizId === quizId).length;
+    }
+
+    // Handle Add New Quiz
+    const [openAddModalQuiz, setOpenAddModalQuiz] = useState(false);
+    const [nameQuiz, setNameQuiz] = useState('');
+    const {executePost: addNewQuiz} = usePost(`${API_URL}/quiz/add-new-quiz`);
+    const handleSubmitNameQuiz = async () => {
+        try {
+            const data = await addNewQuiz({nameQuiz: nameQuiz});
+            if (data) {
+                alert("Thêm bộ câu hỏi mới thành công.");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error Add New Quiz", e);
+        }
+    }
+
     // Handle Stat
     const stats = [
         {name: "Tổng số câu hỏi", amount: questions.length, icon: "total", tone: "tone-a"},
-        {name: "Bài học có luyện tập", amount: quizRes.length, icon: "lesson", tone: "tone-b"},
-        {name: "TB câu hỏi / bài học", amount: Math.round(questions.length / quizRes.length), icon: "avg", tone: "tone-c"},
+        {name: "Bộ câu hỏi", amount: quizRes.length, icon: "lesson", tone: "tone-b"},
+        {name: "TB câu hỏi / bộ câu hỏi", amount: (questions.length / quizRes.length).toFixed(2), icon: "avg", tone: "tone-c"},
     ];
     const iconStatRows = {
         total: (
@@ -95,7 +124,6 @@ const AdminExercise = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [form, setForm] = useState(EMPTY_FORM);
-    // console.log(form);
 
     const openAddModal = () => {
         setEditingId(null);
@@ -200,7 +228,7 @@ const AdminExercise = () => {
         }
         return `${text.slice(0, start)}...${text.slice(-end)}`;
     };
-    console.log(form)
+
     return (
         <div id="admin-exercises">
             <div className="page-head">
@@ -210,12 +238,23 @@ const AdminExercise = () => {
                     <p>Câu hỏi trắc nghiệm dùng để kiểm tra kiến thức sau mỗi bài học.</p>
                 </div>
 
-                <button className="btn btn-primary" onClick={openAddModal}>
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 5v14M5 12h14" />
-                    </svg>
-                    Thêm câu hỏi
-                </button>
+                <div>
+                    <button className="btn btn-ghost" onClick={() => setOpenAddModalQuiz(!openAddModalQuiz)}
+                        style={{marginRight: '10px'}}
+                    >
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 5v14M5 12h14" />
+                        </svg>
+                        Thêm/Sửa bộ câu hỏi
+                    </button>
+
+                    <button className="btn btn-primary" onClick={openAddModal}>
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 5v14M5 12h14" />
+                        </svg>
+                        Thêm câu hỏi
+                    </button>
+                </div>
             </div>
 
             {/* ---------------- STATS ---------------- */}
@@ -404,6 +443,49 @@ const AdminExercise = () => {
                                 <button type="button" className="btn btn-ghost" onClick={closeModal}>Hủy</button>
                                 <button type="submit" className="btn btn-primary">
                                     {editingId === null ? 'Thêm câu hỏi' : 'Lưu thay đổi'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/*  Modal Add Quiz  */}
+            {openAddModalQuiz && (
+                <div className="modal-overlay" onClick={() => setOpenAddModalQuiz(!openAddModalQuiz)}>
+                    <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+                        <h3>Thêm bộ câu hỏi mới</h3>
+
+                        <div className="quiz-list">
+                            <p className="quiz-list__title">Các bộ câu hỏi hiện có ({quizRes.length})</p>
+
+                            <ul className="quiz-list__items">
+                                {quizRes.map((quiz) => (
+                                    <li key={quiz?.id} className="quiz-list__item">
+                                        <span className="quiz-list__name">{quiz?.name} - ({handleQuizSize(quiz?.id)})</span>
+                                        <button type="button" className="quiz-list__delete" title="Xóa" onClick={() => handleDeleteQuiz(quiz?.id)}>
+                                            Xóa
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        <form onSubmit={handleSubmitNameQuiz}>
+                            <div className="field">
+                                <input
+                                    type="text"
+                                    value={nameQuiz}
+                                    onChange={(e) => setNameQuiz(e.target.value)}
+                                    placeholder="VD: Trắc nghiệm ..."
+                                    required
+                                />
+                            </div>
+
+                            <div className="modal-actions">
+                                <button type="button" className="btn btn-ghost" onClick={() => setOpenAddModalQuiz(!openAddModalQuiz)}>Hủy</button>
+                                <button type="submit" className="btn btn-primary">
+                                    Thêm bộ câu hỏi
                                 </button>
                             </div>
                         </form>

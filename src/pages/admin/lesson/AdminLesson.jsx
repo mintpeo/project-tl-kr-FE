@@ -7,6 +7,7 @@ import {useDelete} from "../../../components/use/useDelete.js";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { SortableLessonRow } from "./DraggableRow.jsx";
+import {SortableCateRow} from "./DraggableCateRow.jsx";
 
 const AdminLesson = () => {
     const {data: lessonsRoad} = useFetch(`${API_URL}/admin/all-lessons-road`);
@@ -27,6 +28,91 @@ const AdminLesson = () => {
     });
     const lessonsRoadRes = lessonsRoad.map(mapLessonRoad);
     const [lessonsRoadListRes, setLessonsRoadListRes] = useState([]);
+
+    const [openAddModalCate, setOpenAddModalCate] = useState(false);
+    const [nameCate, setNameCate] = useState('');
+    const {data: loadAllCate} = useFetch(`${API_URL}/admin/all-cate`);
+    // Btn toggle
+    const [checkedCate, setCheckedCate] = useState(false);
+    const [reorderListCate, setReorderListCate] = useState([]);
+    const toggleCate = () => {
+        if (!checkedCate) {
+            const listToReorder = [...loadAllCate].sort((a, b) => a.orderIndex - b.orderIndex);
+            setReorderListCate(listToReorder);
+            setCheckedCate(true);
+        } else {
+            setCheckedCate(false);
+            setReorderListCate([]);
+        }
+    };
+    // Handle Drag Cate
+    const handleDragEndCate = (e) => {
+        const { active, over } = e;
+        if (!over || active.id === over.id) return;
+        setReorderListCate((items) => {
+            const oldIndex = items.findIndex(item => item.id === active.id);
+            const newIndex = items.findIndex(item => item.id === over.id);
+            return arrayMove(items, oldIndex, newIndex);
+        });
+    };
+    // Save New Order Cate
+    const { executePost: handleSaveReorderCate } = usePost(`${API_URL}/admin/update-order-index-cate`);
+    const saveNewOrderCate = async () => {
+        const req = { cateIds: reorderListCate.map(item => item.id) };
+        try {
+            const data = await handleSaveReorderCate(req);
+            if (data) {
+                alert("Cập nhật vị trí danh mục thành công!");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.error("Error Save New Order Cate", e);
+            alert("Lỗi khi lưu vị trí danh mục.");
+        }
+    };
+
+    // Handle Edit Cate
+    const {executePost: editCate} = usePost(`${API_URL}/admin/edit-cate`);
+    const handleEditCate = async (cateId) => {
+        try {
+            const data = await editCate({cateId: cateId});
+            if (data) {
+                alert("Cập nhật danh mục thành công.");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error Handle Edit Cate", e);
+        }
+    }
+    // Delete Cate
+    const {executeDelete: deleteCate} = useDelete(`${API_URL}/admin/delete-cate`);
+    const handleDeleteCate = async (cateId) => {
+        if (!window.confirm("Bạn có chắc chắn muốn xoá danh mục này?")) return;
+        try {
+            const data = await deleteCate({cateId: cateId});
+            if (data) {
+                alert("Xoá danh mục thành công.");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error Delete Cate", e);
+        }
+    }
+    // Handle New Cate
+    const {executePost: createNewCate} = usePost(`${API_URL}/admin/create-cate`);
+    const handleNewCate = async (e) => {
+        e.preventDefault();
+
+        try {
+            const data = await createNewCate({nameCate: nameCate});
+            if (data) {
+                alert("Tạo danh mục mới thành công.");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error Handle New Cate", e);
+        }
+    }
 
     // Handle Quiz
     const {data: loadQuizzes} = useFetch(`${API_URL}/admin/get-quizzes`);
@@ -226,10 +312,10 @@ const AdminLesson = () => {
     }, [searchName, categoryFilter, statusFilter, lessonsRoad]);
 
     // Get All Cate Road
-    const {data: getAllCateRoad} = useFetch(`${API_URL}/admin/all-cate-road`);
-    const cateList = getAllCateRoad.map((cate) => ({
-        id: cate.id,
-        name: cate.name,
+    const cateList = loadAllCate.map((cate) => ({
+        id: cate?.id,
+        name: cate?.name,
+        lessonsSize: cate?.lessonsSize
     }))
 
     // Handle Stat
@@ -277,10 +363,10 @@ const AdminLesson = () => {
                     <p>Thêm, chỉnh sửa và xuất bản các bài học video theo từng danh mục.</p>
                 </div>
                 <div>
-                    {/*<button className="btn btn-ghost" style={{marginRight: '10px'}}>*/}
-                    {/*    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>*/}
-                    {/*    Thêm danh mục*/}
-                    {/*</button>*/}
+                    <button className="btn btn-ghost" style={{marginRight: '10px'}} onClick={() => setOpenAddModalCate(!openAddModalCate)}>
+                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
+                        Thêm danh mục
+                    </button>
                     <button className="btn btn-primary" onClick={openAddModal}>
                         <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
                         Thêm bài học
@@ -452,6 +538,7 @@ const AdminLesson = () => {
                                         value={form.cateRouteId || ""}
                                         onChange={(e) => handleFieldChange("cateRouteId", Number(e.target.value))}
                                     >
+                                        <option value="">Chưa phân loại</option>
                                         {cateList.map((c) => (
                                             <option key={c.id} value={c.id}>{c.name}</option>
                                         ))}
@@ -537,6 +624,96 @@ const AdminLesson = () => {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {openAddModalCate && (
+                <div className="modal-overlay" onClick={() => setOpenAddModalCate(!openAddModalCate)}>
+                    <div className="modal-card"
+                         onClick={(e) => e.stopPropagation()}>
+                        <h3>Thêm danh mục mới</h3>
+
+                        <div className="quiz-list">
+                            <div style={{display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: '10px'}}>
+                                <p className="quiz-list__title">Các danh mục hiện có ({loadAllCate.length})</p>
+                                <div className="char-switch">
+                                    <p style={{ margin: 0, fontSize: '12px', color: 'var(--ink-soft)' }}>Sắp xếp vị trí</p>
+
+                                    <button
+                                        type="button"
+                                        className={`toggle-btn ${checkedCate ? 'active' : ''}`}
+                                        onClick={toggleCate}
+                                    >
+                                        <span className="toggle-thumb" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {checkedCate ? (
+                                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEndCate}>
+                                    <SortableContext items={reorderListCate.map(c => c.id)} strategy={verticalListSortingStrategy}>
+                                        <ul className="quiz-list__items" style={{ marginBottom: '10px' }}>
+                                            {reorderListCate.map((c, index) => (
+                                                <SortableCateRow key={c.id} cate={c} index={index} />
+                                            ))}
+                                        </ul>
+                                    </SortableContext>
+                                </DndContext>
+                            ) : (
+                                <ul className="quiz-list__items" style={{ marginBottom: '10px' }}>
+                                    {loadAllCate.map((cate) => (
+                                        <li key={cate?.id} className="quiz-list__item">
+                                            <span className="quiz-list__name">{cate?.name} - ({cate?.lessonsSize})</span>
+                                            <div>
+                                                <button type="button" className="quiz-list__delete" title="Đổi trạng thái"
+                                                        style={{ marginRight: '5px' }} onClick={() => handleEditCate(cate?.id)}>
+                                                    {cate?.active ? "Hiển thị" : "Ẩn"}
+                                                </button>
+                                                <button type="button" className="quiz-list__delete" title="Xóa" onClick={() => handleDeleteCate(cate?.id)}>
+                                                    Xóa
+                                                </button>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+
+                            {!checkedCate &&
+                                <>
+                                    <form onSubmit={handleNewCate}>
+                                        <div className="field">
+                                            <input
+                                                type="text"
+                                                value={nameCate}
+                                                onChange={(e) => setNameCate(e.target.value)}
+                                                placeholder="VD: Danh mục..."
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="modal-actions">
+                                            <button type="button" className="btn btn-ghost" onClick={() => setOpenAddModalCate(!openAddModalCate)}>Hủy</button>
+                                            <button type="submit" className="btn btn-primary">
+                                                Thêm danh mục
+                                            </button>
+                                        </div>
+                                    </form>
+                                </>
+                            }
+
+                            {checkedCate && (
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '15px', alignItems: 'center', padding: '10px 16px', background: '#eff6ff', borderRadius: '8px' }}>
+                                    <span style={{ fontSize: '12px', color: '#1e40af' }}>
+                                        Đang ở chế độ sắp xếp. Kéo thả các dòng để đổi vị trí, sau đó bấm <b>Lưu thứ tự</b>.
+                                    </span>
+                                    <div style={{ display: 'flex', gap: '8px', whiteSpace: "nowrap" }}>
+                                        <button type="button" className="btn btn-ghost" onClick={toggleCate}>Hủy</button>
+                                        <button type="button" className="btn btn-primary" onClick={saveNewOrderCate}>Lưu thứ tự</button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
