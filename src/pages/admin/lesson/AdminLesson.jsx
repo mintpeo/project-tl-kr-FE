@@ -211,7 +211,7 @@ const AdminLesson = () => {
         }));
     }
     // Modal
-    const EMPTY_FORM = { name: '', cateRouteId: 1, active: true, duration: '', description: '', youtubeId: '' };
+    const EMPTY_FORM = { name: '', cateRouteId: null, active: true, duration: '', description: '', youtubeId: '' };
     const [modalOpen, setModalOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [form, setForm] = useState(EMPTY_FORM);
@@ -270,6 +270,10 @@ const AdminLesson = () => {
                 }
             } else {
                 // Create New Lesson
+                if (form?.cateRouteId == null) {
+                    alert("Vui lòng chọn danh mục!");
+                    return;
+                }
                 const res = await handleCreateNewLesson(req);
                 if (res) {
                     alert("Tạo bài học mới thành công.");
@@ -364,8 +368,7 @@ const AdminLesson = () => {
                 </div>
                 <div>
                     <button className="btn btn-ghost" style={{marginRight: '10px'}} onClick={() => setOpenAddModalCate(!openAddModalCate)}>
-                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
-                        Thêm danh mục
+                        Xem danh mục
                     </button>
                     <button className="btn btn-primary" onClick={openAddModal}>
                         <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
@@ -546,12 +549,12 @@ const AdminLesson = () => {
                                 </div>
 
                                 <div className="field">
-                                    <label>Bộ câu hỏi</label>
+                                    <label>Bài luyện tập</label>
                                     <select
                                         value={form?.quizId || ""}
                                         onChange={(e) => handleFieldChange("quizId", e.target.value ? Number(e.target.value) : null)}
                                     >
-                                        <option value="">Chưa có bộ câu hỏi</option>
+                                        <option value="">Chưa có bài luyện tập</option>
                                         {loadQuizzes.map((c) => (
                                             <option key={c.id} value={c.id}>{c.name}</option>
                                         ))}

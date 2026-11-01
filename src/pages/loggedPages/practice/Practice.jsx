@@ -46,7 +46,7 @@ const Practice = () => {
         { name: 'Phụ âm đôi' },
     ];
 
-    const clearCanvas = () => {
+    const clearCanvasSelectedChar = () => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -56,7 +56,44 @@ const Practice = () => {
         setUndoCount(0);
         setScoreDisable(false);
         setMatchedTemplate('');
+    }
+
+    const clearCanvas = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        historyRef.current = [];
+        setUndoCount(0);
+        setScoreDisable(false);
+        // setMatchedTemplate('');
     };
+
+    // Save image canvas
+    const savePNG = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+
+        const tempCtx = tempCanvas.getContext("2d");
+        tempCtx.fillStyle = "#FFFFFF";
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        tempCtx.drawImage(canvas, 0, 0);
+
+        // Lấy dữ liệu ảnh Base64 (Nền trắng, nét đen)
+        const image = tempCanvas.toDataURL("image/png");
+
+        // Tải ảnh về máy để test với Python model
+        const link = document.createElement("a");
+        link.href = image;
+        const selectLabel = charList[selectedChar];
+        link.download = selectLabel.name + "-";
+        link.click();
+    }
 
     // Submit Canvas, Save Practice
     const {executePost: handlePredict} = usePost(`${API_URL}/predict/data-url`);
@@ -77,9 +114,13 @@ const Practice = () => {
         tempCtx.drawImage(canvas, 0, 0);
 
         const dataUrl = tempCanvas.toDataURL("image/png");
+        const selectLabel = charList[selectedChar];
 
         try {
-            const data = await handlePredict({ dataUrl });
+            const data = await handlePredict({
+                dataUrl,
+                expected: selectLabel?.transcription
+            });
             console.log(data);
             if (!data || !data.prediction) {
                 alert("Không nhận được phản hồi từ AI, vui lòng thử lại!");
@@ -87,10 +128,10 @@ const Practice = () => {
             }
 
             setPredict(data.prediction);
+            setMatchedTemplate(data?.matched_template?.img_url);
             setScoreDisable(true);
 
             const predictLabel = data.prediction.label;
-            const selectLabel = charList[selectedChar];
 
             // predictLabel !== charList[selectChar]
             if (predictLabel !== selectLabel?.transcription) {
@@ -98,7 +139,7 @@ const Practice = () => {
                 setMess(`Bạn đang chọn chữ '${selectLabel?.name || selectLabel?.transcription}', nhưng AI thấy nét vẽ giống chữ '${data.prediction.char}' hơn.`);
                 setFeedBack(["Hãy quan sát kỹ nét mẫu và thử viết lại."]);
                 setScoreFB(0);
-                setMatchedTemplate('');
+                // setMatchedTemplate('');
                 // setScoreDisable(true);
                 return;
             }
@@ -109,7 +150,7 @@ const Practice = () => {
             setGrade(data?.evaluation?.grade || "Đạt");
             setMess(data?.evaluation?.message || "");
             setScoreFB(simScore);
-            setMatchedTemplate(data?.matched_template?.img_url);
+            // setMatchedTemplate(data?.matched_template?.img_url);
             // setScoreDisable(true);
 
             // Save Practice
@@ -174,7 +215,7 @@ const Practice = () => {
         canvas.getContext("2d").putImageData(prev, 0, 0);
         setUndoCount(historyRef.current.length);
         setScoreDisable(false);
-        setMatchedTemplate('');
+        // setMatchedTemplate('');
     };
 
     useEffect(() => {
@@ -258,7 +299,7 @@ const Practice = () => {
                                     key={index}
                                     onClick={() => {
                                         setSelectedChar(index);
-                                        clearCanvas();
+                                        clearCanvasSelectedChar();
                                     }}
                                     className={`cat-pill ${selectedChar === index ? 'active' : ''}`}
                                 >
@@ -315,7 +356,7 @@ const Practice = () => {
 
                     <div className="canvas-actions">
                         <button className="btn btn-ghost" onClick={clearCanvas}>Xóa</button>
-                        {/*<button className="btn btn-ghost" onClick={savePNG}>Save PNG</button>*/}
+                        <button className="btn btn-ghost" onClick={savePNG}>Save PNG</button>
                         <button className="btn btn-ghost" onClick={undoStroke} disabled={undoCount === 0}>Hoàn tác</button>
                         <button className="btn btn-primary" onClick={submitCanvas}>Gửi để AI chấm điểm</button>
                     </div>

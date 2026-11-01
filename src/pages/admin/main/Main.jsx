@@ -84,7 +84,7 @@ const Main = () => {
                 // Tạo tài khoản mới
                 const req = {
                     fullName: form.fullName.trim(),
-                    email: form.email.trim(),
+                    email: form.changeEmail.trim(),
                     password: form.password,
                     numberPhone: form.phone.trim(),
                     active: form.active,

@@ -40,11 +40,11 @@ const AdminExercise = () => {
     // Delete Quiz
     const {executeDelete: deleteQuiz} = useDelete(`${API_URL}/quiz/delete`);
     const handleDeleteQuiz = async (quizId) => {
-        if (!window.confirm("Bạn có chắc chắn muốn xoá bộ câu hỏi này?")) return;
+        if (!window.confirm("Bạn có chắc chắn muốn xoá bài luyện tập này?")) return;
         try {
             const data = await deleteQuiz({quizId: quizId});
             if (data) {
-                alert("Xoá bộ câu hỏi mới thành công.");
+                alert("Xoá bài luyện tập thành công.");
                 window.location.reload();
             }
         } catch (e) {
@@ -76,8 +76,8 @@ const AdminExercise = () => {
     // Handle Stat
     const stats = [
         {name: "Tổng số câu hỏi", amount: questions.length, icon: "total", tone: "tone-a"},
-        {name: "Bộ câu hỏi", amount: quizRes.length, icon: "lesson", tone: "tone-b"},
-        {name: "TB câu hỏi / bộ câu hỏi", amount: (questions.length / quizRes.length).toFixed(2), icon: "avg", tone: "tone-c"},
+        {name: "Bài luyện tập", amount: quizRes.length, icon: "lesson", tone: "tone-b"},
+        {name: "TB câu hỏi / bài luyện tập", amount: (questions.length / quizRes.length).toFixed(2), icon: "avg", tone: "tone-c"},
     ];
     const iconStatRows = {
         total: (
@@ -205,7 +205,7 @@ const AdminExercise = () => {
     // Delete Question
     const {executeDelete: handleDeleteQuestion} = useDelete(`${API_URL}/admin/delete-question`);
     const deleteQuestion = async (id) => {
-        if (!window.confirm('Xóa câu hỏi này khỏi bài luyện tập?')) return;
+        if (!window.confirm('Bạn có chắc chắn muốn xoá câu hỏi này?')) return;
         const req = {
             questionId: id
         }
@@ -242,10 +242,7 @@ const AdminExercise = () => {
                     <button className="btn btn-ghost" onClick={() => setOpenAddModalQuiz(!openAddModalQuiz)}
                         style={{marginRight: '10px'}}
                     >
-                        <svg viewBox="0 0 24 24">
-                            <path d="M12 5v14M5 12h14" />
-                        </svg>
-                        Thêm/Sửa bộ câu hỏi
+                        Xem bài luyện tập
                     </button>
 
                     <button className="btn btn-primary" onClick={openAddModal}>
@@ -290,7 +287,7 @@ const AdminExercise = () => {
                 </div>
 
                 <select value={lessonFilter} onChange={(e) => setLessonFilter(Number(e.target.value))}>
-                    <option value={0}>Tất cả bộ câu hỏi</option>
+                    <option value={0}>Tất cả bài luyện tập</option>
                     {loadAdminQuiz.map((l) => (
                         <option key={l?.id} value={l?.id}>{l?.name}</option>
                     ))}
@@ -305,7 +302,7 @@ const AdminExercise = () => {
                         <th>STT</th>
                         <th>Câu hỏi</th>
                         <th>Đáp án</th>
-                        <th>Thuộc bộ câu hỏi</th>
+                        <th>Thuộc bài luyện tập</th>
                         <th style={{ textAlign: 'right' }}>Hành động</th>
                     </tr>
                     </thead>
@@ -352,12 +349,12 @@ const AdminExercise = () => {
 
                         <form onSubmit={handleSubmit}>
                             <div className="field">
-                                <label>Thuộc bộ câu hỏi</label>
+                                <label style={{marginBottom: '10px'}}>Thuộc bài luyện tập</label>
                                 <select value={form.quizId}
                                         onChange={(e) => setForm({...form, quizId: Number(e.target.value)})}
                                         required
                                 >
-                                    <option value=''>Chọn bộ câu hỏi</option>
+                                    <option value=''>Chọn bài luyện tập</option>
                                     {loadAdminQuiz.map((l) => (
                                         <option key={l?.id} value={l?.id}>{l?.name}</option>
                                     ))}
@@ -454,10 +451,10 @@ const AdminExercise = () => {
             {openAddModalQuiz && (
                 <div className="modal-overlay" onClick={() => setOpenAddModalQuiz(!openAddModalQuiz)}>
                     <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-                        <h3>Thêm bộ câu hỏi mới</h3>
+                        <h3>Thêm bài luyện tập</h3>
 
                         <div className="quiz-list">
-                            <p className="quiz-list__title">Các bộ câu hỏi hiện có ({quizRes.length})</p>
+                            <p className="quiz-list__title">Các bài luyện tập hiện có ({quizRes.length})</p>
 
                             <ul className="quiz-list__items">
                                 {quizRes.map((quiz) => (
@@ -485,7 +482,7 @@ const AdminExercise = () => {
                             <div className="modal-actions">
                                 <button type="button" className="btn btn-ghost" onClick={() => setOpenAddModalQuiz(!openAddModalQuiz)}>Hủy</button>
                                 <button type="submit" className="btn btn-primary">
-                                    Thêm bộ câu hỏi
+                                    Thêm bài luyện tập
                                 </button>
                             </div>
                         </form>
