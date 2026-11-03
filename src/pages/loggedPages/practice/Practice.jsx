@@ -121,7 +121,7 @@ const Practice = () => {
                 dataUrl,
                 expected: selectLabel?.transcription
             });
-            console.log(data);
+            // console.log(data);
             if (!data || !data.prediction) {
                 alert("Không nhận được phản hồi từ AI, vui lòng thử lại!");
                 return;
@@ -136,7 +136,7 @@ const Practice = () => {
             // predictLabel !== charList[selectChar]
             if (predictLabel !== selectLabel?.transcription) {
                 setGrade("Chưa khớp ký tự");
-                setMess(`Bạn đang chọn chữ '${selectLabel?.name || selectLabel?.transcription}', nhưng AI thấy nét vẽ giống chữ '${data.prediction.char}' hơn.`);
+                setMess(`Bạn đang chọn ký tự '${selectLabel?.name || selectLabel?.transcription}', nhưng AI thấy nét vẽ giống ký tự '${data.prediction.char}' hơn.`);
                 setFeedBack(["Hãy quan sát kỹ nét mẫu và thử viết lại."]);
                 setScoreFB(0);
                 // setMatchedTemplate('');
@@ -356,7 +356,7 @@ const Practice = () => {
 
                     <div className="canvas-actions">
                         <button className="btn btn-ghost" onClick={clearCanvas}>Xóa</button>
-                        <button className="btn btn-ghost" onClick={savePNG}>Save PNG</button>
+                        {/*<button className="btn btn-ghost" onClick={savePNG}>Save PNG</button>*/}
                         <button className="btn btn-ghost" onClick={undoStroke} disabled={undoCount === 0}>Hoàn tác</button>
                         <button className="btn btn-primary" onClick={submitCanvas}>Gửi để AI chấm điểm</button>
                     </div>

@@ -2,12 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import './LevelExam.css';
 import { usePost } from "../../../components/use/usePost.js";
 import { API_URL, LOCAL_STORAGE_KEYS } from "../../../components/API_URL.jsx";
-
-const EXAM_CONFIG = {
-    passPercent: 80,                         // % tối thiểu để đạt (BE trả "passed" thì ưu tiên BE)
-    timeLimitSec: 600,                       // thời gian làm bài (giây) = 10 phút
-    perChapter: { vowel: 5, consonant: 5 },  // số câu bốc từ mỗi chương
-};
+import useFetch from "../../../components/use/useFetch.js";
+import Skeleton from "../../../components/loading/Skeleton.jsx";
 
 const EXAM_CHAPTERS = {
     vowel: 'Nguyên âm',
@@ -53,6 +49,16 @@ export default function LevelExam({onFinish}) {
         handleLoadUserLevel();
         handleLoadLevelExam();
     }, []);
+
+    // Set up exam config
+    const {data: loadExamConfig, loading: loadingExamConfig} = useFetch(`${API_URL}/exam/get`);
+    const EXAM_CONFIG = {
+        passPercent: loadExamConfig?.passPercent,                         // % tối thiểu để đạt (BE trả "passed" thì ưu tiên BE)
+        timeLimitSec: loadExamConfig?.timeLimitSec,                       // thời gian làm bài (giây) = 10 phút
+        perChapter: {
+            vowel: loadExamConfig?.numberOfVowel,
+            consonant: loadExamConfig?.numberOfConsonant },  // số câu bốc từ mỗi chương
+    };
 
     const [levelExam, setLevelExam] = useState(null);
     const {executePost: loadLevelExam} = usePost(`${API_URL}/level-exam/get`);
@@ -131,7 +137,7 @@ export default function LevelExam({onFinish}) {
         }));
     };
 
-    const totalQuestions = examBank.vowel.length + examBank.consonant.length;
+    const totalQuestions = loadExamConfig?.numberOfConsonant + loadExamConfig?.numberOfVowel;
     const answeredCount = Object.keys(answers).length;
 
     // Gửi danh sách đáp án lên BE để chấm
@@ -201,6 +207,8 @@ export default function LevelExam({onFinish}) {
         if (left > 0 && !window.confirm(`Bạn còn ${left} câu chưa trả lời. Vẫn nộp bài?`)) return;
         submit();
     };
+
+    if (loadingExamConfig) return <Skeleton />
 
     if (levelExam != null) {
         return (

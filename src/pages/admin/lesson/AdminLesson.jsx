@@ -8,6 +8,7 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from 
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { SortableLessonRow } from "./DraggableRow.jsx";
 import {SortableCateRow} from "./DraggableCateRow.jsx";
+import Skeleton from "../../../components/loading/Skeleton.jsx";
 
 const AdminLesson = () => {
     const {data: lessonsRoad} = useFetch(`${API_URL}/admin/all-lessons-road`);
@@ -29,6 +30,52 @@ const AdminLesson = () => {
     const lessonsRoadRes = lessonsRoad.map(mapLessonRoad);
     const [lessonsRoadListRes, setLessonsRoadListRes] = useState([]);
 
+    // Open Modal Exam config
+    const [openModalExamConfig, setOpenModalExamConfig] = useState(false);
+    const [formExamConfig, setFormExamConfig] = useState(null);
+    const {data: loadExamConfig, loading: loadingExamConfig} = useFetch(`${API_URL}/admin/exam-config`);
+    const handleOpenModalExamConfig = () => {
+        setFormExamConfig({
+            id: loadExamConfig?.id,
+            numberOfConsonant: loadExamConfig?.numberOfConsonant,
+            numberOfVowel: loadExamConfig?.numberOfVowel,
+            passPercent: loadExamConfig?.passPercent,
+            timeLimitSec: loadExamConfig?.timeLimitSec
+        })
+        setOpenModalExamConfig(!openModalExamConfig);
+    };
+    // Handle Field Change
+    const handleExamChange = (field, value) => {
+        setFormExamConfig(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    }
+    // Submit Form Exam
+    const {executePost: editExamConfig} = usePost(`${API_URL}/admin/edit-exam-config`);
+    const handleSubmitExam = async (e) => {
+        e.preventDefault();
+
+        const req = {
+            id: formExamConfig?.id,
+            numberOfConsonant: formExamConfig?.numberOfConsonant,
+            numberOfVowel: formExamConfig?.numberOfVowel,
+            passPercent: formExamConfig?.passPercent,
+            timeLimitSec: formExamConfig?.timeLimitSec
+        }
+
+        try {
+            const data = await editExamConfig(req);
+            if (data) {
+                alert("Thay đổi cấu hình ôn tập thành công.");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error Edit Exam Config", e);
+        }
+    }
+
+    // Open Modal Cate
     const [openAddModalCate, setOpenAddModalCate] = useState(false);
     const [nameCate, setNameCate] = useState('');
     const {data: loadAllCate} = useFetch(`${API_URL}/admin/all-cate`);
@@ -366,8 +413,11 @@ const AdminLesson = () => {
                     <h1>Quản lý bài học</h1>
                     <p>Thêm, chỉnh sửa và xuất bản các bài học video theo từng danh mục.</p>
                 </div>
-                <div>
-                    <button className="btn btn-ghost" style={{marginRight: '10px'}} onClick={() => setOpenAddModalCate(!openAddModalCate)}>
+                <div className="btn-list">
+                    <button className="btn btn-ghost" onClick={() => handleOpenModalExamConfig()}>
+                        Cấu hình bài ôn tập
+                    </button>
+                    <button className="btn btn-ghost" onClick={() => setOpenAddModalCate(!openAddModalCate)}>
                         Xem danh mục
                     </button>
                     <button className="btn btn-primary" onClick={openAddModal}>
@@ -717,6 +767,70 @@ const AdminLesson = () => {
                                 </div>
                             )}
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {openModalExamConfig && (
+                <div className="modal-overlay" onClick={() => setOpenModalExamConfig(!openModalExamConfig)}>
+                    <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+                        <h3>Cấu hình bài ôn tập</h3>
+
+                        {loadingExamConfig && (<Skeleton />)}
+                        {!loadingExamConfig && (
+                            <form onSubmit={handleSubmitExam}>
+                                <div className="field-row">
+                                    <div className="field">
+                                        <label>Số câu đúng yêu cầu (%)</label>
+                                        <input
+                                            type="text"
+                                            value={formExamConfig?.passPercent || ""}
+                                            onChange={(e) => handleExamChange("passPercent", e.target.value)}
+                                            placeholder="VD: 80"
+                                        />
+                                    </div>
+
+                                    <div className="field">
+                                        <label>Thời gian làm bài (giây/s)</label>
+                                        <input
+                                            type="text"
+                                            value={formExamConfig?.timeLimitSec || ""}
+                                            onChange={(e) => handleExamChange("timeLimitSec", e.target.value)}
+                                            placeholder="VD: 600"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="field-row">
+                                    <div className="field">
+                                        <label>Số câu nguyên âm</label>
+                                        <input
+                                            type="text"
+                                            value={formExamConfig?.numberOfVowel || ""}
+                                            onChange={(e) => handleExamChange("numberOfVowel", e.target.value)}
+                                            placeholder="VD: 5"
+                                        />
+                                    </div>
+
+                                    <div className="field">
+                                        <label>Số câu phụ âm</label>
+                                        <input
+                                            type="text"
+                                            value={formExamConfig?.numberOfConsonant || ""}
+                                            onChange={(e) => handleExamChange("numberOfConsonant", e.target.value)}
+                                            placeholder="VD: 5"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="modal-actions">
+                                    <button type="button" className="btn btn-ghost" onClick={() => setOpenModalExamConfig(!openModalExamConfig)}>Hủy</button>
+                                    <button type="submit" className="btn btn-primary">
+                                        Lưu thay đổi
+                                    </button>
+                                </div>
+                            </form>
+                        )}
                     </div>
                 </div>
             )}

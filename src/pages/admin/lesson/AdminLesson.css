@@ -13,6 +13,7 @@
         justify-content: space-between;
         align-items: flex-end;
         margin-bottom: 24px;
+        gap: 10px;
 
         h1 {
             font-size: 25px;
@@ -33,6 +34,16 @@
             color: var(--celadon-dark);
             font-weight: 700;
             margin-bottom: 6px;
+        }
+    }
+
+    .btn-list {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+
+        button {
+            padding: 10px 1px !important;
         }
     }
 
