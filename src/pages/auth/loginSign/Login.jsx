@@ -11,6 +11,7 @@ const Login = ({isTabLogin}) => {
     const [email, setEmail] = useState("");
     const [pass, setPass] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [changeTypePass, setChangeTypePass] = useState(false);
 
     const handleLoginGoogle = () => {
         window.location.href = "http://localhost:8080/oauth2/authorization/google";
@@ -42,7 +43,7 @@ const Login = ({isTabLogin}) => {
                     setIsLoading(false);
 
                     if (data.role === "USER") navigate("/home");
-                    else navigate("/admin")
+                    else navigate("/admin/")
                     alert("Đăng nhập thành công.");
                 }
             }
@@ -80,9 +81,9 @@ const Login = ({isTabLogin}) => {
                         <path d="M8 11V7a4 4 0 118 0v4"/>
                     </svg>
 
-                    <input onChange={(e) => setPass(e.target.value)} type="password" placeholder="••••••••" required/>
+                    <input onChange={(e) => setPass(e.target.value)} type={!changeTypePass ? `password` : `text`} placeholder="••••••••" required/>
 
-                    <svg className="toggle-eye" viewBox="0 0 24 24">
+                    <svg onClick={() => setChangeTypePass(!changeTypePass)} className="toggle-eye" viewBox="0 0 24 24">
                         <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
                         <circle cx="12" cy="12" r="3"/>
                     </svg>
@@ -90,7 +91,8 @@ const Login = ({isTabLogin}) => {
             </div>
 
             <div className="row-between">
-                <label className="checkbox-row"><input type="checkbox"/> Ghi nhớ đăng nhập</label>
+                <div></div>
+                {/*<label className="checkbox-row"><input type="checkbox"/> Ghi nhớ đăng nhập</label>*/}
                 <span onClick={() => navigate("/forget")} className="link">Quên mật khẩu?</span>
             </div>
 

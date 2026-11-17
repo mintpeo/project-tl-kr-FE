@@ -23,8 +23,8 @@ const Header = () => {
                 <nav className="nav-links">
                     <a href="#features">Tính năng</a>
                     <a href="#how">Cách hoạt động</a>
-                    <a href="#">Bảng chữ cái</a>
-                    <a href="#">Về chúng tôi</a>
+                    <a href="#cta">Bảng chữ cái</a>
+                    <a href="#footer">Về chúng tôi</a>
                 </nav>
 
                 <div className="nav-actions">

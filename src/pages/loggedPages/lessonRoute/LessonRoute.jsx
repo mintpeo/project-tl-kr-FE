@@ -7,6 +7,7 @@ import CharHangul from "../../../components/hangul/CharHangul.jsx";
 import Combine from "../combine/Combine.jsx";
 import {usePost} from "../../../components/use/usePost.js";
 import Quiz from "../../../components/quiz/Quiz.jsx";
+import LevelExam from "./LevelExam.jsx";
 
 const LessonRoute = () => {
     const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
@@ -84,7 +85,6 @@ const LessonRoute = () => {
                 const per = Math.round((count / res.length) * 100);
                 setCountLesson(count);
                 setTrack(per);
-
                 setCategories(res);
             } catch (e) {
                 console.log("Error Loading Categories User", e);
@@ -186,7 +186,7 @@ const LessonRoute = () => {
                         <p>{countLesson}/{categories.length} chương đã hoàn thành</p>
                     </div>
 
-                    {categories.map((item, index) => {
+                    {categories.sort((a, b) => a.orderIndex - b.orderIndex).map((item, index) => {
                         // Next Lesson if learn lesson before
                         const isPrevLearned = index === 0 || categories[index - 1]?.learned;
                         return (
@@ -218,10 +218,9 @@ const LessonRoute = () => {
 
                                 <div className="submodule-list">
                                     {loadingLessonCate && (<Skeleton />)}
-
                                     {lessons.sort((a, b) => a.orderIndex - b.orderIndex)
                                         .map((lesson, index) => (
-                                            <>
+                                            <div key={index}>
                                                 <div className={`sub-item ${selectedLessonRoute === lesson.orderIndex ? `active` : ``}`}
                                                      onClick={() => setSelectedLessonRoute(lesson.orderIndex)}
                                                 >
@@ -265,10 +264,10 @@ const LessonRoute = () => {
                                                         Bài luyện tập ({lesson?.totalQuestions} câu)
                                                     </div>
                                                 )}
-                                            </>
+                                            </div>
                                         ))}
 
-                                    {lessons && lessons.length <= 0 && (
+                                    {(lessons && lessons.length <= 0) && (
                                         <div className="sub-item sub-item-child">
                                             <p>Không có bài học nào.</p>
                                         </div>
@@ -293,7 +292,13 @@ const LessonRoute = () => {
                     </div>
                 )}
 
-                {selectedCateId > 0 && (
+                {selectedCateId === 4 && (
+                    <div className="content-card">
+                        <LevelExam />
+                    </div>
+                )}
+
+                {(selectedCateId > 0 && selectedCateId !== 4) && (
                     <div className="card content-card">
                         <div className="video-player">
                             {lessonRoute?.youtubeId ? (

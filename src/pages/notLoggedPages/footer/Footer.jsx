@@ -3,7 +3,7 @@ import './Footer.css';
 
 const Footer = () => {
     return (
-        <footer className="footer">
+        <footer className="footer" id="footer">
             <div className="footer-container">
                 <div className="footer-top">
                     <div className="footer-col brand-col">
@@ -39,7 +39,7 @@ const Footer = () => {
 
                     <div className="footer-col">
                         <h4>Liên hệ</h4>
-                        <p className="contact-info">Email: support@geulssi.vn</p>
+                        <p className="contact-info">Email: support@st.hcmuaf.edu.vn</p>
                         <p className="contact-info">Địa chỉ: TP. Hồ Chí Minh, Việt Nam</p>
                     </div>
                 </div>

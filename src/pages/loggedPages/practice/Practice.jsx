@@ -11,7 +11,11 @@ const Practice = () => {
 
     const {data: characters, loading: isLoading} = useFetch(`${API_URL}/character/all`);
     const vowels = characters.filter(char => char.type === "VOWEL");
+    const vowelsSingle = vowels.filter(char => !char.double);
+    const vowelsDouble = vowels.filter(char => char.double);
     const consonants = characters.filter(char => char.type === "CONSONANT");
+    const consonantsSingle = consonants.filter(char => !char.double);
+    const consonantsDouble = consonants.filter(char => char.double);
 
     const [selectedCate, setSelectedCate] = useState(0);
     const [charList, setCharList] = useState([]);
@@ -32,14 +36,27 @@ const Practice = () => {
     const isDrawing = useRef(false);
 
     useEffect(() => {
-        setCharList(vowels);
+        setCharList(vowelsSingle);
     }, [characters]);
 
     const cateList = [
-        { name: 'Nguyên âm' },
-        { name: 'Phụ âm' },
-        // { name: 'Âm ghép' }
+        { name: 'Nguyên âm đơn' },
+        { name: 'Nguyên âm đôi' },
+        { name: 'Phụ âm đơn' },
+        { name: 'Phụ âm đôi' },
     ];
+
+    const clearCanvasSelectedChar = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        historyRef.current = [];
+        setUndoCount(0);
+        setScoreDisable(false);
+        setMatchedTemplate('');
+    }
 
     const clearCanvas = () => {
         const canvas = canvasRef.current;
@@ -50,8 +67,33 @@ const Practice = () => {
         historyRef.current = [];
         setUndoCount(0);
         setScoreDisable(false);
-        setMatchedTemplate('');
+        // setMatchedTemplate('');
     };
+
+    // Save image canvas
+    const savePNG = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+
+        const tempCtx = tempCanvas.getContext("2d");
+        tempCtx.fillStyle = "#FFFFFF";
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        tempCtx.drawImage(canvas, 0, 0);
+
+        // Lấy dữ liệu ảnh Base64 (Nền trắng, nét đen)
+        const image = tempCanvas.toDataURL("image/png");
+
+        // Tải ảnh về máy để test với Python model
+        const link = document.createElement("a");
+        link.href = image;
+        const selectLabel = charList[selectedChar];
+        link.download = selectLabel.name + "-";
+        link.click();
+    }
 
     // Submit Canvas, Save Practice
     const {executePost: handlePredict} = usePost(`${API_URL}/predict/data-url`);
@@ -72,9 +114,13 @@ const Practice = () => {
         tempCtx.drawImage(canvas, 0, 0);
 
         const dataUrl = tempCanvas.toDataURL("image/png");
+        const selectLabel = charList[selectedChar];
 
         try {
-            const data = await handlePredict({ dataUrl });
+            const data = await handlePredict({
+                dataUrl,
+                expected: selectLabel?.transcription
+            });
             console.log(data);
             if (!data || !data.prediction) {
                 alert("Không nhận được phản hồi từ AI, vui lòng thử lại!");
@@ -82,18 +128,18 @@ const Practice = () => {
             }
 
             setPredict(data.prediction);
+            setMatchedTemplate(data?.matched_template?.img_url);
             setScoreDisable(true);
 
             const predictLabel = data.prediction.label;
-            const selectLabel = charList[selectedChar];
 
             // predictLabel !== charList[selectChar]
             if (predictLabel !== selectLabel?.transcription) {
                 setGrade("Chưa khớp ký tự");
-                setMess(`Bạn đang chọn chữ '${selectLabel?.name || selectLabel?.transcription}', nhưng AI thấy nét vẽ giống chữ '${data.prediction.char}' hơn.`);
+                setMess(`Bạn đang chọn ký tự '${selectLabel?.name || selectLabel?.transcription}', nhưng AI thấy nét vẽ giống ký tự '${data.prediction.char}' hơn.`);
                 setFeedBack(["Hãy quan sát kỹ nét mẫu và thử viết lại."]);
                 setScoreFB(0);
-                setMatchedTemplate('');
+                // setMatchedTemplate('');
                 // setScoreDisable(true);
                 return;
             }
@@ -104,7 +150,7 @@ const Practice = () => {
             setGrade(data?.evaluation?.grade || "Đạt");
             setMess(data?.evaluation?.message || "");
             setScoreFB(simScore);
-            setMatchedTemplate(data?.matched_template?.img_url);
+            // setMatchedTemplate(data?.matched_template?.img_url);
             // setScoreDisable(true);
 
             // Save Practice
@@ -169,7 +215,7 @@ const Practice = () => {
         canvas.getContext("2d").putImageData(prev, 0, 0);
         setUndoCount(historyRef.current.length);
         setScoreDisable(false);
-        setMatchedTemplate('');
+        // setMatchedTemplate('');
     };
 
     useEffect(() => {
@@ -206,8 +252,10 @@ const Practice = () => {
     };
 
     useEffect(() => {
-        if (selectedCate === 0) setCharList(vowels);
-        if (selectedCate === 1) setCharList(consonants);
+        if (selectedCate === 0) setCharList(vowelsSingle);
+        if (selectedCate === 1) setCharList(vowelsDouble);
+        if (selectedCate === 2) setCharList(consonantsSingle);
+        if (selectedCate === 3) setCharList(consonantsDouble);
         setSelectedChar(-1);
     }, [selectedCate]);
 
@@ -251,7 +299,7 @@ const Practice = () => {
                                     key={index}
                                     onClick={() => {
                                         setSelectedChar(index);
-                                        clearCanvas();
+                                        clearCanvasSelectedChar();
                                     }}
                                     className={`cat-pill ${selectedChar === index ? 'active' : ''}`}
                                 >

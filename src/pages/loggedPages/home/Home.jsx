@@ -4,11 +4,23 @@ import {usePost} from "../../../components/use/usePost.js";
 import {API_URL, LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
 import {useNavigate} from "react-router-dom";
 import Skeleton from "../../../components/loading/Skeleton.jsx";
+import ReactPlayer from "react-player";
+import useFetch from "../../../components/use/useFetch.js";
 
 const Home = () => {
     const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
     const user = JSON.parse(user_info);
     const navigate = useNavigate();
+
+    const {data: loadLessonsHome, loading: loadingLessonsHome} = useFetch(`${API_URL}/lesson-route/lessons-home`);
+    const mapLessonsHomeRes = (l) => ({
+        id: l?.id,
+        des: l?.des,
+        desFinish: l?.desFinish,
+        youtubeId: l?.youtubeId,
+        orderIndex: l?.orderIndex,
+    });
+    const lessonRoute = loadLessonsHome.map(mapLessonsHomeRes);
 
     // Handle Cate
     const {executePost: loadLessonProgress, loading:loadingLesson} = usePost(`${API_URL}/progress/lesson-progress`);
@@ -133,6 +145,42 @@ const Home = () => {
             </div>
 
             <div className="section-title">
+                <h3>Giới thiệu về Hàn Quốc và Bảng chữ cái Hangul</h3>
+            </div>
+
+            <div className="content-card">
+                <div className="video-player">
+                    {loadingLessonsHome && <Skeleton />}
+
+                    {lessonRoute.sort((a, b) => a.orderIndex - b.orderIndex).map((l) => (
+                        <div className="video-item" key={l?.id}>
+                            <ReactPlayer
+                                src={`https://www.youtube.com/watch?v=${l?.youtubeId}`}
+                                width="100%"
+                                height="100%"
+                                controls={true}
+                                progressInterval={1000}
+                            />
+                        </div>
+                    ))}
+
+                    {!loadingLessonsHome && lessonRoute.length === 0 && (
+                        <div className="video-item placeholder">
+                            <span className="ghost-char">가</span>
+                            <div className="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+
+                            <div className="video-bar">
+                                <div className="video-progress-track">
+                                    <div className="video-progress-fill"></div>
+                                </div>
+                                <span className="video-duration">3:05 / 8:45</span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <div className="section-title">
                 <h3>Tiếp tục bài học</h3>
                 <span onClick={() => navigate("/road")} className="link-mini">Xem tất cả</span>
             </div>
@@ -141,7 +189,7 @@ const Home = () => {
                 {loadingLesson && <Skeleton />}
                 {(!loadingLesson && categories.length > 0) && (
                     categories.map((lesson, index) => (
-                        <div onClick={() => navigate("/road")} className="card lesson-card">
+                        <div key={index} onClick={() => navigate("/road")} className="card lesson-card">
                             <div className="lesson-glyph">{glyphCate(index)}</div>
                             <h4>{lesson.title}</h4>
                             <p>{lesson.sub}</p>

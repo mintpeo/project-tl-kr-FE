@@ -1,0 +1,118 @@
+.pc {
+    --pc-accent: var(--ink-soft);
+    --pc-bg: var(--paper-card);
+    --pc-line: var(--paper-dim);
+
+    width: 100%;
+    max-width: 320px;
+    max-height: 50vh;
+    margin: 0 auto;
+    padding: 20px 16px;
+    box-sizing: border-box;
+    text-align: center;
+    border: 2px dashed var(--pc-line);
+    border-radius: 18px;
+    background: var(--pc-bg);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    color: var(--ink);
+    transition: background .2s ease, border-color .2s ease;
+
+    &.pc-recording  { --pc-accent: var(--celadon-dark); --pc-line: var(--celadon); }
+    &.pc-correct    { --pc-accent: var(--celadon-dark); --pc-line: var(--celadon-dark); --pc-bg: var(--celadon-light); border-style: solid; }
+    &.pc-wrong,
+    &.pc-error      { --pc-accent: var(--plum);         --pc-line: var(--plum);         --pc-bg: var(--plum-light);     border-style: solid; }
+
+    .pc-target {
+        margin: 0 0 14px !important;
+        font-size: 13px;
+        color: var(--ink-soft);
+
+        span {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--ink);
+            margin-left: 6px;
+        }
+    }
+
+    .pc-mic {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: none;
+        background: var(--pc-accent);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform .15s ease;
+
+        &:hover:not(:disabled) { transform: scale(1.05); }
+        &:disabled { cursor: wait; }
+    }
+    &.pc-idle .pc-mic { background: var(--celadon-dark); }
+
+    /* vòng sóng khi đang thu */
+    &.pc-recording .pc-mic { animation: pc-pulse 1.2s ease-out infinite; }
+
+    .pc-icon {
+        width: 24px;
+        height: 24px;
+        fill: none;
+        stroke: #fff;
+        stroke-width: 2.4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+
+        &.mic { stroke-width: 2; }
+    }
+
+    .pc-stop { width: 22px; height: 22px; border-radius: 5px; background: #fff; }
+
+    .pc-spinner {
+        width: 26px;
+        height: 26px;
+        border: 3px solid rgba(255, 255, 255, .35);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: pc-spin .8s linear infinite;
+    }
+
+    .pc-label {
+        margin: 12px 0 0 !important;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--pc-accent);
+    }
+    &.pc-idle .pc-label,
+    &.pc-processing .pc-label { color: var(--ink-soft); font-weight: 600; }
+
+    .pc-heard { margin: 8px 0 0; font-size: 12.5px; color: var(--ink-soft); }
+    .pc-heard strong { font-family: 'Noto Serif KR', serif; color: var(--ink); }
+
+    .pc-retry {
+        margin-top: 12px;
+        border: 1px solid var(--pc-line);
+        background: transparent;
+        color: var(--pc-accent);
+        padding: 8px 18px;
+        min-height: 40px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+    }
+}
+
+@keyframes pc-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(95, 133, 103, .5); }
+    100% { box-shadow: 0 0 0 20px rgba(95, 133, 103, 0); }
+}
+@keyframes pc-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .pc.pc-recording .pc-mic, .pc .pc-spinner { animation: none; }
+}

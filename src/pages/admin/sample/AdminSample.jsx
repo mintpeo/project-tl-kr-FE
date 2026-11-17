@@ -6,19 +6,11 @@ import {usePutUploadFile} from "../../../components/use/usePut.js";
 import Skeleton from "../../../components/loading/Skeleton.jsx";
 import {useDelete} from "../../../components/use/useDelete.js";
 
-/* ============================================================
-   DỮ LIỆU MẪU — thay bằng dữ liệu thật từ API /api/admin/samples
-   Mỗi ký tự có 1 mảng "samples" (nhiều ảnh chữ mẫu tham chiếu
-   để AI so sánh khi chấm điểm nét viết của người học).
-   ============================================================ */
 const CATEGORY_OPTIONS = [
     { value: 'vowel', label: 'Nguyên âm' },
     { value: 'consonant', label: 'Phụ âm' },
 ];
 
-/* ============================================================
-   COMPONENT
-   ============================================================ */
 const AdminSample = () => {
     const {data: getAllTempChars} = useFetch(`${API_URL}/admin/all-temp`);
     const mapChars = (c) => ({
@@ -65,16 +57,30 @@ const AdminSample = () => {
     const activeChar = chars.find((c) => c.id === activeCharId) ?? null;
 
     // Add Char Temp
+    const ALLOWED_TYPES = ['image/png', 'image/jpeg'];
+    const MAX_SIZE_MB = 2;
     const {executePutUploadFile: uploadCharTemp, loading: loadingUploadCharTemp} = usePutUploadFile(`${API_URL}/admin/upload-char-temp`);
     const addSample = async (charId, file) => {
-        const label = file ? file.name : `Viết tay ${Math.floor(Math.random() * 90 + 10)}`;
+        if (!file) {
+            alert("Vui lòng chọn một ảnh.");
+            return;
+        }
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            alert("Chỉ chấp nhận ảnh PNG hoặc JPG.");
+            return;
+        }
+        if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+            alert(`Ảnh quá lớn, tối đa ${MAX_SIZE_MB}MB.`);
+            return;
+        }
 
+        const label = file ? file.name : `Viết tay ${Math.floor(Math.random() * 90 + 10)}`;
         const formData = new FormData();
         formData.append("file", file);
         formData.append("charId", charId);
         try {
             const data = await uploadCharTemp(formData);
-            if (data !== null) {
+            if (data) {
                 alert("Tải lên ảnh mẫu thành công.");
                 window.location.reload();
             }
@@ -85,6 +91,7 @@ const AdminSample = () => {
 
     const {executeDelete: deleteChar, loading: loadingDeleteCharTemp} = useDelete(`${API_URL}/admin/delete-char-temp`);
     const removeSample = async (sampleId) => {
+        if (!window.confirm("Bạn có chắc chắn muốn xoá chữ mẫu này?")) return;
         const req = {
             id: sampleId
         }
@@ -93,7 +100,7 @@ const AdminSample = () => {
         } catch (e) {
             console.log("Error Delete Char Temp", e);
         }
-        alert("Xoá ảnh mẫu thành công.");
+        alert("Xoá chữ mẫu thành công.");
         window.location.reload();
     }
 
@@ -233,7 +240,7 @@ const AdminSample = () => {
 
                                     {activeChar.samples.length < 3 && (
                                         <label className="sample-tile add-tile">
-                                            <input type="file" accept="image/*" hidden onChange={(e) => handleFileInput(e, activeChar.id)} />
+                                            <input type="file" accept="image/png,image/jpeg" hidden onChange={(e) => handleFileInput(e, activeChar.id)} />
                                             <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
                                             <span>Thêm chữ mẫu</span>
                                         </label>

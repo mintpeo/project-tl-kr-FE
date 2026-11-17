@@ -441,6 +441,8 @@
                     align-items: center;
                     justify-content: center;
                     overflow: hidden;
+                    flex-direction: column;
+                    gap: 16px;
 
                     audio {
                         border-radius: 14px;

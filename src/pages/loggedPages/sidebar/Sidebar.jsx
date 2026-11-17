@@ -120,7 +120,7 @@ const Sidebar = () => {
                     {isMenuOpen && (
                         <div className="user-dropdown-menu">
                             <button
-                                className="menu-item"
+                                className={`menu-item ${location.pathname === "/profile" ? `active`: ``}`}
                                 onClick={() => {
                                     setIsMenuOpen(false);
                                     navigate("/profile");
@@ -130,16 +130,16 @@ const Sidebar = () => {
                                 <span>Thông tin cá nhân</span>
                             </button>
 
-                            <button
-                                className="menu-item"
-                                onClick={() => {
-                                    setIsMenuOpen(false);
-                                    navigate("/setting");
-                                }}
-                            >
-                                <RiSettings3Line size={18} />
-                                <span>Cài đặt</span>
-                            </button>
+                            {/*<button*/}
+                            {/*    className="menu-item"*/}
+                            {/*    onClick={() => {*/}
+                            {/*        setIsMenuOpen(false);*/}
+                            {/*        navigate("/setting");*/}
+                            {/*    }}*/}
+                            {/*>*/}
+                            {/*    <RiSettings3Line size={18} />*/}
+                            {/*    <span>Cài đặt</span>*/}
+                            {/*</button>*/}
 
                             <div className="menu-divider"></div>
 

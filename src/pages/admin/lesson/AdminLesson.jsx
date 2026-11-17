@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import './AdminLesson.css';
 import useFetch from "../../../components/use/useFetch.js";
 import {API_URL} from "../../../components/API_URL.jsx";
@@ -7,6 +7,8 @@ import {useDelete} from "../../../components/use/useDelete.js";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { SortableLessonRow } from "./DraggableRow.jsx";
+import {SortableCateRow} from "./DraggableCateRow.jsx";
+import Skeleton from "../../../components/loading/Skeleton.jsx";
 
 const AdminLesson = () => {
     const {data: lessonsRoad} = useFetch(`${API_URL}/admin/all-lessons-road`);
@@ -26,7 +28,137 @@ const AdminLesson = () => {
         quizId: lesson?.quiz?.id,
     });
     const lessonsRoadRes = lessonsRoad.map(mapLessonRoad);
-    const [lessonsRoadListRes, setLessonsRoadListRes] = useState([]);
+
+    // Open Modal Exam config
+    const [openModalExamConfig, setOpenModalExamConfig] = useState(false);
+    const [formExamConfig, setFormExamConfig] = useState(null);
+    const {data: loadExamConfig, loading: loadingExamConfig} = useFetch(`${API_URL}/admin/exam-config`);
+    const handleOpenModalExamConfig = () => {
+        setFormExamConfig({
+            id: loadExamConfig?.id,
+            numberOfConsonant: loadExamConfig?.numberOfConsonant,
+            numberOfVowel: loadExamConfig?.numberOfVowel,
+            passPercent: loadExamConfig?.passPercent,
+            timeLimitSec: loadExamConfig?.timeLimitSec
+        })
+        setOpenModalExamConfig(!openModalExamConfig);
+    };
+    // Handle Field Change
+    const handleExamChange = (field, value) => {
+        setFormExamConfig(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    }
+    // Submit Form Exam
+    const {executePost: editExamConfig} = usePost(`${API_URL}/admin/edit-exam-config`);
+    const handleSubmitExam = async (e) => {
+        e.preventDefault();
+
+        const req = {
+            id: formExamConfig?.id,
+            numberOfConsonant: formExamConfig?.numberOfConsonant,
+            numberOfVowel: formExamConfig?.numberOfVowel,
+            passPercent: formExamConfig?.passPercent,
+            timeLimitSec: formExamConfig?.timeLimitSec
+        }
+
+        try {
+            const data = await editExamConfig(req);
+            if (data) {
+                alert("Thay đổi cấu hình ôn tập thành công.");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error Edit Exam Config", e);
+        }
+    }
+
+    // Open Modal Cate
+    const [openAddModalCate, setOpenAddModalCate] = useState(false);
+    const [nameCate, setNameCate] = useState('');
+    const {data: loadAllCate} = useFetch(`${API_URL}/admin/all-cate`);
+    // Btn toggle
+    const [checkedCate, setCheckedCate] = useState(false);
+    const [reorderListCate, setReorderListCate] = useState([]);
+    const toggleCate = () => {
+        if (!checkedCate) {
+            const listToReorder = [...loadAllCate].sort((a, b) => a.orderIndex - b.orderIndex);
+            setReorderListCate(listToReorder);
+            setCheckedCate(true);
+        } else {
+            setCheckedCate(false);
+            setReorderListCate([]);
+        }
+    };
+    // Handle Drag Cate
+    const handleDragEndCate = (e) => {
+        const { active, over } = e;
+        if (!over || active.id === over.id) return;
+        setReorderListCate((items) => {
+            const oldIndex = items.findIndex(item => item.id === active.id);
+            const newIndex = items.findIndex(item => item.id === over.id);
+            return arrayMove(items, oldIndex, newIndex);
+        });
+    };
+    // Save New Order Cate
+    const { executePost: handleSaveReorderCate } = usePost(`${API_URL}/admin/update-order-index-cate`);
+    const saveNewOrderCate = async () => {
+        const req = { cateIds: reorderListCate.map(item => item.id) };
+        try {
+            const data = await handleSaveReorderCate(req);
+            if (data) {
+                alert("Cập nhật vị trí danh mục thành công!");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.error("Error Save New Order Cate", e);
+            alert("Lỗi khi lưu vị trí danh mục.");
+        }
+    };
+
+    // Handle Edit Cate
+    const {executePost: editCate} = usePost(`${API_URL}/admin/edit-cate`);
+    const handleEditCate = async (cateId) => {
+        try {
+            const data = await editCate({cateId: cateId});
+            if (data) {
+                alert("Cập nhật danh mục thành công.");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error Handle Edit Cate", e);
+        }
+    }
+    // Delete Cate
+    const {executeDelete: deleteCate} = useDelete(`${API_URL}/admin/delete-cate`);
+    const handleDeleteCate = async (cateId) => {
+        if (!window.confirm("Bạn có chắc chắn muốn xoá danh mục này?")) return;
+        try {
+            const data = await deleteCate({cateId: cateId});
+            if (data) {
+                alert("Xoá danh mục thành công.");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error Delete Cate", e);
+        }
+    }
+    // Handle New Cate
+    const {executePost: createNewCate} = usePost(`${API_URL}/admin/create-cate`);
+    const handleNewCate = async (e) => {
+        e.preventDefault();
+
+        try {
+            const data = await createNewCate({nameCate: nameCate});
+            if (data) {
+                alert("Tạo danh mục mới thành công.");
+                window.location.reload();
+            }
+        } catch (e) {
+            console.log("Error Handle New Cate", e);
+        }
+    }
 
     // Handle Quiz
     const {data: loadQuizzes} = useFetch(`${API_URL}/admin/get-quizzes`);
@@ -125,7 +257,7 @@ const AdminLesson = () => {
         }));
     }
     // Modal
-    const EMPTY_FORM = { name: '', cateRouteId: 1, active: true, duration: '', description: '', youtubeId: '' };
+    const EMPTY_FORM = { name: '', cateRouteId: null, active: true, duration: '', description: '', youtubeId: '' };
     const [modalOpen, setModalOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [form, setForm] = useState(EMPTY_FORM);
@@ -184,6 +316,10 @@ const AdminLesson = () => {
                 }
             } else {
                 // Create New Lesson
+                if (form?.cateRouteId == null) {
+                    alert("Vui lòng chọn danh mục!");
+                    return;
+                }
                 const res = await handleCreateNewLesson(req);
                 if (res) {
                     alert("Tạo bài học mới thành công.");
@@ -196,40 +332,53 @@ const AdminLesson = () => {
     }
 
     // Search, Filter
-    const {executePost: handleSearch} = usePost(`${API_URL}/admin/search-lessons-name`);
-    const [searchName, setSearchName] = useState("");
+    // const {executePost: handleSearch} = usePost(`${API_URL}/admin/search-lessons-name`);
+    // const [searchName, setSearchName] = useState("");
+    // const [statusFilter, setStatusFilter] = useState(-1);
+    // const [categoryFilter, setCategoryFilter] = useState(0);
+    // useEffect(() => {
+    //     const timer = setTimeout(async () => {
+    //         let baseList = lessonsRoadRes;
+    //
+    //         if (searchName.trim()) {
+    //             try {
+    //                 const data = await handleSearch({lessonRoadName: searchName});
+    //                 baseList = Array.isArray(data) ? data.map(mapLessonRoad) : [];
+    //                 setLessonsRoadListRes(baseList);
+    //             } catch (e) {
+    //                 console.log("Error Search Name Lesson", e);
+    //             }
+    //         }
+    //
+    //         let filtered = [...baseList];
+    //         if (categoryFilter !== 0) filtered = filtered.filter(l => l.cateId === categoryFilter);
+    //
+    //         if (statusFilter === 1) filtered = filtered.filter(l => l.active);
+    //         else if (statusFilter === 0) filtered = filtered.filter(l => !l.active);
+    //
+    //         setLessonsRoadListRes(filtered);
+    //     }, 300);
+    //     return () => clearTimeout(timer);
+    // }, [searchName, categoryFilter, statusFilter, lessonsRoad]);
+
+    // Handle Filter
+    const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState(-1);
     const [categoryFilter, setCategoryFilter] = useState(0);
-    useEffect(() => {
-        const timer = setTimeout(async () => {
-            let baseList = lessonsRoadRes;
-
-            if (searchName.trim()) {
-                try {
-                    const data = await handleSearch({lessonRoadName: searchName});
-                    baseList = Array.isArray(data) ? data.map(mapLessonRoad) : [];
-                    setLessonsRoadListRes(baseList);
-                } catch (e) {
-                    console.log("Error Search Name Lesson", e);
-                }
-            }
-
-            let filtered = [...baseList];
-            if (categoryFilter !== 0) filtered = filtered.filter(l => l.cateId === categoryFilter);
-
-            if (statusFilter === 1) filtered = filtered.filter(l => l.active);
-            else if (statusFilter === 0) filtered = filtered.filter(l => !l.active);
-
-            setLessonsRoadListRes(filtered);
-        }, 300);
-        return () => clearTimeout(timer);
-    }, [searchName, categoryFilter, statusFilter, lessonsRoad]);
+    const filtered = useMemo(() => {
+        return lessonsRoadRes.filter((l) => {
+            const matchesSearch = l.name?.toLowerCase().includes(search.toLowerCase());
+            const matchesCate = categoryFilter === 0 || l.cateId === categoryFilter;
+            const matchesStatus = statusFilter === -1 || (statusFilter === 1 ? l.active : !l.active);
+            return matchesSearch && matchesCate && matchesStatus;
+        });
+    }, [lessonsRoad, search, categoryFilter, statusFilter]);
 
     // Get All Cate Road
-    const {data: getAllCateRoad} = useFetch(`${API_URL}/admin/all-cate-road`);
-    const cateList = getAllCateRoad.map((cate) => ({
-        id: cate.id,
-        name: cate.name,
+    const cateList = loadAllCate.map((cate) => ({
+        id: cate?.id,
+        name: cate?.name,
+        lessonsSize: cate?.lessonsSize
     }))
 
     // Handle Stat
@@ -276,13 +425,15 @@ const AdminLesson = () => {
                     <h1>Quản lý bài học</h1>
                     <p>Thêm, chỉnh sửa và xuất bản các bài học video theo từng danh mục.</p>
                 </div>
-                <div>
-                    {/*<button className="btn btn-ghost" style={{marginRight: '10px'}}>*/}
-                    {/*    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>*/}
-                    {/*    Thêm danh mục*/}
-                    {/*</button>*/}
+                <div className="btn-list">
+                    <button className="btn btn-ghost" onClick={() => handleOpenModalExamConfig()}>
+                        Cấu hình bài ôn tập
+                    </button>
+                    <button className="btn btn-ghost" onClick={() => setOpenAddModalCate(!openAddModalCate)}>
+                        Xem danh mục
+                    </button>
                     <button className="btn btn-primary" onClick={openAddModal}>
-                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
+                        {/*<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>*/}
                         Thêm bài học
                     </button>
                 </div>
@@ -312,8 +463,8 @@ const AdminLesson = () => {
                         disabled={checked}
                         type="text"
                         placeholder="Tìm theo tên bài học..."
-                        value={searchName || ""}
-                        onChange={(e) => setSearchName(e.target.value)}
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
 
@@ -398,7 +549,7 @@ const AdminLesson = () => {
                         </thead>
 
                         <tbody>
-                        {lessonsRoadListRes .map((l, index) => (
+                        {filtered.map((l, index) => (
                             <tr key={l.id}>
                                 <td>{index + 1}</td>
                                 <td>{truncateText(l.name, 20)}</td>
@@ -420,7 +571,7 @@ const AdminLesson = () => {
                             </tr>
                         ))}
 
-                        {lessonsRoadListRes.length === 0 && (
+                        {filtered.length === 0 && (
                             <tr><td colSpan={7} className="empty-row">Không tìm thấy bài học phù hợp.</td></tr>
                         )}
                         </tbody>
@@ -452,6 +603,7 @@ const AdminLesson = () => {
                                         value={form.cateRouteId || ""}
                                         onChange={(e) => handleFieldChange("cateRouteId", Number(e.target.value))}
                                     >
+                                        <option value="">Chưa phân loại</option>
                                         {cateList.map((c) => (
                                             <option key={c.id} value={c.id}>{c.name}</option>
                                         ))}
@@ -459,12 +611,12 @@ const AdminLesson = () => {
                                 </div>
 
                                 <div className="field">
-                                    <label>Bộ câu hỏi</label>
+                                    <label>Bài luyện tập</label>
                                     <select
                                         value={form?.quizId || ""}
                                         onChange={(e) => handleFieldChange("quizId", e.target.value ? Number(e.target.value) : null)}
                                     >
-                                        <option value="">Chưa có bộ câu hỏi</option>
+                                        <option value="">Chưa có bài luyện tập</option>
                                         {loadQuizzes.map((c) => (
                                             <option key={c.id} value={c.id}>{c.name}</option>
                                         ))}
@@ -537,6 +689,160 @@ const AdminLesson = () => {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {openAddModalCate && (
+                <div className="modal-overlay" onClick={() => setOpenAddModalCate(!openAddModalCate)}>
+                    <div className="modal-card"
+                         onClick={(e) => e.stopPropagation()}>
+                        <h3>Thêm danh mục mới</h3>
+
+                        <div className="quiz-list">
+                            <div style={{display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: '10px'}}>
+                                <p className="quiz-list__title">Các danh mục hiện có ({loadAllCate.length})</p>
+                                <div className="char-switch">
+                                    <p style={{ margin: 0, fontSize: '12px', color: 'var(--ink-soft)' }}>Sắp xếp vị trí</p>
+
+                                    <button
+                                        type="button"
+                                        className={`toggle-btn ${checkedCate ? 'active' : ''}`}
+                                        onClick={toggleCate}
+                                    >
+                                        <span className="toggle-thumb" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {checkedCate ? (
+                                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEndCate}>
+                                    <SortableContext items={reorderListCate.map(c => c.id)} strategy={verticalListSortingStrategy}>
+                                        <ul className="quiz-list__items" style={{ marginBottom: '10px' }}>
+                                            {reorderListCate.map((c, index) => (
+                                                <SortableCateRow key={c.id} cate={c} index={index} />
+                                            ))}
+                                        </ul>
+                                    </SortableContext>
+                                </DndContext>
+                            ) : (
+                                <ul className="quiz-list__items" style={{ marginBottom: '10px' }}>
+                                    {loadAllCate.map((cate) => (
+                                        <li key={cate?.id} className="quiz-list__item">
+                                            <span className="quiz-list__name">{cate?.name} - ({cate?.lessonsSize})</span>
+                                            <div>
+                                                <button type="button" className="quiz-list__delete" title="Đổi trạng thái"
+                                                        style={{ marginRight: '5px' }} onClick={() => handleEditCate(cate?.id)}>
+                                                    {cate?.active ? "Hiển thị" : "Ẩn"}
+                                                </button>
+                                                <button type="button" className="quiz-list__delete" title="Xóa" onClick={() => handleDeleteCate(cate?.id)}>
+                                                    Xóa
+                                                </button>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+
+                            {!checkedCate &&
+                                <>
+                                    <form onSubmit={handleNewCate}>
+                                        <div className="field">
+                                            <input
+                                                type="text"
+                                                value={nameCate}
+                                                onChange={(e) => setNameCate(e.target.value)}
+                                                placeholder="VD: Danh mục..."
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="modal-actions">
+                                            <button type="button" className="btn btn-ghost" onClick={() => setOpenAddModalCate(!openAddModalCate)}>Hủy</button>
+                                            <button type="submit" className="btn btn-primary">
+                                                Thêm danh mục
+                                            </button>
+                                        </div>
+                                    </form>
+                                </>
+                            }
+
+                            {checkedCate && (
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '15px', alignItems: 'center', padding: '10px 16px', background: '#eff6ff', borderRadius: '8px' }}>
+                                    <span style={{ fontSize: '12px', color: '#1e40af' }}>
+                                        Đang ở chế độ sắp xếp. Kéo thả các dòng để đổi vị trí, sau đó bấm <b>Lưu thứ tự</b>.
+                                    </span>
+                                    <div style={{ display: 'flex', gap: '8px', whiteSpace: "nowrap" }}>
+                                        <button type="button" className="btn btn-ghost" onClick={toggleCate}>Hủy</button>
+                                        <button type="button" className="btn btn-primary" onClick={saveNewOrderCate}>Lưu thứ tự</button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {openModalExamConfig && (
+                <div className="modal-overlay" onClick={() => setOpenModalExamConfig(!openModalExamConfig)}>
+                    <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+                        <h3>Cấu hình bài ôn tập</h3>
+
+                        {loadingExamConfig && (<Skeleton />)}
+                        {!loadingExamConfig && (
+                            <form onSubmit={handleSubmitExam}>
+                                <div className="field-row">
+                                    <div className="field">
+                                        <label>Số câu đúng yêu cầu (%)</label>
+                                        <input
+                                            type="text"
+                                            value={formExamConfig?.passPercent || ""}
+                                            onChange={(e) => handleExamChange("passPercent", e.target.value)}
+                                            placeholder="VD: 80"
+                                        />
+                                    </div>
+
+                                    <div className="field">
+                                        <label>Thời gian làm bài (giây/s)</label>
+                                        <input
+                                            type="text"
+                                            value={formExamConfig?.timeLimitSec || ""}
+                                            onChange={(e) => handleExamChange("timeLimitSec", e.target.value)}
+                                            placeholder="VD: 600"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="field-row">
+                                    <div className="field">
+                                        <label>Số câu nguyên âm</label>
+                                        <input
+                                            type="text"
+                                            value={formExamConfig?.numberOfVowel || ""}
+                                            onChange={(e) => handleExamChange("numberOfVowel", e.target.value)}
+                                            placeholder="VD: 5"
+                                        />
+                                    </div>
+
+                                    <div className="field">
+                                        <label>Số câu phụ âm</label>
+                                        <input
+                                            type="text"
+                                            value={formExamConfig?.numberOfConsonant || ""}
+                                            onChange={(e) => handleExamChange("numberOfConsonant", e.target.value)}
+                                            placeholder="VD: 5"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="modal-actions">
+                                    <button type="button" className="btn btn-ghost" onClick={() => setOpenModalExamConfig(!openModalExamConfig)}>Hủy</button>
+                                    <button type="submit" className="btn btn-primary">
+                                        Lưu thay đổi
+                                    </button>
+                                </div>
+                            </form>
+                        )}
                     </div>
                 </div>
             )}

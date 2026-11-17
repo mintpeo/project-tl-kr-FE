@@ -4,8 +4,7 @@ import useFetch from "../../../components/use/useFetch.js";
 import {API_URL} from "../../../components/API_URL.jsx";
 import {usePost} from "../../../components/use/usePost.js";
 import Skeleton from "../../../components/loading/Skeleton.jsx";
-import {USER_DETAIL_MOCK} from "../../loggedPages/progress/userDetailMock.js";
-import UserDetailModal from "../../loggedPages/progress/UserDetailModal.jsx";
+import UserDetailModal from "./UserDetailModal.jsx";
 
 const AdminActivity = () => {
     const {data: loadUserActivity} = useFetch(`${API_URL}/admin/get-user-activity`);
@@ -317,15 +316,15 @@ const AdminActivity = () => {
                         onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
+                <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                    <option value="practices">Sắp xếp: Lượt luyện viết</option>
+                    <option value="avgScore">Sắp xếp: Mức độ tương đồng</option>
+                    <option value="streak">Sắp xếp: Streak</option>
+                </select>
                 <select value={statusFilter} onChange={(e) => setStatusFilter(JSON.parse(e.target.value))}>
                     <option value="null">Tất cả trạng thái</option>
                     <option value="true">Đã kích hoạt</option>
                     <option value="false">Chưa kích hoạt</option>
-                </select>
-                <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                    <option value="practices">Sắp xếp: Lượt luyện viết</option>
-                    <option value="avgScore">Sắp xếp: Độ chính xác</option>
-                    <option value="streak">Sắp xếp: Streak</option>
                 </select>
             </div>
 
@@ -336,7 +335,7 @@ const AdminActivity = () => {
                     <tr>
                         <th>STT</th>
                         <th>Người dùng</th>
-                        {/*<th>Lượt luyện viết</th>*/}
+                        <th>Lượt luyện viết</th>
                         <th>Mức độ tương đồng TB</th>
                         <th>Streak</th>
                         {/*<th>Hoạt động gần nhất</th>*/}
@@ -358,7 +357,7 @@ const AdminActivity = () => {
                                     </div>
                                 </div>
                             </td>
-                            {/*<td className="mono">{u?.practices}</td>*/}
+                            <td className="mono">{u?.practices}</td>
                             <td>
                                 <span className={`score-chip tone-${scoreTone(u?.avgScore)}`}>{u?.avgScore}%</span>
                             </td>

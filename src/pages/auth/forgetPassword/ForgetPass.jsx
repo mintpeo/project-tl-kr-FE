@@ -72,7 +72,7 @@ const ForgetPass = () => {
                         <div className="field-hint" id="emailHint">Dùng email bạn đã đăng ký với 글씨.</div>
                     </div>
 
-                    <BtnSpinner text={`Gửi mã xác thực`} isLoading={isLoading} />
+                    <BtnSpinner text={`Gửi liên kết đặt lại mật khẩu`} isLoading={isLoading} />
 
                     <div className="back-link" onClick={() => navigate("/auth")}>
                         <svg viewBox="0 0 24 24">
@@ -93,7 +93,7 @@ const ForgetPass = () => {
                         </svg>
                     </div>
 
-                    <h1>Nhập mã xác thực</h1>
+                    <h1>Vui lòng kiểm tra địa chỉ Email!</h1>
 
                     <div className="desc" style={{marginBottom: 0}}>
                         <p>Đã gửi đường link để đặt lại mật khẩu đến</p>

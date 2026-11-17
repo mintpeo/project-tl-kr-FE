@@ -12,7 +12,7 @@ import {
     RiLogoutCircleRLine
 } from "react-icons/ri";
 import { TbAlphabetKorean } from "react-icons/tb";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {LOCAL_STORAGE_KEYS} from "../../../components/API_URL.jsx";
 import {IoMenu} from "react-icons/io5";
 
@@ -21,9 +21,8 @@ const Sidebar = () => {
     const user = JSON.parse(user_info);
 
     const navigate = useNavigate();
-    const [selectedPage, setSelectedPage] = useState(0);
+    const location = useLocation();
     const [isMenuContent, setIsMenuContent] = useState(false);
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const dataPages = [
         {name: "Tài khoản", navi: "/", icon: "RiUser3Line"},
@@ -82,11 +81,8 @@ const Sidebar = () => {
 
                             return (
                                 <button key={index}
-                                        className={`nav-item ${selectedPage === index ? `active` : ``}`}
-                                        onClick={() => {
-                                            changeNavi(`/${item.navi}`);
-                                            setSelectedPage(index);
-                                        }}>
+                                        className={`nav-item ${location.pathname === `/admin${item.navi}` ? `active` : ``}`}
+                                        onClick={() => changeNavi(`/${item.navi}`)}>
                                     {IconComponent && <IconComponent size={24} />}
                                     {item.name}
                                 </button>

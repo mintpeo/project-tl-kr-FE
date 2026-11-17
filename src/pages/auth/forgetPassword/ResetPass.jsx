@@ -13,9 +13,17 @@ const ResetPass = () => {
     const step = ['', '', ''];
     const [currentStep, setCurrentStep] = useState(2);
     const [password, setPassword] = useState("");
+    const [passwordAgain, setPasswordAgain] = useState("");
+    const [changeTypePass, setChangeTypePass] = useState(false);
+    const [changeTypePassAgain, setChangeTypePassAgain] = useState(false);
 
     const handleResetPass = async (e) => {
         e.preventDefault();
+
+        if (password !== passwordAgain) {
+            alert("Hai mật khẩu phải trùng nhau!")
+            return;
+        }
 
         const resetPassReq = {
             email: email,
@@ -65,37 +73,37 @@ const ResetPass = () => {
                                 <path d="M8 11V7a4 4 0 118 0v4"/>
                             </svg>
 
-                            <input onChange={(e) => setPassword(e.target.value)} type="password" id="newPassInput" placeholder="••••••••" required/>
+                            <input onChange={(e) => setPassword(e.target.value)} type={!changeTypePass ? `password` : `text`} id="newPassInput" placeholder="••••••••" required/>
 
-                            <svg className="toggle-eye" viewBox="0 0 24 24">
+                            <svg onClick={() => setChangeTypePass(!changeTypePass)} className="toggle-eye" viewBox="0 0 24 24">
                                 <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
                                 <circle cx="12" cy="12" r="3"/>
                             </svg>
                         </div>
                     </div>
 
-                    <ul className="rule-list" id="ruleList">
-                        <li id="ruleLen">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M20 6L9 17l-5-5"/>
-                            </svg>
-                            Ít nhất 8 ký tự
-                        </li>
+                    {/*<ul className="rule-list" id="ruleList">*/}
+                    {/*    <li id="ruleLen">*/}
+                    {/*        <svg viewBox="0 0 24 24">*/}
+                    {/*            <path d="M20 6L9 17l-5-5"/>*/}
+                    {/*        </svg>*/}
+                    {/*        Ít nhất 8 ký tự*/}
+                    {/*    </li>*/}
 
-                        <li id="ruleNum">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M20 6L9 17l-5-5"/>
-                            </svg>
-                            Chứa ít nhất 1 chữ số
-                        </li>
+                    {/*    <li id="ruleNum">*/}
+                    {/*        <svg viewBox="0 0 24 24">*/}
+                    {/*            <path d="M20 6L9 17l-5-5"/>*/}
+                    {/*        </svg>*/}
+                    {/*        Chứa ít nhất 1 chữ số*/}
+                    {/*    </li>*/}
 
-                        <li id="ruleCase">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M20 6L9 17l-5-5"/>
-                            </svg>
-                            Chứa chữ hoa và chữ thường
-                        </li>
-                    </ul>
+                    {/*    <li id="ruleCase">*/}
+                    {/*        <svg viewBox="0 0 24 24">*/}
+                    {/*            <path d="M20 6L9 17l-5-5"/>*/}
+                    {/*        </svg>*/}
+                    {/*        Chứa chữ hoa và chữ thường*/}
+                    {/*    </li>*/}
+                    {/*</ul>*/}
 
                     <div className="field">
                         <label>Xác nhận mật khẩu mới</label>
@@ -106,9 +114,9 @@ const ResetPass = () => {
                                 <path d="M8 11V7a4 4 0 118 0v4"/>
                             </svg>
 
-                            <input type="password" id="confirmPassInput" placeholder="••••••••" required/>
+                            <input onChange={(e) => setPasswordAgain(e.target.value)} type={!changeTypePassAgain ? `password` : `text`} id="confirmPassInput" placeholder="••••••••" required/>
 
-                            <svg className="toggle-eye" viewBox="0 0 24 24">
+                            <svg onClick={() => setChangeTypePassAgain(!changeTypePassAgain)} className="toggle-eye" viewBox="0 0 24 24">
                                 <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
                                 <circle cx="12" cy="12" r="3"/>
                             </svg>

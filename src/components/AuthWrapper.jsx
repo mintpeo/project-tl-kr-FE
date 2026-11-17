@@ -11,15 +11,19 @@ const AuthWrapper = () => {
     useEffect(() => {
         const initUserData = async () => {
             try {
-                const user_info = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
-                if (user_info) {
-                    const user = JSON.parse(user_info);
+                const changeEmail = localStorage.getItem('changeEmail');
+                if (changeEmail !== null) {
+                    const data = await getInfoUser({ email: changeEmail });
+                    if (data) localStorage.setItem(LOCAL_STORAGE_KEYS.USER_INFO, JSON.stringify(data));
+                    return;
+                }
 
+                const userInfo = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_INFO);
+                if (userInfo) {
+                    const user = JSON.parse(userInfo);
                     if (user?.email) {
                         const data = await getInfoUser({ email: user.email });
-                        if (data) {
-                            localStorage.setItem(LOCAL_STORAGE_KEYS.USER_INFO, JSON.stringify(data));
-                        }
+                        if (data) localStorage.setItem(LOCAL_STORAGE_KEYS.USER_INFO, JSON.stringify(data));
                     }
                 }
             } catch (e) {
