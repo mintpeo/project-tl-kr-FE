@@ -6,19 +6,11 @@ import {usePutUploadFile} from "../../../components/use/usePut.js";
 import Skeleton from "../../../components/loading/Skeleton.jsx";
 import {useDelete} from "../../../components/use/useDelete.js";
 
-/* ============================================================
-   DỮ LIỆU MẪU — thay bằng dữ liệu thật từ API /api/admin/samples
-   Mỗi ký tự có 1 mảng "samples" (nhiều ảnh chữ mẫu tham chiếu
-   để AI so sánh khi chấm điểm nét viết của người học).
-   ============================================================ */
 const CATEGORY_OPTIONS = [
     { value: 'vowel', label: 'Nguyên âm' },
     { value: 'consonant', label: 'Phụ âm' },
 ];
 
-/* ============================================================
-   COMPONENT
-   ============================================================ */
 const AdminSample = () => {
     const {data: getAllTempChars} = useFetch(`${API_URL}/admin/all-temp`);
     const mapChars = (c) => ({

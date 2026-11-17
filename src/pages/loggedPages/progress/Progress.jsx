@@ -186,11 +186,13 @@ const Progress = () => {
         }
     }
 
+    const completedTotal = mastery.filter((m) => m?.score > 50).length;
+
     // Handle Stat
     const STATS = [
-        { icon: 'check', tone: 'a', num: `${progress?.averageScore != null ? progress?.averageScore : 0 }%`, label: 'Độ chính xác trung bình' },
+        { icon: 'check', tone: 'a', num: `${progress?.averageScore != null ? progress?.averageScore : 0 }%`, label: 'Độ tương đồng trung bình' },
         { icon: 'pen', tone: 'b', num: `${progress?.countPractices}`, label: 'Lượt luyện viết' },
-        { icon: 'book', tone: 'c', num: `${progress?.countIsPass}/${mastery.length}`, label: 'Ký tự đã thành thạo' },
+        { icon: 'book', tone: 'c', num: `${completedTotal}/${mastery.length}`, label: 'Ký tự đã thành thạo' },
         { icon: 'flame', tone: 'd', num: `${streak} ngày`, label: 'Chuỗi học liên tiếp' },
     ];
 
@@ -203,7 +205,7 @@ const Progress = () => {
         if (!c?.date) return ["--/--", 0, 0];
 
         const [year, month, day] = c.date.split("-");
-        return [`${day}/${month}`, c.averageScore, c.totalPractice];
+        return [`${day}/${month}`, Math.round(c.averageScore), c.totalPractice];
     };
     // Data Chart
     useEffect(() => {
@@ -253,8 +255,6 @@ const Progress = () => {
     }
     const heatmap = useMemo(() => seedHeatmap(45, totalPractice), [totalPractice]);
 
-    const completedTotal = mastery.filter((m) => m?.score > 0).length;
-
     return (
         <div id="progress-page">
             <div className="page-head">
@@ -291,7 +291,7 @@ const Progress = () => {
 
                             <div className="level-stats">
                                 <div className="stat-item">
-                                    <span className="stat-label">Điểm trung bình</span>
+                                    <span className="stat-label">Độ tương đồng trung bình</span>
                                     <span className="stat-val">{`${userPractice?.totalScore}%`}</span>
                                 </div>
 
@@ -388,8 +388,8 @@ const Progress = () => {
                 <div className="card panel">
                     <div className="panel-head">
                         <div>
-                            <h3>Độ chính xác theo thời gian</h3>
-                            <p>Điểm trung bình do AI đánh giá mỗi ngày</p>
+                            <h3>Độ tương đồng theo thời gian</h3>
+                            <p>Độ tương đồng trung bình do AI đánh giá mỗi ngày</p>
                         </div>
 
                         <div className="range-toggle">

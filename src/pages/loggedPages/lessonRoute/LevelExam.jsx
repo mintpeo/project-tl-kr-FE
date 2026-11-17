@@ -60,6 +60,8 @@ export default function LevelExam({onFinish}) {
             consonant: loadExamConfig?.numberOfConsonant },  // số câu bốc từ mỗi chương
     };
 
+    // Check completed level exam?
+    // if is pass => level exam else => null
     const [levelExam, setLevelExam] = useState(null);
     const {executePost: loadLevelExam} = usePost(`${API_URL}/level-exam/get`);
     const handleLoadLevelExam = async () => {

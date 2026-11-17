@@ -38,7 +38,7 @@ const AdminExercise = () => {
     }, [loadAdminQuestions]);
 
     // Delete Quiz
-    const {executeDelete: deleteQuiz} = useDelete(`${API_URL}/quiz/delete`);
+    const {executeDelete: deleteQuiz} = useDelete(`${API_URL}/admin/quiz`);
     const handleDeleteQuiz = async (quizId) => {
         if (!window.confirm("Bạn có chắc chắn muốn xoá bài luyện tập này?")) return;
         try {
@@ -60,12 +60,12 @@ const AdminExercise = () => {
     // Handle Add New Quiz
     const [openAddModalQuiz, setOpenAddModalQuiz] = useState(false);
     const [nameQuiz, setNameQuiz] = useState('');
-    const {executePost: addNewQuiz} = usePost(`${API_URL}/quiz/add-new-quiz`);
+    const {executePost: addNewQuiz} = usePost(`${API_URL}/admin/add-new-quiz`);
     const handleSubmitNameQuiz = async () => {
         try {
             const data = await addNewQuiz({nameQuiz: nameQuiz});
             if (data) {
-                alert("Thêm bộ câu hỏi mới thành công.");
+                alert("Thêm bài luyện tập mới thành công.");
                 window.location.reload();
             }
         } catch (e) {
@@ -183,11 +183,12 @@ const AdminExercise = () => {
 
         if (editingId === null) {
             const req = {
-                quizId: form.quizId,
-                question: form.question.trim(),
-                questionMediaUrl: '',
-                correct: form.correct,
-                options: form.options,
+                quizId: form?.quizId,
+                question: form?.question.trim(),
+                isQuestionAudio: form?.questionAudio,
+                questionMediaUrl: form?.questionMediaUrl,
+                correct: form?.correct,
+                options: form?.options,
                 isAudio: form?.audio
             }
             try {

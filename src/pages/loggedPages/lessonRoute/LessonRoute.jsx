@@ -85,7 +85,6 @@ const LessonRoute = () => {
                 const per = Math.round((count / res.length) * 100);
                 setCountLesson(count);
                 setTrack(per);
-
                 setCategories(res);
             } catch (e) {
                 console.log("Error Loading Categories User", e);

@@ -18,7 +18,7 @@ const sameJamo = (a, b) => !!a && !!b && canon(a) === canon(b);
  *  - headers    : (tuỳ chọn) ví dụ { Authorization: `Bearer ${token}` }
  *  - onResult   : (tuỳ chọn) ({ correct, recognized, confidence }) => void
  */
-export default function PronounceCheck({ expected, kind = 'consonant', endpoint, headers = {}, onResult }) {    const [status, setStatus] = useState('idle');   // idle | recording | processing | correct | wrong | error
+export default function PronounceCheck({ expected, kind = 'consonant', onResult }) {    const [status, setStatus] = useState('idle');   // idle | recording | processing | correct | wrong | error
     const [recognized, setRecognized] = useState('');
     const [message, setMessage] = useState('');
 
@@ -27,14 +27,12 @@ export default function PronounceCheck({ expected, kind = 'consonant', endpoint,
     const chunksRef = useRef([]);
     const timerRef = useRef(null);
 
-    // Đổi chữ cần đọc thì quay về trạng thái ban đầu
     useEffect(() => {
         setStatus('idle');
         setRecognized('');
         setMessage('');
     }, [expected]);
 
-    // Dọn dẹp khi rời trang
     useEffect(() => () => {
         clearTimeout(timerRef.current);
         streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -88,7 +86,9 @@ export default function PronounceCheck({ expected, kind = 'consonant', endpoint,
             form.append('audio', wav, 'speech.wav');
             form.append('kind', kind);                 // "vowel" | "consonant"
 
-            const res = await fetch(endpoint, { method: 'POST', headers, body: form });
+            const res = await fetch("http://localhost:8080/api/audio/check", {
+                method: 'POST',
+                body: form });
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
             console.log('speech result:', data);       // phải có char: "ㅏ"

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import './AdminLesson.css';
 import useFetch from "../../../components/use/useFetch.js";
 import {API_URL} from "../../../components/API_URL.jsx";
@@ -28,7 +28,6 @@ const AdminLesson = () => {
         quizId: lesson?.quiz?.id,
     });
     const lessonsRoadRes = lessonsRoad.map(mapLessonRoad);
-    const [lessonsRoadListRes, setLessonsRoadListRes] = useState([]);
 
     // Open Modal Exam config
     const [openModalExamConfig, setOpenModalExamConfig] = useState(false);
@@ -333,34 +332,47 @@ const AdminLesson = () => {
     }
 
     // Search, Filter
-    const {executePost: handleSearch} = usePost(`${API_URL}/admin/search-lessons-name`);
-    const [searchName, setSearchName] = useState("");
+    // const {executePost: handleSearch} = usePost(`${API_URL}/admin/search-lessons-name`);
+    // const [searchName, setSearchName] = useState("");
+    // const [statusFilter, setStatusFilter] = useState(-1);
+    // const [categoryFilter, setCategoryFilter] = useState(0);
+    // useEffect(() => {
+    //     const timer = setTimeout(async () => {
+    //         let baseList = lessonsRoadRes;
+    //
+    //         if (searchName.trim()) {
+    //             try {
+    //                 const data = await handleSearch({lessonRoadName: searchName});
+    //                 baseList = Array.isArray(data) ? data.map(mapLessonRoad) : [];
+    //                 setLessonsRoadListRes(baseList);
+    //             } catch (e) {
+    //                 console.log("Error Search Name Lesson", e);
+    //             }
+    //         }
+    //
+    //         let filtered = [...baseList];
+    //         if (categoryFilter !== 0) filtered = filtered.filter(l => l.cateId === categoryFilter);
+    //
+    //         if (statusFilter === 1) filtered = filtered.filter(l => l.active);
+    //         else if (statusFilter === 0) filtered = filtered.filter(l => !l.active);
+    //
+    //         setLessonsRoadListRes(filtered);
+    //     }, 300);
+    //     return () => clearTimeout(timer);
+    // }, [searchName, categoryFilter, statusFilter, lessonsRoad]);
+
+    // Handle Filter
+    const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState(-1);
     const [categoryFilter, setCategoryFilter] = useState(0);
-    useEffect(() => {
-        const timer = setTimeout(async () => {
-            let baseList = lessonsRoadRes;
-
-            if (searchName.trim()) {
-                try {
-                    const data = await handleSearch({lessonRoadName: searchName});
-                    baseList = Array.isArray(data) ? data.map(mapLessonRoad) : [];
-                    setLessonsRoadListRes(baseList);
-                } catch (e) {
-                    console.log("Error Search Name Lesson", e);
-                }
-            }
-
-            let filtered = [...baseList];
-            if (categoryFilter !== 0) filtered = filtered.filter(l => l.cateId === categoryFilter);
-
-            if (statusFilter === 1) filtered = filtered.filter(l => l.active);
-            else if (statusFilter === 0) filtered = filtered.filter(l => !l.active);
-
-            setLessonsRoadListRes(filtered);
-        }, 300);
-        return () => clearTimeout(timer);
-    }, [searchName, categoryFilter, statusFilter, lessonsRoad]);
+    const filtered = useMemo(() => {
+        return lessonsRoadRes.filter((l) => {
+            const matchesSearch = l.name?.toLowerCase().includes(search.toLowerCase());
+            const matchesCate = categoryFilter === 0 || l.cateId === categoryFilter;
+            const matchesStatus = statusFilter === -1 || (statusFilter === 1 ? l.active : !l.active);
+            return matchesSearch && matchesCate && matchesStatus;
+        });
+    }, [lessonsRoad, search, categoryFilter, statusFilter]);
 
     // Get All Cate Road
     const cateList = loadAllCate.map((cate) => ({
@@ -421,7 +433,7 @@ const AdminLesson = () => {
                         Xem danh mục
                     </button>
                     <button className="btn btn-primary" onClick={openAddModal}>
-                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
+                        {/*<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>*/}
                         Thêm bài học
                     </button>
                 </div>
@@ -451,8 +463,8 @@ const AdminLesson = () => {
                         disabled={checked}
                         type="text"
                         placeholder="Tìm theo tên bài học..."
-                        value={searchName || ""}
-                        onChange={(e) => setSearchName(e.target.value)}
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
 
@@ -537,7 +549,7 @@ const AdminLesson = () => {
                         </thead>
 
                         <tbody>
-                        {lessonsRoadListRes .map((l, index) => (
+                        {filtered.map((l, index) => (
                             <tr key={l.id}>
                                 <td>{index + 1}</td>
                                 <td>{truncateText(l.name, 20)}</td>
@@ -559,7 +571,7 @@ const AdminLesson = () => {
                             </tr>
                         ))}
 
-                        {lessonsRoadListRes.length === 0 && (
+                        {filtered.length === 0 && (
                             <tr><td colSpan={7} className="empty-row">Không tìm thấy bài học phù hợp.</td></tr>
                         )}
                         </tbody>

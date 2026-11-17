@@ -121,7 +121,7 @@ const Practice = () => {
                 dataUrl,
                 expected: selectLabel?.transcription
             });
-            // console.log(data);
+            console.log(data);
             if (!data || !data.prediction) {
                 alert("Không nhận được phản hồi từ AI, vui lòng thử lại!");
                 return;

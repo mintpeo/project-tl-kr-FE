@@ -58,7 +58,7 @@ const CharHangul = ({isVowels}) => {
                     // src={`${API_URL}/audio/speak?text=${encodeURIComponent(selectedSingle?.name)}`}
                 />
 
-                <PronounceCheck expected={selectedSingle?.name} kind={selectedSingle?.type?.toLowerCase()} endpoint="http://localhost:8000/speech/check" />
+                <PronounceCheck expected={selectedSingle?.name} kind={selectedSingle?.type?.toLowerCase()} />
             </div>
 
             <p><strong>{isVowels ? vowelsPair.length : consonantsPair.length}</strong> {isVowels ? 'Nguyên âm đôi' : 'Phụ âm kép'}:</p>
@@ -87,7 +87,7 @@ const CharHangul = ({isVowels}) => {
                     // src={`${API_URL}/audio/speak?text=${encodeURIComponent(selectedPair?.name)}`}
                 />
 
-                <PronounceCheck expected={selectedPair?.name} kind={selectedPair?.type?.toLowerCase()} endpoint="http://localhost:8000/speech/check" />
+                <PronounceCheck expected={selectedPair?.name} kind={selectedPair?.type?.toLowerCase()} />
             </div>
         </>
     );

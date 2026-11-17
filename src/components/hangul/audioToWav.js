@@ -1,5 +1,3 @@
-// Đổi bản ghi của trình duyệt (webm/opus, mp4/aac...) thành WAV 16 kHz, mono, 16-bit.
-// Làm ở FE để BE không cần ffmpeg và chạy được cả Safari/iPhone.
 export async function blobToWav16k(blob) {
     const arrayBuf = await blob.arrayBuffer();
 
